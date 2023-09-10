@@ -1,4 +1,3 @@
-# Road Runner Quickstart
+# FTC-CenterStage
 
-Check out the [docs](https://rr.brott.dev/docs/v1-0/tuning/).
-
+SaMoTech Robotic's team code for the 2023-2024 FTC CenterStage season.
