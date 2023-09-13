@@ -52,17 +52,17 @@ public final class MecanumDrive {
         public double lateralInPerTick = 1;
         public double trackWidthTicks = 0;
 
-        // feedforward parameters in tick units
+        // feedforward parameters (in tick units)
         public double kS = 0;
         public double kV = 0;
         public double kA = 0;
 
-        // path profile parameters
+        // path profile parameters (in inches)
         public double maxWheelVel = 50;
         public double minProfileAccel = -30;
         public double maxProfileAccel = 50;
 
-        // turn profile parameters
+        // turn profile parameters (in radians)
         public double maxAngVel = Math.PI; // shared with path
         public double maxAngAccel = Math.PI;
 
@@ -136,19 +136,19 @@ public final class MecanumDrive {
 
             Twist2dDual<Time> twist = kinematics.forward(new MecanumKinematics.WheelIncrements<>(
                     new DualNum<Time>(new double[]{
-                            (leftFrontPosVel.position - lastLeftFrontPos) + kinematics.trackWidth * headingDelta,
+                            (leftFrontPosVel.position - lastLeftFrontPos),
                             leftFrontPosVel.velocity,
                     }).times(PARAMS.inPerTick),
                     new DualNum<Time>(new double[]{
-                            (leftRearPosVel.position - lastLeftRearPos) + kinematics.trackWidth * headingDelta,
+                            (leftRearPosVel.position - lastLeftRearPos),
                             leftRearPosVel.velocity,
                     }).times(PARAMS.inPerTick),
                     new DualNum<Time>(new double[]{
-                            (rightRearPosVel.position - lastRightRearPos) - kinematics.trackWidth * headingDelta,
+                            (rightRearPosVel.position - lastRightRearPos),
                             rightRearPosVel.velocity,
                     }).times(PARAMS.inPerTick),
                     new DualNum<Time>(new double[]{
-                            (rightFrontPosVel.position - lastRightFrontPos) - kinematics.trackWidth * headingDelta,
+                            (rightFrontPosVel.position - lastRightFrontPos),
                             rightFrontPosVel.velocity,
                     }).times(PARAMS.inPerTick)
             ));
