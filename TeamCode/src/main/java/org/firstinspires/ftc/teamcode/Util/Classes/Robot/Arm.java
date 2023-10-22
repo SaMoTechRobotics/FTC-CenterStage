@@ -3,9 +3,9 @@ package org.firstinspires.ftc.teamcode.Util.Classes.Robot;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
-import org.firstinspires.ftc.teamcode.Util.Constants.ArmRotation;
-import org.firstinspires.ftc.teamcode.Util.Constants.ArmSpeed;
-import org.firstinspires.ftc.teamcode.Util.Constants.WristRotation;
+import org.firstinspires.ftc.teamcode.Util.Constants.Robot.ArmRotation;
+import org.firstinspires.ftc.teamcode.Util.Constants.Robot.ArmSpeed;
+import org.firstinspires.ftc.teamcode.Util.Constants.Robot.WristRotation;
 
 public class Arm {
     private final DcMotor armMotor;

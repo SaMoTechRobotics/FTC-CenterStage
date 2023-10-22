@@ -2,7 +2,7 @@ package org.firstinspires.ftc.teamcode.Util.Classes.Robot;
 
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
-import org.firstinspires.ftc.teamcode.Util.Constants.ClawPosition;
+import org.firstinspires.ftc.teamcode.Util.Constants.Robot.ClawPosition;
 
 public class Claw {
     private final Servo clawServo;

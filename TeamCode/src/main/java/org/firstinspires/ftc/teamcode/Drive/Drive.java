@@ -5,10 +5,9 @@ import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.DcMotor;
 import org.firstinspires.ftc.teamcode.Util.Classes.Robot.Robot;
-import org.firstinspires.ftc.teamcode.Util.Constants.ArmRotation;
-import org.firstinspires.ftc.teamcode.Util.Constants.WristRotation;
+import org.firstinspires.ftc.teamcode.Util.Constants.Robot.ArmRotation;
+import org.firstinspires.ftc.teamcode.Util.Constants.Robot.WristRotation;
 
 
 @Config
