@@ -44,6 +44,10 @@ public class Drive extends LinearOpMode {
                 robot.claw.toggle();
             }
 
+            if (Gamepad1.wasJustPressed(GamepadKeys.Button.Y)) {
+                robot.arm.setHangingLock(true);
+            }
+
             if (Gamepad2.wasJustPressed(GamepadKeys.Button.A)) {
                 robot.arm.setWristRotation(WristRotation.Down);
             } else if (Gamepad2.wasJustPressed(GamepadKeys.Button.Y)) {

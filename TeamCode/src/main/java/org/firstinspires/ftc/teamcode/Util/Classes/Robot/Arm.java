@@ -24,8 +24,26 @@ public class Arm {
         armMotor.setPower(ArmSpeed.MaxSpeed);
     }
 
+    public void setGlobalWristRotation(double degrees) {
+        int ticks = armMotor.getCurrentPosition();
+        double rotation = ticks / (ArmRotation.TicksAt90Degrees / 90.0);
+        setWristRotation(degrees - rotation);
+    }
+
     public void setWristRotation(double degrees) {
         wristServo.setPosition(degreesToWristPosition(degrees));
+    }
+
+    public void setHangingLock(boolean lock) {
+        if (lock) {
+            armMotor.setTargetPosition(degreesToArmTicks(ArmRotation.Hang));
+            armMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            wristServo.setPosition(degreesToWristPosition(WristRotation.Hang));
+            armMotor.setPower(ArmSpeed.MaxSpeed);
+        } else {
+            armMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            armMotor.setPower(0);
+        }
     }
 
     private int degreesToArmTicks(double degrees) {
