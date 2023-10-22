@@ -13,8 +13,8 @@ public class BaseAuto extends LinearOpMode {
     public final static AutoColor COLOR = AutoColor.RED;
 
     @Override
-    public void runOpMode() throws InterruptedException {
-        RobotStorage.reset();
+    public void runOpMode() {
+        RobotStorage.reset(SIDE, COLOR);
         Robot robot = new Robot(hardwareMap);
 
         while (!isStarted()) {
