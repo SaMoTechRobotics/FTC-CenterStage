@@ -14,8 +14,12 @@ public class Claw {
         clawServo.setPosition(ClawPosition.Closed);
     }
 
-    public void setClawOpen(boolean open) {
+    public void setOpen(boolean open) {
         clawOpen = open;
         clawServo.setPosition(clawOpen ? ClawPosition.Open : ClawPosition.Closed);
+    }
+
+    public void toggle() {
+        setOpen(!clawOpen);
     }
 }

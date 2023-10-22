@@ -7,6 +7,8 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import org.firstinspires.ftc.teamcode.Util.Classes.Robot.Robot;
+import org.firstinspires.ftc.teamcode.Util.Constants.ArmRotation;
+import org.firstinspires.ftc.teamcode.Util.Constants.WristRotation;
 
 
 @Config
@@ -30,6 +32,26 @@ public class Drive extends LinearOpMode {
 
             robot.chassis.updateWithControls(Gamepad1);
 
+            if (Gamepad2.getButton(GamepadKeys.Button.DPAD_DOWN)) {
+                robot.arm.setRotation(ArmRotation.Down);
+            } else if (Gamepad2.getButton(GamepadKeys.Button.DPAD_UP)) {
+                robot.arm.setRotation(ArmRotation.Deliver);
+            } else if (Gamepad2.getButton(GamepadKeys.Button.DPAD_RIGHT)) {
+                robot.arm.setRotation(ArmRotation.Hang);
+            }
+
+            if(Gamepad2.wasJustPressed(GamepadKeys.Button.X)) {
+                robot.claw.toggle();
+            }
+
+            if (Gamepad2.wasJustPressed(GamepadKeys.Button.A)) {
+                robot.arm.setWristRotation(WristRotation.Down);
+            } else if (Gamepad2.wasJustPressed(GamepadKeys.Button.Y)) {
+                robot.arm.setWristRotation(WristRotation.Up);
+            }
+
+            Gamepad1.readButtons();
+            Gamepad2.readButtons();
         }
     }
 }

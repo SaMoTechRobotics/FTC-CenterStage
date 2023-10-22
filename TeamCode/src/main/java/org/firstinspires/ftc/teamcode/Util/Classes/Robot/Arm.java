@@ -4,6 +4,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 import org.firstinspires.ftc.teamcode.Util.Constants.ArmRotation;
+import org.firstinspires.ftc.teamcode.Util.Constants.ArmSpeed;
 import org.firstinspires.ftc.teamcode.Util.Constants.WristRotation;
 
 public class Arm {
@@ -12,11 +13,15 @@ public class Arm {
 
     public Arm(HardwareMap hardwareMap) {
         armMotor = hardwareMap.get(DcMotor.class, "arm");
+        armMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        armMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         wristServo = hardwareMap.get(Servo.class, "wrist");
     }
 
-    public void setArmRotation(double degrees) {
+    public void setRotation(double degrees) {
         armMotor.setTargetPosition(degreesToArmTicks(degrees));
+        armMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        armMotor.setPower(ArmSpeed.MaxSpeed);
     }
 
     public void setWristRotation(double degrees) {
