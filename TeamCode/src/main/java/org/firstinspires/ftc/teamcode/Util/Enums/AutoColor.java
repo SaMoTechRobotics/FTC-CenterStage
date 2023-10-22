@@ -1,12 +1,12 @@
 package org.firstinspires.ftc.teamcode.Util.Enums;
 
-public enum AutoSide {
-    LEFT(-1),
-    RIGHT(1);
+public enum AutoColor {
+    RED(-1),
+    BLUE(1);
 
     public final int value;
 
-    AutoSide(int value) {
+    AutoColor(int value) {
         this.value = value;
     }
 }
