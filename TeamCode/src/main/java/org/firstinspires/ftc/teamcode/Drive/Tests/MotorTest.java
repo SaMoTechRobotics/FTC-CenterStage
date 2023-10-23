@@ -8,6 +8,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 import org.firstinspires.ftc.teamcode.Util.Classes.Robot.Chassis;
+import org.firstinspires.ftc.teamcode.Util.Constants.Robot.ArmSpeed;
 
 
 @Config
@@ -22,14 +23,15 @@ public class MotorTest extends LinearOpMode {
     public static int ArmDeliverPosition = -425;
     public static int ArmHangPosition = -280;
 
-    public static Double ArmSpeed = 0.15;
+    public static Double armSpeed = 0.15;
 
     @Override
     public void runOpMode() {
         Chassis chassis = new Chassis(hardwareMap);
 
-        DcMotor motor = hardwareMap.get(DcMotor.class, "motor");
+        DcMotor motor = hardwareMap.get(DcMotor.class, "arm");
         motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         Servo claw = hardwareMap.get(Servo.class, "claw");
@@ -50,11 +52,11 @@ public class MotorTest extends LinearOpMode {
 
             chassis.updateWithControls(Gamepad1);
 
-//            if (Gamepad2.getButton(GamepadKeys.Button.RIGHT_BUMPER)) {
-//                motor.setPower(Gamepad2.getRightY() * 0.4);
-//            } else {
-//                motor.setPower(Gamepad2.getRightY() * 0.2);
-//            }
+            if (Gamepad2.getButton(GamepadKeys.Button.RIGHT_BUMPER)) {
+                motor.setPower(Gamepad2.getLeftY() * ArmSpeed.MaxSpeed);
+            } else {
+                motor.setPower(Gamepad2.getLeftY() * armSpeed);
+            }
 
             if (Gamepad2.wasJustPressed(GamepadKeys.Button.X)) {
                 clawOpen = !clawOpen;
@@ -65,20 +67,20 @@ public class MotorTest extends LinearOpMode {
                 wrist.setPosition(wrist.getPosition() == WristDown ? WristUp : WristDown);
             }
 
-
-            if(Gamepad2.wasJustPressed(GamepadKeys.Button.DPAD_UP)) {
-                motor.setTargetPosition(ArmDeliverPosition);
-                motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                motor.setPower(ArmSpeed);
-            } else if (Gamepad2.wasJustPressed(GamepadKeys.Button.DPAD_LEFT)) {
-                motor.setTargetPosition(ArmHangPosition);
-                motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                motor.setPower(ArmSpeed);
-            } else if(Gamepad2.wasJustPressed(GamepadKeys.Button.DPAD_DOWN)) {
-                motor.setTargetPosition(0);
-                motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                motor.setPower(ArmSpeed);
-            }
+//
+//            if(Gamepad2.wasJustPressed(GamepadKeys.Button.DPAD_UP)) {
+//                motor.setTargetPosition(ArmDeliverPosition);
+//                motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+//                motor.setPower(armSpeed);
+//            } else if (Gamepad2.wasJustPressed(GamepadKeys.Button.DPAD_LEFT)) {
+//                motor.setTargetPosition(ArmHangPosition);
+//                motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+//                motor.setPower(armSpeed);
+//            } else if(Gamepad2.wasJustPressed(GamepadKeys.Button.DPAD_DOWN)) {
+//                motor.setTargetPosition(0);
+//                motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+//                motor.setPower(armSpeed);
+//            }
 
 
             telemetry.addData("Motor Ticks", motor.getCurrentPosition());

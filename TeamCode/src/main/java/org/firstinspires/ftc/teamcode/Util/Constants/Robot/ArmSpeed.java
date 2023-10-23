@@ -4,5 +4,5 @@ import com.acmerobotics.dashboard.config.Config;
 
 @Config
 public class ArmSpeed {
-    public static Double MaxSpeed = 0.5;
+    public static Double MaxSpeed = 1.0;
 }

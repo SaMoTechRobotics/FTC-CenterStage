@@ -31,14 +31,14 @@ public class Arm {
     }
 
     public void setWristRotation(double degrees) {
-        wristServo.setPosition(degreesToWristPosition(degrees));
+        wristServo.setPosition(degrees);
     }
 
     public void setHangingLock(boolean lock) {
         if (lock) {
-            armMotor.setTargetPosition(degreesToArmTicks(ArmRotation.Hang));
+            armMotor.setTargetPosition(degreesToArmTicks(ArmRotation.HangingLock));
             armMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            wristServo.setPosition(degreesToWristPosition(WristRotation.Hang));
+            wristServo.setPosition(WristRotation.Hang);
             armMotor.setPower(ArmSpeed.MaxSpeed);
         } else {
             armMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
