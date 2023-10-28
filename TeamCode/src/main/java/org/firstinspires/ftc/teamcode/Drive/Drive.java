@@ -31,16 +31,32 @@ public class Drive extends LinearOpMode {
 
             robot.chassis.updateWithControls(Gamepad1);
 
-            if (Gamepad2.getButton(GamepadKeys.Button.DPAD_DOWN)) {
-                robot.arm.setRotation(ArmRotation.Down);
-            } else if (Gamepad2.getButton(GamepadKeys.Button.DPAD_UP)) {
-                robot.arm.setRotation(ArmRotation.Deliver);
-            } else if (Gamepad2.getButton(GamepadKeys.Button.DPAD_RIGHT)) {
-                robot.arm.setRotation(ArmRotation.Hang);
+            if (Math.abs(Gamepad2.getLeftX()) > 0.01) {
+                robot.arm.manualRotation(Gamepad2.getLeftX());
+                robot.arm.setGlobalWristRotation(true);
+            } else {
+            if (Gamepad2.getButton(GamepadKeys.Button.DPAD_UP)) {
+                robot.arm.setRotation(ArmRotation.HighDeliver);
+                robot.arm.setGlobalWristRotation(true);
+            } else if (Gamepad2.getButton(GamepadKeys.Button.DPAD_LEFT)) {
+                robot.arm.setRotation(ArmRotation.MidDeliver);
+                robot.arm.setGlobalWristRotation(true);
+            } else if (Gamepad2.getButton(GamepadKeys.Button.DPAD_DOWN)) {
+                robot.arm.setRotation(ArmRotation.LowDeliver);
+                robot.arm.setGlobalWristRotation(true);
+            }
             }
 
-            if(Gamepad2.wasJustPressed(GamepadKeys.Button.X)) {
-                robot.claw.toggle();
+            if (Gamepad2.getButton(GamepadKeys.Button.A)) {
+                robot.resetForIntake();
+            }
+
+            robot.arm.update();
+
+            if(Gamepad2.wasJustPressed(GamepadKeys.Button.RIGHT_BUMPER)) {
+                robot.claw.setOpen(false);
+            } else if(Gamepad2.wasJustPressed(GamepadKeys.Button.LEFT_BUMPER)) {
+                robot.claw.setOpen(true);
             }
 
             if (Gamepad1.wasJustPressed(GamepadKeys.Button.Y)) {
@@ -49,7 +65,7 @@ public class Drive extends LinearOpMode {
                 robot.arm.setHangingLock(false);
             }
 
-            if (Gamepad2.wasJustPressed(GamepadKeys.Button.A)) {
+            if (Gamepad2.wasJustPressed(GamepadKeys.Button.B)) {
                 robot.arm.setWristRotation(WristRotation.Down);
             } else if (Gamepad2.wasJustPressed(GamepadKeys.Button.Y)) {
                 robot.arm.setWristRotation(WristRotation.Up);
