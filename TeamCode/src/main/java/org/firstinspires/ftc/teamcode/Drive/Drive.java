@@ -34,8 +34,7 @@ public class Drive extends LinearOpMode {
             if (Math.abs(Gamepad2.getLeftX()) > 0.01) {
                 robot.arm.manualRotation(Gamepad2.getLeftX());
                 robot.arm.setGlobalWristRotation(true);
-            } else {
-            if (Gamepad2.getButton(GamepadKeys.Button.DPAD_UP)) {
+            } else if (Gamepad2.getButton(GamepadKeys.Button.DPAD_UP)) {
                 robot.arm.setRotation(ArmRotation.HighDeliver);
                 robot.arm.setGlobalWristRotation(true);
             } else if (Gamepad2.getButton(GamepadKeys.Button.DPAD_LEFT)) {
@@ -47,7 +46,8 @@ public class Drive extends LinearOpMode {
             } else if (Gamepad1.getButton(GamepadKeys.Button.B)) {
                 robot.arm.setWristRotation(ArmRotation.Hang);
                 robot.arm.setWristRotation(WristRotation.Down);
-            }
+            } else {
+                robot.arm.holdRotation();
             }
 
             if (Gamepad2.getButton(GamepadKeys.Button.A)) {

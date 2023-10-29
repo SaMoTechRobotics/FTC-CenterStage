@@ -23,7 +23,12 @@ public class Arm {
 
     public void update() {
         if (globalWristRotation) updateGlobalWristRotation();
+    }
 
+    public void holdRotation() {
+        armMotor.setTargetPosition(degreesToArmTicks(armMotor.getCurrentPosition()));
+        armMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        armMotor.setPower(ArmSpeed.HoldSpeed);
     }
 
     public void setRotation(double degrees) {
