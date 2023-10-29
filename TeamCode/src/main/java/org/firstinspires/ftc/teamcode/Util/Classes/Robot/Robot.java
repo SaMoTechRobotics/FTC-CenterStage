@@ -21,4 +21,10 @@ public class Robot {
         arm.setWristRotation(WristRotation.Down);
         claw.setOpen(true);
     }
+
+    public void prepareDroneLaunch() {
+        arm.setRotation(ArmRotation.DroneLaunch);
+        arm.setWristRotation(WristRotation.Down);
+        claw.setOpen(true);
+    }
 }

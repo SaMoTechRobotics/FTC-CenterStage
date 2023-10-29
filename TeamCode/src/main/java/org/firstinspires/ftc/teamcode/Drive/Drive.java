@@ -51,7 +51,7 @@ public class Drive extends LinearOpMode {
                 robot.resetForIntake();
             }
 
-            robot.arm.update();
+            robot.arm.update(telemetry);
 
             if(Gamepad2.wasJustPressed(GamepadKeys.Button.RIGHT_BUMPER)) {
                 robot.claw.setOpen(false);
@@ -71,8 +71,16 @@ public class Drive extends LinearOpMode {
                 robot.arm.setWristRotation(WristRotation.Up);
             }
 
+            if(Gamepad1.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER) > 0.1 && Gamepad1.getButton(GamepadKeys.Button.LEFT_BUMPER)) {
+                robot.prepareDroneLaunch();
+            }
+            if(Gamepad1.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER) > 0.1 && Gamepad1.getButton(GamepadKeys.Button.RIGHT_BUMPER)) {
+                robot.resetForIntake();
+            }
+
             Gamepad1.readButtons();
             Gamepad2.readButtons();
+            telemetry.update();
         }
     }
 }
