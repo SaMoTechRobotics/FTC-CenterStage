@@ -21,8 +21,9 @@ public class Arm {
         wristServo = hardwareMap.get(Servo.class, "wrist");
     }
 
-    public void update() {
-        updateGlobalWristRotation();
+    public void update(Telemetry telemetry) {
+        if (globalWristRotation) updateGlobalWristRotation(telemetry);
+
     }
 
     public void setRotation(double degrees) {
@@ -40,16 +41,21 @@ public class Arm {
         globalWristRotation = value;
     }
 
-    public void updateGlobalWristRotation() {
+    public void updateGlobalWristRotation(Telemetry telemetry) {
+        telemetry.addLine("Updating... " + Math.random());
         int ticks = armMotor.getCurrentPosition();
-        double rotation = ticks / (ArmRotation.TicksAt90Degrees / 90.0);
-        double wristRotation = 180 - rotation;
+//        telemetry.addData("Arm Position", ticks);
+        double rotation = ticks * (90.0 / ArmRotation.TicksAt90Degrees);
+//        telemetry.addData("Arm Rotation", rotation);
+        double wristRotation = rotation - WristRotation.ArmComplementAngle;
+//        telemetry.addData("Wrist Rotation", wristRotation);
         double wristPosition = degreesToWristPosition(wristRotation);
-        setWristRotation(wristPosition);
+//        telemetry.addData("Wrist Position", wristPosition);
+        wristServo.setPosition(wristPosition);
     }
 
-    public void setWristRotation(double degrees) {
-        wristServo.setPosition(degrees);
+    public void setWristRotation(double position) {
+        wristServo.setPosition(position);
         globalWristRotation = false;
     }
 
