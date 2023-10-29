@@ -25,16 +25,38 @@ public class Arm {
         if (globalWristRotation) updateGlobalWristRotation();
     }
 
+    public double getRotation() {
+        return armMotor.getCurrentPosition() * (90.0 / ArmRotation.TicksAt90Degrees);
+    }
+
+    public void setWristPickup(Boolean value) {
+        if (value) {
+            setRotation(ArmRotation.Down, ArmSpeed.Slow);
+            setWristRotation(WristRotation.Down);
+        } else {
+            setRotation(ArmRotation.HoldDown, ArmSpeed.Slow);
+            setWristRotation(WristRotation.HoldDown);
+        }
+    }
+
     public void holdRotation() {
-        armMotor.setTargetPosition(degreesToArmTicks(armMotor.getCurrentPosition()));
-        armMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        armMotor.setPower(ArmSpeed.HoldSpeed);
+        if (armMotor.getMode() == DcMotor.RunMode.RUN_USING_ENCODER) {
+            armMotor.setTargetPosition(armMotor.getCurrentPosition());
+            armMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            armMotor.setPower(ArmSpeed.HoldSpeed);
+        }
     }
 
     public void setRotation(double degrees) {
         armMotor.setTargetPosition(degreesToArmTicks(degrees));
         armMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         armMotor.setPower(ArmSpeed.MaxSpeed);
+    }
+
+    public void setRotation(double degrees, double speed) {
+        armMotor.setTargetPosition(degreesToArmTicks(degrees));
+        armMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        armMotor.setPower(speed);
     }
 
     public void manualRotation(double power) {

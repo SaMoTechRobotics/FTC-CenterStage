@@ -7,7 +7,12 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import org.firstinspires.ftc.teamcode.Util.Classes.Robot.Robot;
 import org.firstinspires.ftc.teamcode.Util.Constants.Robot.ArmRotation;
+import org.firstinspires.ftc.teamcode.Util.Constants.Robot.ArmSpeed;
+import org.firstinspires.ftc.teamcode.Util.Constants.Robot.ClawPosition;
 import org.firstinspires.ftc.teamcode.Util.Constants.Robot.WristRotation;
+
+import java.util.Timer;
+import java.util.TimerTask;
 
 
 @Config
@@ -20,6 +25,8 @@ public class Drive extends LinearOpMode {
         GamepadEx Gamepad1 = new GamepadEx(gamepad1);
         GamepadEx Gamepad2 = new GamepadEx(gamepad2);
 
+        Timer timer = new Timer();
+
         waitForStart();
 
         while (opModeIsActive()) {
@@ -31,20 +38,30 @@ public class Drive extends LinearOpMode {
 
             robot.chassis.updateWithControls(Gamepad1);
 
-            if (Math.abs(Gamepad2.getLeftX()) > 0.01) {
+            if(Math.abs(Gamepad2.getRightX()) > 0.01) {
+                robot.arm.manualRotation(Gamepad2.getRightX() * ArmSpeed.SlowManual);
+                if (!robot.pickUp) {
+                    robot.arm.setGlobalWristRotation(true);
+                }
+            } else if (Math.abs(Gamepad2.getLeftX()) > 0.01) {
                 robot.arm.manualRotation(Gamepad2.getLeftX());
-                robot.arm.setGlobalWristRotation(true);
-            } else if (Gamepad2.getButton(GamepadKeys.Button.DPAD_UP)) {
+                if (!robot.pickUp) {
+                    robot.arm.setGlobalWristRotation(true);
+                }
+            } else if (Gamepad2.wasJustPressed(GamepadKeys.Button.DPAD_UP)) {
                 robot.arm.setRotation(ArmRotation.HighDeliver);
                 robot.arm.setGlobalWristRotation(true);
-            } else if (Gamepad2.getButton(GamepadKeys.Button.DPAD_LEFT)) {
+            } else if (Gamepad2.wasJustPressed(GamepadKeys.Button.DPAD_LEFT)) {
                 robot.arm.setRotation(ArmRotation.MidDeliver);
                 robot.arm.setGlobalWristRotation(true);
-            } else if (Gamepad2.getButton(GamepadKeys.Button.DPAD_DOWN)) {
+            } else if (Gamepad2.wasJustPressed(GamepadKeys.Button.DPAD_DOWN)) {
                 robot.arm.setRotation(ArmRotation.LowDeliver);
                 robot.arm.setGlobalWristRotation(true);
-            } else if (Gamepad1.getButton(GamepadKeys.Button.B)) {
-                robot.arm.setWristRotation(ArmRotation.Hang);
+            } else if (Gamepad2.wasJustPressed(GamepadKeys.Button.DPAD_RIGHT)) {
+                robot.arm.setRotation(ArmRotation.Down);
+                robot.arm.setWristPickup(true);
+            } else if (Gamepad1.wasJustPressed(GamepadKeys.Button.B)) {
+                robot.arm.setRotation(ArmRotation.Hang);
                 robot.arm.setWristRotation(WristRotation.Down);
             } else {
                 robot.arm.holdRotation();
@@ -54,12 +71,28 @@ public class Drive extends LinearOpMode {
                 robot.resetForIntake();
             }
 
-            robot.arm.update();
-
             if(Gamepad2.wasJustPressed(GamepadKeys.Button.RIGHT_BUMPER)) {
                 robot.claw.setOpen(false);
+                if (robot.pickUp) {
+                    timer.purge();
+                    timer.schedule(new TimerTask() {
+                        @Override
+                        public void run() {
+                            robot.arm.setWristPickup(false);
+                        }
+                    }, ClawPosition.WaitTime);
+                }
             } else if(Gamepad2.wasJustPressed(GamepadKeys.Button.LEFT_BUMPER)) {
                 robot.claw.setOpen(true);
+                if (robot.pickUp) {
+                    timer.purge();
+                    timer.schedule(new TimerTask() {
+                        @Override
+                        public void run() {
+                            robot.arm.setWristPickup(true);
+                        }
+                    }, ClawPosition.WaitTime);
+                }
             }
 
 
@@ -75,12 +108,15 @@ public class Drive extends LinearOpMode {
                 robot.arm.setWristRotation(WristRotation.Up);
             }
 
-            if(Gamepad1.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER) > 0.1 && Gamepad1.getButton(GamepadKeys.Button.LEFT_BUMPER)) {
+            if(Gamepad1.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER) > 0.1 && Gamepad1.wasJustPressed(GamepadKeys.Button.LEFT_BUMPER)) {
                 robot.prepareDroneLaunch();
             }
-            if(Gamepad1.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER) > 0.1 && Gamepad1.getButton(GamepadKeys.Button.RIGHT_BUMPER)) {
+            if(Gamepad1.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER) > 0.1 && Gamepad1.wasJustPressed(GamepadKeys.Button.RIGHT_BUMPER)) {
                 robot.resetForIntake();
             }
+
+            robot.update();
+            telemetry.addData("Robot arm rotation", robot.arm.getRotation());
 
             Gamepad1.readButtons();
             Gamepad2.readButtons();
