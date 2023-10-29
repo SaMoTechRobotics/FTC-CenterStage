@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.Util.Classes.Robot;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.Util.Constants.Robot.ArmRotation;
 import org.firstinspires.ftc.teamcode.Util.Constants.Robot.ArmSpeed;
 import org.firstinspires.ftc.teamcode.Util.Constants.Robot.WristRotation;
@@ -64,15 +65,16 @@ public class Arm {
         }
     }
 
-    public void testWristDegrees(double degrees) {
+    public void testWristDegrees(double degrees, Telemetry telemetry) {
         wristServo.setPosition(degreesToWristPosition(degrees));
+        telemetry.addData("Wrist Position At " + degrees + " deg", degreesToWristPosition(degrees));
     }
 
     private int degreesToArmTicks(double degrees) {
         return (int) (degrees * (ArmRotation.TicksAt90Degrees / 90.0));
     }
 
-    private int degreesToWristPosition(double degrees) {
-        return (int) (degrees * (WristRotation.PositionAt180Degrees - WristRotation.PositionAt0Degrees) / 180.0 + WristRotation.PositionAt0Degrees);
+    private double degreesToWristPosition(double degrees) {
+        return (degrees * (Math.abs(WristRotation.PositionAt180Degrees - WristRotation.PositionAt0Degrees)) / 180.0 + WristRotation.PositionAt0Degrees);
     }
 }

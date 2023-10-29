@@ -10,6 +10,8 @@ public class ArmRotation {
     public static int MidDeliver = 130;
     public static int LowDeliver = 150;
 
+    public static int DroneLaunch = 150;
+
     public static int Down = 0;
     public static int Hang = 90;
     public static int HangingLock = 10;

@@ -28,10 +28,10 @@ public class ArmTest extends LinearOpMode {
                 robot.claw.setOpen(true);
             }
 
-            if (Gamepad2.wasJustPressed(GamepadKeys.Button.Y)) {
-                robot.arm.testWristDegrees(180);
+            if (Gamepad1.wasJustPressed(GamepadKeys.Button.Y)) {
+                robot.arm.testWristDegrees(180, telemetry);
             } else if (Gamepad1.wasJustPressed(GamepadKeys.Button.A)) {
-                robot.arm.testWristDegrees(0);
+                robot.arm.testWristDegrees(0, telemetry);
             }
 
             if (Gamepad2.wasJustPressed(GamepadKeys.Button.B)) {
@@ -42,6 +42,7 @@ public class ArmTest extends LinearOpMode {
 
             Gamepad1.readButtons();
             Gamepad2.readButtons();
+            telemetry.update();
         }
     }
 }
