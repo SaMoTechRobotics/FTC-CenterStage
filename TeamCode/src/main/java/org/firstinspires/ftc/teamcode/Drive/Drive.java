@@ -106,6 +106,8 @@ public class Drive extends LinearOpMode {
                 robot.arm.setWristRotation(WristRotation.Down);
             } else if (Gamepad2.wasJustPressed(GamepadKeys.Button.Y)) {
                 robot.arm.setWristRotation(WristRotation.Up);
+            } else if (Gamepad2.wasJustPressed(GamepadKeys.Button.X)) {
+                robot.arm.setWristRotation(WristRotation.Forward);
             }
 
             if(Gamepad1.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER) > 0.1 && Gamepad1.wasJustPressed(GamepadKeys.Button.LEFT_BUMPER)) {
