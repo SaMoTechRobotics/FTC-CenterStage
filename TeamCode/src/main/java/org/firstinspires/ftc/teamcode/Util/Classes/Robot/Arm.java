@@ -6,11 +6,13 @@ import com.qualcomm.robotcore.hardware.Servo;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.Util.Constants.Robot.ArmRotation;
 import org.firstinspires.ftc.teamcode.Util.Constants.Robot.ArmSpeed;
+import org.firstinspires.ftc.teamcode.Util.Constants.Robot.ClawPosition;
 import org.firstinspires.ftc.teamcode.Util.Constants.Robot.WristRotation;
 
 public class Arm {
     private final DcMotor armMotor;
     private final Servo wristServo;
+    private final Servo droneServo;
 
     private boolean globalWristRotation = false;
 
@@ -19,10 +21,16 @@ public class Arm {
         armMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         armMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         wristServo = hardwareMap.get(Servo.class, "wrist");
+        droneServo = hardwareMap.get(Servo.class, "drone");
+        droneServo.setPosition(ClawPosition.DroneLock);
     }
 
     public void update() {
         if (globalWristRotation) updateGlobalWristRotation();
+    }
+
+    public void launchDrone() {
+        droneServo.setPosition(ClawPosition.DroneRelease);
     }
 
     public double getRotation() {

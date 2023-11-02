@@ -114,7 +114,7 @@ public class Drive extends LinearOpMode {
                 robot.prepareDroneLaunch();
             }
             if(Gamepad1.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER) > 0.1 && Gamepad1.wasJustPressed(GamepadKeys.Button.RIGHT_BUMPER)) {
-                robot.resetForIntake();
+                robot.arm.launchDrone();
             }
 
             robot.update();
