@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.Util.Classes.Robot;
 
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import org.firstinspires.ftc.teamcode.Util.Constants.Robot.ChassisSpeed;
 
@@ -12,11 +13,9 @@ public class Chassis {
     public double StrafeSpeed = ChassisSpeed.MidStrafe;
     public boolean brake = true;
 
-    /**
-     * Creates a new chassis with 4 motors
-     *
-     * @param hardwareMap The hardware map of the robot
-     */
+    public DistanceSensor leftDistanceSensor;
+    public DistanceSensor rightDistanceSensor;
+
     public Chassis(HardwareMap hardwareMap) {
         this.Wheels =
                 new Wheels(
@@ -28,6 +27,9 @@ public class Chassis {
 
         this.Wheels.FrontLeft.setDirection(DcMotor.Direction.REVERSE);
         this.Wheels.BackLeft.setDirection(DcMotor.Direction.REVERSE);
+
+        this.leftDistanceSensor = hardwareMap.get(DistanceSensor.class, "leftDistance");
+        this.rightDistanceSensor = hardwareMap.get(DistanceSensor.class, "rightDistance");
 
         toggleBrake(true);
     }
@@ -139,7 +141,7 @@ public class Chassis {
     /**
      * The motors of the chassis
      */
-    private static class Wheels {
+    public static class Wheels {
         public DcMotor FrontLeft;
         public DcMotor FrontRight;
         public DcMotor BackLeft;
