@@ -143,6 +143,13 @@ public class Chassis {
 
     }
 
+    public void setPowerAllMotors(Double speed) {
+        this.setPower(this.Wheels.FrontLeft, speed);
+        this.setPower(this.Wheels.FrontRight, speed);
+        this.setPower(this.Wheels.BackRight, speed);
+        this.setPower(this.Wheels.BackLeft, speed);
+    }
+
     /**
      * The motors of the chassis
      */
