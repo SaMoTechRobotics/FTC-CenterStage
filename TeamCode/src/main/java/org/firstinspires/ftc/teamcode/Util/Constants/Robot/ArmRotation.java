@@ -19,5 +19,9 @@ public class ArmRotation {
     public static int Down = 0;
     public static int Hang = 90;
     public static int HangingLock = 10;
+
+    public static double PeriodDivider = 2.0;
+    public static double StartDivider = 4.0;
+
 }
 

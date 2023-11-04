@@ -37,29 +37,36 @@ public class Arm {
     public void update() {
         if (globalWristRotation) updateGlobalWristRotation();
 
-        if (armMotor.getMode() == DcMotor.RunMode.RUN_TO_POSITION) {
-            updateSpeedRamping();
-        }
+//        if (armMotor.getMode() == DcMotor.RunMode.RUN_TO_POSITION) {
+//            updateSpeedRamping();
+//        }
     }
 
     public void updateSpeedRamping() {
-
         telemetry.addData("target", armMotor.getTargetPosition());
         telemetry.addData("start", targetStartRotation);
         telemetry.addData("current", armMotor.getCurrentPosition());
 
-        double period = armMotor.getTargetPosition() - targetStartRotation;
-        double x = armMotor.getCurrentPosition();
+        double period = Math.abs(armMotor.getTargetPosition() - targetStartRotation);
+        double x = Math.abs(armMotor.getCurrentPosition());
+        double h = Math.abs(targetStartRotation);
+
+
+        double sin = Math.sin((Math.PI / (period / ArmRotation.PeriodDivider)) * (x - (period / ArmRotation.StartDivider) - h));
+        telemetry.addData("sin", sin);
 
         double motorPower = ArmSpeed.Min * (
-                Math.sin((Math.PI / period / 2) * (x - (period / 4) - targetStartRotation)) + 1
-        ) + (1 - 2 * ArmSpeed.Min);
+                sin
+        ) + (1.0 - 2.0 * ArmSpeed.Min);
 
-        armMotor.setPower(motorPower);
+//        armMotor.setPower(motorPower);
 
         Telemetry dashboardTelemetry = FtcDashboard.getInstance().getTelemetry();
+        dashboardTelemetry.addData("s", sin);
         dashboardTelemetry.addData("x", armMotor.getPower());
         dashboardTelemetry.update();
+
+        armMotor.setPower(ArmSpeed.Max);
 
 //            double loopTime = System.currentTimeMillis();
 //            double timeDifference = loopTime - lastLoopTime;
@@ -126,8 +133,11 @@ public class Arm {
         targetStartRotation = armMotor.getCurrentPosition();
         armMotor.setTargetPosition(degreesToArmTicks(degrees));
         armMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        armMotor.setPower(ArmSpeed.RampSpeed);
-//        armMotor.setPower(ArmSpeed.Max);
+        if (Math.abs(degrees - armMotor.getCurrentPosition() * 90.0 / ArmRotation.TicksAt90Degrees) < 60) {
+            armMotor.setPower(ArmSpeed.Mid);
+        } else {
+            armMotor.setPower(ArmSpeed.Max);
+        }
     }
 
     public void setRotation(double degrees, double speed) {
