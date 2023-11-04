@@ -4,9 +4,12 @@ import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.Util.Constants.Robot.ChassisSpeed;
 
 public class Chassis {
+    private final Telemetry telemetry;
+
     public Wheels Wheels;
     public double DriveSpeed = ChassisSpeed.MidDrive;
     public double TurnSpeed = ChassisSpeed.MidTurn;
@@ -16,7 +19,9 @@ public class Chassis {
     public DistanceSensor leftDistanceSensor;
     public DistanceSensor rightDistanceSensor;
 
-    public Chassis(HardwareMap hardwareMap) {
+    public Chassis(HardwareMap hardwareMap, Telemetry telemetry) {
+        this.telemetry = telemetry;
+
         this.Wheels =
                 new Wheels(
                         hardwareMap.get(DcMotor.class, "frontLeft"),

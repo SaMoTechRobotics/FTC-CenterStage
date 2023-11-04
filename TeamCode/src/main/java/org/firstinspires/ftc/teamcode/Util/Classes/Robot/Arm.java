@@ -10,6 +10,8 @@ import org.firstinspires.ftc.teamcode.Util.Constants.Robot.ClawPosition;
 import org.firstinspires.ftc.teamcode.Util.Constants.Robot.WristRotation;
 
 public class Arm {
+    private final Telemetry telemetry;
+
     private final DcMotor armMotor;
     private final Servo wristServo;
     private final Servo droneServo;
@@ -19,7 +21,9 @@ public class Arm {
     private double lastLoopTime = 0;
     private double targetStartRotation = 0;
 
-    public Arm(HardwareMap hardwareMap) {
+    public Arm(HardwareMap hardwareMap, Telemetry telemetry) {
+        this.telemetry = telemetry;
+
         armMotor = hardwareMap.get(DcMotor.class, "arm");
         armMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         armMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
