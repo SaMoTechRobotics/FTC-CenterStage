@@ -84,7 +84,7 @@ public class Drive extends LinearOpMode {
                 }
             } else if(Gamepad2.wasJustPressed(GamepadKeys.Button.LEFT_BUMPER)) {
                 robot.claw.setOpen(true);
-                if (robot.pickUp && robot.arm.getWristRotation() == WristRotation.Forward) {
+                if (robot.pickUp && robot.arm.getWristRotation() != WristRotation.Forward) {
                     timer.purge();
                     timer.schedule(new TimerTask() {
                         @Override
