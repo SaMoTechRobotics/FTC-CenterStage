@@ -27,7 +27,7 @@ public class MotorTest extends LinearOpMode {
 
     @Override
     public void runOpMode() {
-        Chassis chassis = new Chassis(hardwareMap);
+        Chassis chassis = new Chassis(hardwareMap, telemetry);
 
         DcMotor motor = hardwareMap.get(DcMotor.class, "arm");
         motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);

@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.Util.Classes.Robot;
 
+import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
@@ -41,30 +43,53 @@ public class Arm {
     }
 
     public void updateSpeedRamping() {
-            double loopTime = System.currentTimeMillis();
-            double timeDifference = loopTime - lastLoopTime;
-            lastLoopTime = loopTime;
-            double rampSpeed = ArmSpeed.RampSpeed * timeDifference;
 
-            boolean speedUp = armMotor.getCurrentPosition() < (armMotor.getTargetPosition() + targetStartRotation) / 2;
+        telemetry.addData("target", armMotor.getTargetPosition());
+        telemetry.addData("start", targetStartRotation);
+        telemetry.addData("current", armMotor.getCurrentPosition());
 
-            if(speedUp) {
-                if (armMotor.getPower() < ArmSpeed.Max) {
-                    if (armMotor.getPower() + rampSpeed > ArmSpeed.Max) {
-                        armMotor.setPower(ArmSpeed.Max);
-                    } else {
-                        armMotor.setPower(armMotor.getPower() + rampSpeed);
-                    }
-                }
-            } else {
-                if (armMotor.getPower() > ArmSpeed.Min) {
-                    if (armMotor.getPower() - rampSpeed > ArmSpeed.Min) {
-                        armMotor.setPower(ArmSpeed.Min);
-                    } else {
-                        armMotor.setPower(armMotor.getPower() - rampSpeed);
-                    }
-                }
-            }
+        double period = armMotor.getTargetPosition() - targetStartRotation;
+        double x = armMotor.getCurrentPosition();
+
+        double motorPower = ArmSpeed.Min * (
+                Math.sin((Math.PI / period / 2) * (x - (period / 4) - targetStartRotation)) + 1
+        ) + (1 - 2 * ArmSpeed.Min);
+
+        armMotor.setPower(motorPower);
+
+        Telemetry dashboardTelemetry = FtcDashboard.getInstance().getTelemetry();
+        dashboardTelemetry.addData("x", armMotor.getPower());
+        dashboardTelemetry.update();
+
+//            double loopTime = System.currentTimeMillis();
+//            double timeDifference = loopTime - lastLoopTime;
+//            lastLoopTime = loopTime;
+//            double rampSpeed = ArmSpeed.RampSpeed * timeDifference;
+//
+//            boolean speedUp = armMotor.getCurrentPosition() > (armMotor.getTargetPosition() + targetStartRotation) / 2;
+//
+//            if(speedUp) {
+//                if (armMotor.getPower() < ArmSpeed.Max) {
+//                    if (armMotor.getPower() + rampSpeed > ArmSpeed.Max) {
+//                        armMotor.setPower(ArmSpeed.Max);
+//                    } else {
+//                        armMotor.setPower(armMotor.getPower() + rampSpeed);
+//                    }
+//                }
+//            } else {
+//                if (armMotor.getPower() > ArmSpeed.Min) {
+//                    if (armMotor.getPower() - rampSpeed > ArmSpeed.Min) {
+//                        armMotor.setPower(ArmSpeed.Min);
+//                    } else {
+//                        armMotor.setPower(armMotor.getPower() - rampSpeed);
+//                    }
+//                }
+//            }
+
+//        TelemetryPacket graphSpeedRamping =
+
+
+
     }
 
     public void launchDrone() {

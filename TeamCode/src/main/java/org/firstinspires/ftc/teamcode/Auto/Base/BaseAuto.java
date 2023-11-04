@@ -23,7 +23,7 @@ public class BaseAuto extends LinearOpMode {
 
     protected void initAuto() {
         RobotStorage.reset(SIDE, COLOR);
-        robot = new Robot(hardwareMap);
+        robot = new Robot(hardwareMap, telemetry);
     }
 
     @Override
