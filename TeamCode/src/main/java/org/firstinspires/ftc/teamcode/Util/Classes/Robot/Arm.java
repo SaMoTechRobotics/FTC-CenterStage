@@ -133,11 +133,14 @@ public class Arm {
         targetStartRotation = armMotor.getCurrentPosition();
         armMotor.setTargetPosition(degreesToArmTicks(degrees));
         armMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-//        if (Math.abs(degrees - armMotor.getCurrentPosition() * 90.0 / ArmRotation.TicksAt90Degrees) < 60) {
-//            armMotor.setPower(ArmSpeed.Mid);
-//        } else {
+        double diff = Math.abs(degrees - armMotor.getCurrentPosition() * 90.0 / ArmRotation.TicksAt90Degrees);
+        if (diff < 15) {
+            armMotor.setPower(ArmSpeed.Min);
+        } else if (diff < 45) {
+            armMotor.setPower(ArmSpeed.Mid);
+        } else {
             armMotor.setPower(ArmSpeed.Max);
-//        }
+        }
     }
 
     public void setRotation(double degrees, double speed) {
