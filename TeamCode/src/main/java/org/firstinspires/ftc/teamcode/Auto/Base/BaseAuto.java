@@ -33,7 +33,6 @@ public class BaseAuto extends LinearOpMode {
 
         waitForStart();
         if (isStopRequested()) return;
-
     }
 
     private SpikeLocation detectSpikeLocation() {
