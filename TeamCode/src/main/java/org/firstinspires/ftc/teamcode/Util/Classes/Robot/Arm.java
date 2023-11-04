@@ -16,6 +16,9 @@ public class Arm {
 
     private boolean globalWristRotation = false;
 
+    private double lastLoopTime = 0;
+    private double targetStartRotation = 0;
+
     public Arm(HardwareMap hardwareMap) {
         armMotor = hardwareMap.get(DcMotor.class, "arm");
         armMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -27,6 +30,37 @@ public class Arm {
 
     public void update() {
         if (globalWristRotation) updateGlobalWristRotation();
+
+        if (armMotor.getMode() == DcMotor.RunMode.RUN_TO_POSITION) {
+            updateSpeedRamping();
+        }
+    }
+
+    public void updateSpeedRamping() {
+            double loopTime = System.currentTimeMillis();
+            double timeDifference = loopTime - lastLoopTime;
+            lastLoopTime = loopTime;
+            double rampSpeed = ArmSpeed.RampSpeed * timeDifference;
+
+            boolean speedUp = armMotor.getCurrentPosition() < (armMotor.getTargetPosition() + targetStartRotation) / 2;
+
+            if(speedUp) {
+                if (armMotor.getPower() < ArmSpeed.Max) {
+                    if (armMotor.getPower() + rampSpeed > ArmSpeed.Max) {
+                        armMotor.setPower(ArmSpeed.Max);
+                    } else {
+                        armMotor.setPower(armMotor.getPower() + rampSpeed);
+                    }
+                }
+            } else {
+                if (armMotor.getPower() > ArmSpeed.Min) {
+                    if (armMotor.getPower() - rampSpeed > ArmSpeed.Min) {
+                        armMotor.setPower(ArmSpeed.Min);
+                    } else {
+                        armMotor.setPower(armMotor.getPower() - rampSpeed);
+                    }
+                }
+            }
     }
 
     public void launchDrone() {
@@ -43,10 +77,10 @@ public class Arm {
 
     public void setWristPickup(Boolean value) {
         if (value) {
-            setRotation(ArmRotation.Down, ArmSpeed.Slow);
+            setRotation(ArmRotation.Down);
             setWristRotation(WristRotation.Down);
         } else {
-            setRotation(ArmRotation.HoldDown, ArmSpeed.Slow);
+            setRotation(ArmRotation.HoldDown);
             setWristRotation(WristRotation.HoldDown);
         }
     }
@@ -60,9 +94,11 @@ public class Arm {
     }
 
     public void setRotation(double degrees) {
+        targetStartRotation = armMotor.getCurrentPosition();
         armMotor.setTargetPosition(degreesToArmTicks(degrees));
         armMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        armMotor.setPower(ArmSpeed.MaxSpeed);
+        armMotor.setPower(ArmSpeed.RampSpeed);
+//        armMotor.setPower(ArmSpeed.Max);
     }
 
     public void setRotation(double degrees, double speed) {
@@ -98,7 +134,7 @@ public class Arm {
             armMotor.setTargetPosition(degreesToArmTicks(ArmRotation.HangingLock));
             armMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             wristServo.setPosition(WristRotation.Hang);
-            armMotor.setPower(ArmSpeed.MaxSpeed);
+            armMotor.setPower(ArmSpeed.Max);
         } else {
             armMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             armMotor.setPower(0);

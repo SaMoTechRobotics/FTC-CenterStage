@@ -53,7 +53,7 @@ public class MotorTest extends LinearOpMode {
             chassis.updateWithControls(Gamepad1);
 
             if (Gamepad2.getButton(GamepadKeys.Button.RIGHT_BUMPER)) {
-                motor.setPower(Gamepad2.getLeftY() * ArmSpeed.MaxSpeed);
+                motor.setPower(Gamepad2.getLeftY() * ArmSpeed.Max);
             } else {
                 motor.setPower(Gamepad2.getLeftY() * armSpeed);
             }

@@ -32,10 +32,6 @@ public class Robot {
 
     public void update() {
         arm.update();
-        if (arm.getRotation() < ArmRotation.MaxPickup) {
-            pickUp = true;
-        } else {
-            pickUp = false;
-        }
+        pickUp = arm.getRotation() < ArmRotation.MaxPickup;
     }
 }
