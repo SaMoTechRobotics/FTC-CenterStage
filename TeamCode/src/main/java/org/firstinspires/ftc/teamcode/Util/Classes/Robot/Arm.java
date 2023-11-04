@@ -31,7 +31,9 @@ public class Arm {
         armMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         wristServo = hardwareMap.get(Servo.class, "wrist");
         droneServo = hardwareMap.get(Servo.class, "drone");
+        setWristRotation(WristRotation.Down);
         droneServo.setPosition(ClawPosition.DroneLock);
+
     }
 
     public void update() {
