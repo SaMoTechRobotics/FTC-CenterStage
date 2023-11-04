@@ -13,6 +13,7 @@ public class Robot {
     public Claw claw;
 
     public Boolean pickUp = true;
+    public Boolean droneReady = false;
 
     public Robot(HardwareMap hardwareMap, Telemetry telemetry) {
         chassis = new Chassis(hardwareMap, telemetry);
@@ -33,6 +34,7 @@ public class Robot {
         arm.setRotation(ArmRotation.DroneLaunch);
         arm.setWristRotation(WristRotation.Down);
         claw.setOpen(true);
+        droneReady = true;
     }
 
     public void update() {
