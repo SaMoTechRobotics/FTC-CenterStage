@@ -12,6 +12,6 @@ public class ArmSpeed {
 
     public static Double HoldSpeed = 0.5;
 
-    public static Double SlowManual = 0.7;
+    public static Double SlowManual = 0.5;
 
 }

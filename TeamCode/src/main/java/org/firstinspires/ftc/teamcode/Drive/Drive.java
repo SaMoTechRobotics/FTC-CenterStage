@@ -49,19 +49,19 @@ public class Drive extends LinearOpMode {
                 if (!robot.pickUp) {
                     robot.arm.setGlobalWristRotation(true);
                 }
-            } else if (Gamepad2.wasJustPressed(GamepadKeys.Button.DPAD_UP)) {
+            } else if (Gamepad2.wasJustReleased(GamepadKeys.Button.DPAD_UP)) {
                 robot.arm.setRotation(ArmRotation.HighDeliver);
                 robot.arm.setGlobalWristRotation(true);
-            } else if (Gamepad2.wasJustPressed(GamepadKeys.Button.DPAD_LEFT)) {
+            } else if (Gamepad2.wasJustReleased(GamepadKeys.Button.DPAD_LEFT)) {
                 robot.arm.setRotation(ArmRotation.MidDeliver);
                 robot.arm.setGlobalWristRotation(true);
-            } else if (Gamepad2.wasJustPressed(GamepadKeys.Button.DPAD_DOWN)) {
+            } else if (Gamepad2.wasJustReleased(GamepadKeys.Button.DPAD_DOWN)) {
                 robot.arm.setRotation(ArmRotation.LowDeliver);
                 robot.arm.setGlobalWristRotation(true);
-            } else if (Gamepad2.wasJustPressed(GamepadKeys.Button.DPAD_RIGHT)) {
+            } else if (Gamepad2.wasJustReleased(GamepadKeys.Button.DPAD_RIGHT)) {
                 robot.arm.setRotation(ArmRotation.Down);
                 robot.arm.setWristPickup(true);
-            } else if (Gamepad1.wasJustPressed(GamepadKeys.Button.B)) {
+            } else if (Gamepad1.wasJustReleased(GamepadKeys.Button.B)) {
                 robot.arm.setRotation(ArmRotation.Hang);
                 robot.arm.setWristRotation(WristRotation.Down);
             } else {
