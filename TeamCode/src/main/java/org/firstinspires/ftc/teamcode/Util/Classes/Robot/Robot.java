@@ -32,7 +32,7 @@ public class Robot {
 
     public void prepareDroneLaunch() {
         arm.setRotation(ArmRotation.DroneLaunch);
-        arm.setWristRotation(WristRotation.Down);
+        arm.setWristRotation(WristRotation.Up);
         claw.setOpen(true);
         droneReady = true;
     }
