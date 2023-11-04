@@ -37,6 +37,10 @@ public class Arm {
         return armMotor.getCurrentPosition() * (90.0 / ArmRotation.TicksAt90Degrees);
     }
 
+    public double getWristRotation() {
+        return wristServo.getPosition();
+    }
+
     public void setWristPickup(Boolean value) {
         if (value) {
             setRotation(ArmRotation.Down, ArmSpeed.Slow);
