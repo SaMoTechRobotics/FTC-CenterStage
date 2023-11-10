@@ -11,17 +11,17 @@ import org.firstinspires.ftc.teamcode.Util.Classes.Robot.RobotStorage;
 import org.firstinspires.ftc.teamcode.Util.Enums.SpikeLocation;
 
 @Config
-public class BaseAuto extends LinearOpMode {
+public abstract class BaseAuto extends LinearOpMode {
     private static Robot robot;
 
-    public static AutoSide SIDE = AutoSide.RIGHT;
-    public static AutoColor COLOR = AutoColor.RED;
+    private final static AutoSide SIDE = AutoSide.RIGHT;
+    private final static AutoColor COLOR = AutoColor.RED;
 
     protected static class DriveDistances {
         public static Double ToParking = 50.0;
     }
 
-    protected void initAuto() {
+    public void initAuto() {
         RobotStorage.reset(SIDE, COLOR);
         robot = new Robot(hardwareMap, telemetry);
     }
@@ -32,7 +32,6 @@ public class BaseAuto extends LinearOpMode {
         }
 
         waitForStart();
-        if (isStopRequested()) return;
     }
 
     private SpikeLocation detectSpikeLocation() {
