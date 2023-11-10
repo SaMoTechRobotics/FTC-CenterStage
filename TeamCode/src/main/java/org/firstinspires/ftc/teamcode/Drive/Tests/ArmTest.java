@@ -10,7 +10,7 @@ import org.firstinspires.ftc.teamcode.Util.Constants.Robot.WristRotation;
 
 
 @Config
-@TeleOp(name = "ArmTest")
+@TeleOp(name = "ArmTest", group = "Tests")
 public class ArmTest extends LinearOpMode {
     @Override
     public void runOpMode() {
