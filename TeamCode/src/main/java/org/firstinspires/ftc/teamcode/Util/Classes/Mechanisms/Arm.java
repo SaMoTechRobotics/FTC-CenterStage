@@ -1,7 +1,6 @@
-package org.firstinspires.ftc.teamcode.Util.Classes.Robot;
+package org.firstinspires.ftc.teamcode.Util.Classes.Mechanisms;
 
 import com.acmerobotics.dashboard.FtcDashboard;
-import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
@@ -96,7 +95,6 @@ public class Arm {
 //            }
 
 //        TelemetryPacket graphSpeedRamping =
-
 
 
     }

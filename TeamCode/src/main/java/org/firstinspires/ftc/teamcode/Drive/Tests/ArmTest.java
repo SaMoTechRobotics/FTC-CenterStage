@@ -5,7 +5,7 @@ import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import org.firstinspires.ftc.teamcode.Util.Classes.Robot.Robot;
+import org.firstinspires.ftc.teamcode.Util.Classes.Robot;
 import org.firstinspires.ftc.teamcode.Util.Constants.Robot.WristRotation;
 
 
@@ -22,9 +22,9 @@ public class ArmTest extends LinearOpMode {
         waitForStart();
 
         while (opModeIsActive()) {
-            if(Gamepad2.wasJustPressed(GamepadKeys.Button.RIGHT_BUMPER)) {
+            if (Gamepad2.wasJustPressed(GamepadKeys.Button.RIGHT_BUMPER)) {
                 robot.claw.setOpen(false);
-            } else if(Gamepad2.wasJustPressed(GamepadKeys.Button.LEFT_BUMPER)) {
+            } else if (Gamepad2.wasJustPressed(GamepadKeys.Button.LEFT_BUMPER)) {
                 robot.claw.setOpen(true);
             }
 

@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.Util.Classes.Robot;
+package org.firstinspires.ftc.teamcode.Util.Classes.Mechanisms;
 
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -113,33 +113,33 @@ public class Chassis {
     }
 
     private void setManualPower(double driveStick, double strafeStick, double turnStick) {
-            /*
-             * The different powers of the motors based of the joysticks
-             */
-            double frontLeftPower =
-                    (driveStick * this.DriveSpeed) +
-                            (turnStick * this.TurnSpeed) +
-                            (strafeStick * this.StrafeSpeed);
-            double frontRightPower =
-                    (driveStick * this.DriveSpeed) -
-                            (turnStick * this.TurnSpeed) -
-                            (strafeStick * this.StrafeSpeed);
-            double backLeftPower =
-                    (driveStick * this.DriveSpeed) +
-                            (turnStick * this.TurnSpeed) -
-                            (strafeStick * this.StrafeSpeed);
-            double backRightPower =
-                    (driveStick * this.DriveSpeed) -
-                            (turnStick * this.TurnSpeed) +
-                            (strafeStick * this.StrafeSpeed);
+        /*
+         * The different powers of the motors based of the joysticks
+         */
+        double frontLeftPower =
+                (driveStick * this.DriveSpeed) +
+                        (turnStick * this.TurnSpeed) +
+                        (strafeStick * this.StrafeSpeed);
+        double frontRightPower =
+                (driveStick * this.DriveSpeed) -
+                        (turnStick * this.TurnSpeed) -
+                        (strafeStick * this.StrafeSpeed);
+        double backLeftPower =
+                (driveStick * this.DriveSpeed) +
+                        (turnStick * this.TurnSpeed) -
+                        (strafeStick * this.StrafeSpeed);
+        double backRightPower =
+                (driveStick * this.DriveSpeed) -
+                        (turnStick * this.TurnSpeed) +
+                        (strafeStick * this.StrafeSpeed);
 
-            /*
-             * Sets the power of all the motors for manual drive
-             */
-            this.setPower(this.Wheels.FrontLeft, frontLeftPower);
-            this.setPower(this.Wheels.FrontRight, frontRightPower);
-            this.setPower(this.Wheels.BackLeft, backLeftPower);
-            this.setPower(this.Wheels.BackRight, backRightPower);
+        /*
+         * Sets the power of all the motors for manual drive
+         */
+        this.setPower(this.Wheels.FrontLeft, frontLeftPower);
+        this.setPower(this.Wheels.FrontRight, frontRightPower);
+        this.setPower(this.Wheels.BackLeft, backLeftPower);
+        this.setPower(this.Wheels.BackRight, backRightPower);
 
     }
 

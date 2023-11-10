@@ -7,7 +7,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
-import org.firstinspires.ftc.teamcode.Util.Classes.Robot.Chassis;
+import org.firstinspires.ftc.teamcode.Util.Classes.Mechanisms.Chassis;
 import org.firstinspires.ftc.teamcode.Util.Constants.Robot.ArmSpeed;
 
 

@@ -1,7 +1,10 @@
-package org.firstinspires.ftc.teamcode.Util.Classes.Robot;
+package org.firstinspires.ftc.teamcode.Util.Classes;
 
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.teamcode.Util.Classes.Mechanisms.Arm;
+import org.firstinspires.ftc.teamcode.Util.Classes.Mechanisms.Chassis;
+import org.firstinspires.ftc.teamcode.Util.Classes.Mechanisms.Claw;
 import org.firstinspires.ftc.teamcode.Util.Constants.Robot.ArmRotation;
 import org.firstinspires.ftc.teamcode.Util.Constants.Robot.WristRotation;
 

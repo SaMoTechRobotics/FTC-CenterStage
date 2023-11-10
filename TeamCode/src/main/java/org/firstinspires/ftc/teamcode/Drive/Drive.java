@@ -1,12 +1,11 @@
 package org.firstinspires.ftc.teamcode.Drive;
 
-import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import org.firstinspires.ftc.teamcode.Util.Classes.Robot.Robot;
+import org.firstinspires.ftc.teamcode.Util.Classes.Robot;
 import org.firstinspires.ftc.teamcode.Util.Constants.Robot.ArmRotation;
 import org.firstinspires.ftc.teamcode.Util.Constants.Robot.ArmSpeed;
 import org.firstinspires.ftc.teamcode.Util.Constants.Robot.ClawPosition;
@@ -40,7 +39,7 @@ public class Drive extends LinearOpMode {
 
             robot.chassis.updateWithControls(Gamepad1);
 
-            if(Math.abs(Gamepad2.getRightX()) > 0.01) {
+            if (Math.abs(Gamepad2.getRightX()) > 0.01) {
                 robot.arm.manualRotation(Gamepad2.getRightX() * ArmSpeed.SlowManual);
                 if (!robot.pickUp) {
                     robot.arm.setGlobalWristRotation(true);
@@ -73,7 +72,7 @@ public class Drive extends LinearOpMode {
                 robot.resetForIntake();
             }
 
-            if(Gamepad2.wasJustPressed(GamepadKeys.Button.RIGHT_BUMPER)) {
+            if (Gamepad2.wasJustPressed(GamepadKeys.Button.RIGHT_BUMPER)) {
                 robot.claw.setOpen(false);
                 if (robot.pickUp) {
                     timer.purge();
@@ -84,7 +83,7 @@ public class Drive extends LinearOpMode {
                         }
                     }, ClawPosition.WaitTime);
                 }
-            } else if(Gamepad2.wasJustPressed(GamepadKeys.Button.LEFT_BUMPER)) {
+            } else if (Gamepad2.wasJustPressed(GamepadKeys.Button.LEFT_BUMPER)) {
                 robot.claw.setOpen(true);
                 if (robot.pickUp && robot.arm.getWristRotation() != WristRotation.Forward) {
                     timer.purge();
@@ -112,10 +111,10 @@ public class Drive extends LinearOpMode {
                 robot.arm.setWristRotation(WristRotation.Forward);
             }
 
-            if(Gamepad1.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER) > 0.1 && Gamepad1.wasJustPressed(GamepadKeys.Button.LEFT_BUMPER)) {
+            if (Gamepad1.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER) > 0.1 && Gamepad1.wasJustPressed(GamepadKeys.Button.LEFT_BUMPER)) {
                 robot.prepareDroneLaunch();
             }
-            if(Gamepad1.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER) > 0.1 && Gamepad1.wasJustPressed(GamepadKeys.Button.RIGHT_BUMPER) && robot.droneReady) {
+            if (Gamepad1.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER) > 0.1 && Gamepad1.wasJustPressed(GamepadKeys.Button.RIGHT_BUMPER) && robot.droneReady) {
                 robot.arm.launchDrone();
             }
 

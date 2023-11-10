@@ -3,16 +3,16 @@ package org.firstinspires.ftc.teamcode.Auto.Base;
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
-import org.firstinspires.ftc.teamcode.Util.Classes.Robot.Robot;
+import org.firstinspires.ftc.teamcode.Util.Classes.AutoRobot;
+import org.firstinspires.ftc.teamcode.Util.Classes.Storage.RobotStorage;
 import org.firstinspires.ftc.teamcode.Util.Constants.Auto.DistanceSensorConstants;
 import org.firstinspires.ftc.teamcode.Util.Enums.AutoColor;
 import org.firstinspires.ftc.teamcode.Util.Enums.AutoSide;
-import org.firstinspires.ftc.teamcode.Util.Classes.Robot.RobotStorage;
 import org.firstinspires.ftc.teamcode.Util.Enums.SpikeLocation;
 
 @Config
 public abstract class BaseAuto extends LinearOpMode {
-    private static Robot robot;
+    private static AutoRobot robot;
 
     private final static AutoSide SIDE = AutoSide.RIGHT;
     private final static AutoColor COLOR = AutoColor.RED;
@@ -23,7 +23,7 @@ public abstract class BaseAuto extends LinearOpMode {
 
     public void initAuto() {
         RobotStorage.reset(SIDE, COLOR);
-        robot = new Robot(hardwareMap, telemetry);
+        robot = new AutoRobot(hardwareMap, telemetry);
     }
 
     @Override
