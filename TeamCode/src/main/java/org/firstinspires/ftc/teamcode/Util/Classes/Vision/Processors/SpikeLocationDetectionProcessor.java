@@ -1,20 +1,16 @@
 package org.firstinspires.ftc.teamcode.Util.Classes.Vision.Processors;
 
 import android.graphics.Canvas;
-
 import android.graphics.Color;
 import android.graphics.Paint;
-import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.internal.camera.calibration.CameraCalibration;
 import org.firstinspires.ftc.teamcode.Util.Enums.SpikeLocation;
 import org.firstinspires.ftc.vision.VisionProcessor;
-
 import org.opencv.core.*;
 import org.opencv.imgproc.Imgproc;
 
-public class SpikeMarkDetectionProcessor implements VisionProcessor {
-    private SpikeLocation location = SpikeLocation.CENTER;
-
+public class SpikeLocationDetectionProcessor implements VisionProcessor {
+    public SpikeLocation location = SpikeLocation.CENTER;
 
     public Scalar lower = new Scalar(130, 0, 0);
     public Scalar upper = new Scalar(255, 130, 130);

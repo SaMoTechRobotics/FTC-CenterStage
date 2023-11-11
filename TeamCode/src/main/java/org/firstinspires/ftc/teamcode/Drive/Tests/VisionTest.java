@@ -5,8 +5,8 @@ import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import org.firstinspires.ftc.teamcode.Util.Classes.AutoRobot;
+import org.firstinspires.ftc.teamcode.Util.Enums.SpikeLocation;
 import org.firstinspires.ftc.teamcode.Util.Enums.VisionProcessor;
-
 
 @Config
 @TeleOp(name = "Vision Test", group = "Tests")
@@ -19,17 +19,18 @@ public class VisionTest extends LinearOpMode {
         GamepadEx Gamepad2 = new GamepadEx(gamepad2);
 
         robot.vision.startProcessor(VisionProcessor.SPIKE_LOCATION_DETECTION);
+//        robot.vision.visionPortal.resumeStreaming();
 
-
-        while (!isStarted()) {
-            telemetry.addData("Spike Location", robot.vision.spikeLocation);
-            telemetry.update();
-        }
-        waitForStart();
+        SpikeLocation spikeLocation = SpikeLocation.CENTER;
 
         while (opModeIsActive()) {
-            robot.vision.update();
+//            spikeLocation = robot.vision.getSpikeLocation();
+            telemetry.addData("Spike Location", spikeLocation);
+            telemetry.update();
 
+            sleep(20);
         }
+
+        robot.vision.close();
     }
 }
