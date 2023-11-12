@@ -4,6 +4,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import org.firstinspires.ftc.robotcore.internal.camera.calibration.CameraCalibration;
+import org.firstinspires.ftc.teamcode.Util.Constants.Auto.SpikeLocationDetectionConstants;
 import org.firstinspires.ftc.teamcode.Util.Enums.SpikeLocation;
 import org.firstinspires.ftc.vision.VisionProcessor;
 import org.opencv.core.*;
@@ -14,8 +15,8 @@ public class SpikeLocationDetectionProcessor implements VisionProcessor {
 
     public Boolean streamingOverlayMode = true;
 
-    public Scalar lower = new Scalar(130, 0, 0);
-    public Scalar upper = new Scalar(255, 130, 130);
+//    public Scalar lower = new Scalar(130, 0, 0);
+//    public Scalar upper = new Scalar(255, 130, 130);
 
     private Mat rawMat = new Mat();
     private final Mat colMat = new Mat();
@@ -32,11 +33,13 @@ public class SpikeLocationDetectionProcessor implements VisionProcessor {
     @Override
     public Object processFrame(Mat frame, long captureTimeNanos) {
         rawMat = frame;
+        if (!streamingOverlayMode) return null;
+
         // Convert the frame to RGB
         Imgproc.cvtColor(frame, colMat, Imgproc.COLOR_RGBA2RGB);
 
         // Filter out everything but red
-        Core.inRange(colMat, lower, upper, redMat);
+        Core.inRange(colMat, SpikeLocationDetectionConstants.lowerRed, SpikeLocationDetectionConstants.upperRed, redMat);
 
         // The 3 sections of the frame
         Rect region1 = new Rect(new Point(0, 0), new Point(frame.cols() / 3, frame.rows()));
