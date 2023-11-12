@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.Util.Classes.Vision;
 
 import android.util.Size;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import org.firstinspires.ftc.robotcore.external.hardware.camera.CameraName;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.teamcode.Util.Classes.Vision.Processors.SpikeLocationDetectionProcessor;
 import org.firstinspires.ftc.teamcode.Util.Enums.SpikeLocation;
@@ -9,7 +10,7 @@ import org.firstinspires.ftc.teamcode.Util.Enums.VisionProcessor;
 import org.firstinspires.ftc.vision.VisionPortal;
 
 public class Vision {
-    private final WebcamName webcam;
+    private final CameraName webcam;
 
     public VisionPortal visionPortal = null;
     SpikeLocationDetectionProcessor spikeMarkDetectionProcessor = null;
@@ -31,6 +32,10 @@ public class Vision {
                 break;
         }
         visionPortal = builder.build();
+    }
+
+    public void toggleProcessorStreamingMode() {
+        if (spikeMarkDetectionProcessor != null) spikeMarkDetectionProcessor.toggleStreamingMode();
     }
 
     public void update() {

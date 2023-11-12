@@ -12,9 +12,12 @@ import org.opencv.imgproc.Imgproc;
 public class SpikeLocationDetectionProcessor implements VisionProcessor {
     public SpikeLocation location = SpikeLocation.CENTER;
 
+    public Boolean streamingOverlayMode = true;
+
     public Scalar lower = new Scalar(130, 0, 0);
     public Scalar upper = new Scalar(255, 130, 130);
 
+    private Mat rawMat = new Mat();
     private final Mat colMat = new Mat();
     private final Mat redMat = new Mat();
 
@@ -22,8 +25,13 @@ public class SpikeLocationDetectionProcessor implements VisionProcessor {
     public void init(int width, int height, CameraCalibration calibration) {
     }
 
+    public void toggleStreamingMode() {
+        streamingOverlayMode = !streamingOverlayMode;
+    }
+
     @Override
     public Object processFrame(Mat frame, long captureTimeNanos) {
+        rawMat = frame;
         // Convert the frame to RGB
         Imgproc.cvtColor(frame, colMat, Imgproc.COLOR_RGBA2RGB);
 
@@ -50,8 +58,13 @@ public class SpikeLocationDetectionProcessor implements VisionProcessor {
             location = SpikeLocation.RIGHT;
         }
 
-        // Display the mask
-        redMat.copyTo(frame);
+        if (streamingOverlayMode) {
+            // Display the mask
+            redMat.copyTo(frame);
+        } else {
+            // Display the raw frame
+            rawMat.copyTo(frame);
+        }
 
         return null; // No context object
     }
