@@ -5,11 +5,13 @@ import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.teamcode.Util.Classes.Robot;
 import org.firstinspires.ftc.teamcode.Util.Constants.Robot.ArmRotation;
 import org.firstinspires.ftc.teamcode.Util.Constants.Robot.ArmSpeed;
 import org.firstinspires.ftc.teamcode.Util.Constants.Robot.ClawPosition;
 import org.firstinspires.ftc.teamcode.Util.Constants.Robot.WristRotation;
+import org.firstinspires.ftc.vision.VisionPortal;
 
 import java.util.Timer;
 import java.util.TimerTask;
@@ -22,6 +24,9 @@ public class Drive extends LinearOpMode {
     public void runOpMode() {
         Robot robot = new Robot(hardwareMap, telemetry);
         robot.claw.setOpen(true);
+        VisionPortal.Builder builder = new VisionPortal.Builder();
+        builder.setCamera(hardwareMap.get(WebcamName.class, "Webcam 1"));
+        VisionPortal visionPortal = builder.build();
 
         GamepadEx Gamepad1 = new GamepadEx(gamepad1);
         GamepadEx Gamepad2 = new GamepadEx(gamepad2);
@@ -31,6 +36,11 @@ public class Drive extends LinearOpMode {
         waitForStart();
 
         while (opModeIsActive()) {
+            if (Gamepad1.wasJustPressed(GamepadKeys.Button.DPAD_UP)) {
+                visionPortal.resumeStreaming();
+            } else if (Gamepad1.wasJustPressed(GamepadKeys.Button.DPAD_DOWN)) {
+                visionPortal.stopStreaming();
+            }
 
             robot.chassis.updateSpeed(
                     Gamepad1.getButton(GamepadKeys.Button.LEFT_BUMPER),
