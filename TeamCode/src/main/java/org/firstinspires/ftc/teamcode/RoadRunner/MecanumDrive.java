@@ -1,42 +1,15 @@
 package org.firstinspires.ftc.teamcode.RoadRunner;
 
 import androidx.annotation.NonNull;
-
 import com.acmerobotics.dashboard.canvas.Canvas;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
+import com.acmerobotics.roadrunner.Actions;
 import com.acmerobotics.roadrunner.*;
-import com.acmerobotics.roadrunner.AngularVelConstraint;
-import com.acmerobotics.roadrunner.DualNum;
-import com.acmerobotics.roadrunner.HolonomicController;
-import com.acmerobotics.roadrunner.MecanumKinematics;
-import com.acmerobotics.roadrunner.MinVelConstraint;
-import com.acmerobotics.roadrunner.MotorFeedforward;
-import com.acmerobotics.roadrunner.Pose2d;
-import com.acmerobotics.roadrunner.Pose2dDual;
-import com.acmerobotics.roadrunner.ProfileAccelConstraint;
-import com.acmerobotics.roadrunner.Time;
-import com.acmerobotics.roadrunner.TimeTrajectory;
-import com.acmerobotics.roadrunner.TimeTurn;
-import com.acmerobotics.roadrunner.TrajectoryActionBuilder;
-import com.acmerobotics.roadrunner.TurnConstraints;
-import com.acmerobotics.roadrunner.Twist2dDual;
-import com.acmerobotics.roadrunner.Vector2d;
-import com.acmerobotics.roadrunner.VelConstraint;
-import com.acmerobotics.roadrunner.ftc.Encoder;
-import com.acmerobotics.roadrunner.ftc.FlightRecorder;
-import com.acmerobotics.roadrunner.ftc.LynxFirmware;
-import com.acmerobotics.roadrunner.ftc.OverflowEncoder;
-import com.acmerobotics.roadrunner.ftc.PositionVelocityPair;
-import com.acmerobotics.roadrunner.ftc.RawEncoder;
+import com.acmerobotics.roadrunner.ftc.*;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
-import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.hardware.IMU;
-import com.qualcomm.robotcore.hardware.VoltageSensor;
-
+import com.qualcomm.robotcore.hardware.*;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 
 import java.lang.Math;
@@ -48,13 +21,13 @@ import java.util.List;
 public final class MecanumDrive {
     public static class Params {
         // drive model parameters
-        public double inPerTick = 0;
-        public double lateralInPerTick = 1;
-        public double trackWidthTicks = 0;
+        public double inPerTick = 76.0 / 101085.5;
+        public double lateralInPerTick = 0.0007518388;
+        public double trackWidthTicks = 13;
 
         // feedforward parameters (in tick units)
-        public double kS = 0;
-        public double kV = 0;
+        public double kS = 0.6079423266819526;
+        public double kV = 0.00014905669005208828;
         public double kA = 0;
 
         // path profile parameters (in inches)
@@ -176,10 +149,13 @@ public final class MecanumDrive {
             module.setBulkCachingMode(LynxModule.BulkCachingMode.AUTO);
         }
 
-        leftFront = hardwareMap.get(DcMotorEx.class, "leftFront");
-        leftBack = hardwareMap.get(DcMotorEx.class, "leftBack");
-        rightBack = hardwareMap.get(DcMotorEx.class, "rightBack");
-        rightFront = hardwareMap.get(DcMotorEx.class, "rightFront");
+        leftFront = hardwareMap.get(DcMotorEx.class, "backLeft");
+        leftBack = hardwareMap.get(DcMotorEx.class, "frontLeft");
+        rightBack = hardwareMap.get(DcMotorEx.class, "frontRight");
+        rightFront = hardwareMap.get(DcMotorEx.class, "backRight");
+
+        rightBack.setDirection(DcMotorSimple.Direction.REVERSE);
+        rightFront.setDirection(DcMotorSimple.Direction.REVERSE);
 
         leftFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         leftBack.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -194,7 +170,8 @@ public final class MecanumDrive {
 
         voltageSensor = hardwareMap.voltageSensor.iterator().next();
 
-        localizer = new DriveLocalizer();
+//        localizer = new DriveLocalizer();
+        localizer = new ThreeDeadWheelLocalizer(hardwareMap, PARAMS.inPerTick);
 
         FlightRecorder.write("MECANUM_PARAMS", PARAMS);
     }
