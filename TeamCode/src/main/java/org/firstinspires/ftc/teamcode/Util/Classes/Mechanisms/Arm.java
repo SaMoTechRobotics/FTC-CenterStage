@@ -161,7 +161,12 @@ public class Arm {
     public void updateGlobalWristRotation() {
         int ticks = armMotor.getCurrentPosition();
         double rotation = ticks * (90.0 / ArmRotation.TicksAt90Degrees);
-        double wristRotation = rotation - WristRotation.ArmComplementAngle;
+        double wristRotation;
+        if (rotation < ArmRotation.MaxPickup) {
+            wristRotation = WristRotation.PickupComplementAngle - rotation;
+        } else {
+            wristRotation = rotation - WristRotation.ArmComplementAngle;
+        }
         double wristPosition = degreesToWristPosition(wristRotation);
         wristServo.setPosition(wristPosition);
     }
