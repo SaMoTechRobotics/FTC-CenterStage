@@ -4,6 +4,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.ServoImpl;
 
 public class MicroServo extends ServoImpl {
+    //Formula = (Pulse Width - 500) / 2000
     public static Double min = 0.125;
     public static Double max = 0.875;
 
