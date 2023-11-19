@@ -180,7 +180,7 @@ public class Arm {
         if (lock) {
             armMotor.setTargetPosition(degreesToArmTicks(ArmRotation.HangingLock));
             armMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            wristServo.setPosition(WristRotation.Hang);
+            wristServo.setPosition(WristRotation.HangLock);
             armMotor.setPower(ArmSpeed.Max);
         } else {
             armMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
