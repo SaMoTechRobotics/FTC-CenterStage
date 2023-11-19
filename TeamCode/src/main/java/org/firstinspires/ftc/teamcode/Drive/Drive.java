@@ -9,12 +9,10 @@ import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.teamcode.Util.Classes.Robot;
 import org.firstinspires.ftc.teamcode.Util.Constants.Robot.ArmRotation;
 import org.firstinspires.ftc.teamcode.Util.Constants.Robot.ArmSpeed;
-import org.firstinspires.ftc.teamcode.Util.Constants.Robot.ClawPosition;
 import org.firstinspires.ftc.teamcode.Util.Constants.Robot.WristRotation;
 import org.firstinspires.ftc.vision.VisionPortal;
 
 import java.util.Timer;
-import java.util.TimerTask;
 
 
 @Config
@@ -23,7 +21,7 @@ public class Drive extends LinearOpMode {
     @Override
     public void runOpMode() {
         Robot robot = new Robot(hardwareMap, telemetry);
-        robot.claw.setOpen(true);
+        robot.claw.close();
         VisionPortal.Builder builder = new VisionPortal.Builder();
         builder.setCamera(hardwareMap.get(WebcamName.class, "Webcam 1"));
         VisionPortal visionPortal = builder.build();
@@ -78,31 +76,17 @@ public class Drive extends LinearOpMode {
                 robot.arm.holdRotation();
             }
 
-            if (Gamepad2.getButton(GamepadKeys.Button.A)) {
+            if (Gamepad2.wasJustReleased(GamepadKeys.Button.A)) {
                 robot.resetForIntake();
             }
 
             if (Gamepad2.wasJustPressed(GamepadKeys.Button.RIGHT_BUMPER)) {
-                robot.claw.setOpen(false);
-                if (robot.pickUp) {
-                    timer.purge();
-                    timer.schedule(new TimerTask() {
-                        @Override
-                        public void run() {
-                            robot.arm.setWristPickup(false);
-                        }
-                    }, ClawPosition.WaitTime);
-                }
+                robot.claw.close();
             } else if (Gamepad2.wasJustPressed(GamepadKeys.Button.LEFT_BUMPER)) {
-                robot.claw.setOpen(true);
-                if (robot.pickUp && robot.arm.getWristRotation() != WristRotation.Forward) {
-                    timer.purge();
-                    timer.schedule(new TimerTask() {
-                        @Override
-                        public void run() {
-                            robot.arm.setWristPickup(true);
-                        }
-                    }, ClawPosition.WaitTime);
+                if (robot.pickUp) {
+                    robot.claw.open();
+                } else {
+                    robot.claw.openNext();
                 }
             }
 
@@ -128,8 +112,19 @@ public class Drive extends LinearOpMode {
                 robot.arm.launchDrone();
             }
 
+//            if (Gamepad2.getButton(GamepadKeys.Button.X)) {
+//                robot.claw.primaryClawServo.getController().pwmEnable();
+//            } else {
+//                robot.claw.primaryClawServo.getController().pwmDisable();
+//            }
+
             robot.update();
             telemetry.addData("Robot arm rotation", robot.arm.getRotation());
+            telemetry.addLine();
+            telemetry.addData("Primary servo position", robot.claw.getPrimaryPosition());
+            telemetry.addLine(robot.claw.primaryClawServo.getController().getManufacturer() + "-" + robot.claw.primaryClawServo.getController().getConnectionInfo() + "-" + robot.claw.primaryClawServo.getController().getPwmStatus());
+
+            telemetry.addData("Secondary servo position", robot.claw.getSecondaryPosition());
 
             Gamepad1.readButtons();
             Gamepad2.readButtons();

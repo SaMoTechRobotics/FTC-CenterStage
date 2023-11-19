@@ -30,13 +30,12 @@ public class Robot {
         arm.setHangingLock(false);
         arm.setRotation(ArmRotation.Down);
         arm.setWristRotation(WristRotation.Down);
-        claw.setOpen(true);
+        claw.open();
     }
 
     public void prepareDroneLaunch() {
         arm.setRotation(ArmRotation.DroneLaunch);
         arm.setWristRotation(WristRotation.Up);
-        claw.setOpen(true);
         droneReady = true;
     }
 

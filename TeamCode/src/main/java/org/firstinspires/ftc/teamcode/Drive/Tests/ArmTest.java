@@ -23,9 +23,9 @@ public class ArmTest extends LinearOpMode {
 
         while (opModeIsActive()) {
             if (Gamepad2.wasJustPressed(GamepadKeys.Button.RIGHT_BUMPER)) {
-                robot.claw.setOpen(false);
+                robot.claw.close();
             } else if (Gamepad2.wasJustPressed(GamepadKeys.Button.LEFT_BUMPER)) {
-                robot.claw.setOpen(true);
+                robot.claw.open();
             }
 
             if (Gamepad1.wasJustPressed(GamepadKeys.Button.Y)) {

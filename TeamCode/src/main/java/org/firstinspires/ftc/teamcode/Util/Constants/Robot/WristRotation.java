@@ -10,7 +10,7 @@ public class WristRotation {
     public static Double PositionAt180Degrees = 0.85;
 
     public static Double HoldDown = 0.95;
-    public static Double Down = 0.91;
+    public static Double Down = 0.98;
     public static Double Up = 0.0;
     public static Double Forward = 0.4;
 

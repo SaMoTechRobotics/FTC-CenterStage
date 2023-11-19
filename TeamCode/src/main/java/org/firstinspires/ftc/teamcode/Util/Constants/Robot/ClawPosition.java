@@ -4,8 +4,10 @@ import com.acmerobotics.dashboard.config.Config;
 
 @Config
 public class ClawPosition {
-    public static Double Open = 0.5;
-    public static Double Closed = 0.03;
+    public static Double PrimaryOpen = 0.9;
+    public static Double PrimaryClosed = 0.1;
+    public static Double SecondaryOpen = 0.1;
+    public static Double SecondaryClosed = 0.9;
 
     public static int WaitTime = 300;
 
