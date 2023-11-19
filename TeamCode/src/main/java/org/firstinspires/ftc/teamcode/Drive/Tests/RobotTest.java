@@ -50,7 +50,7 @@ public class RobotTest extends LinearOpMode {
                     Gamepad1.getButton(GamepadKeys.Button.RIGHT_BUMPER)
             );
 
-            chassis.updateWithControls(Gamepad1);
+            chassis.updateWithControls(Gamepad1, Gamepad2, false);
 
             if (Gamepad2.getButton(GamepadKeys.Button.RIGHT_BUMPER)) {
                 motor.setPower(Gamepad2.getLeftY() * ArmSpeed.Max);

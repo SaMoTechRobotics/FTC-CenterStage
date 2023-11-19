@@ -47,7 +47,7 @@ public class Drive extends LinearOpMode {
                     Gamepad1.getButton(GamepadKeys.Button.RIGHT_BUMPER)
             );
 
-            robot.chassis.updateWithControls(Gamepad1);
+            robot.chassis.updateWithControls(Gamepad1, Gamepad2, !robot.pickUp);
 
             if (Math.abs(Gamepad2.getRightX()) > 0.01) {
                 robot.arm.manualRotation(Gamepad2.getRightX() * ArmSpeed.SlowManual);
@@ -73,7 +73,7 @@ public class Drive extends LinearOpMode {
                 robot.arm.setWristPickup(true);
             } else if (Gamepad1.wasJustReleased(GamepadKeys.Button.B)) {
                 robot.arm.setRotation(ArmRotation.Hang);
-                robot.arm.setWristRotation(WristRotation.Down);
+                robot.arm.setWristRotation(WristRotation.Hang);
             } else {
                 robot.arm.holdRotation();
             }

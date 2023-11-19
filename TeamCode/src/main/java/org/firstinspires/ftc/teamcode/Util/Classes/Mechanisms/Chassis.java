@@ -119,16 +119,19 @@ public class Chassis {
         }
     }
 
-    /**
-     * Drives the robot based on the input from gamepad 1 and if auto drive is enabled
-     *
-     * @param gamepad1  The gamepad to use for input, (gamepad1)
-     * @param autoDrive Whether or not auto drive is enabled
-     */
     public void updateWithControls(
-            GamepadEx gamepad1
+            GamepadEx gamepad1,
+            GamepadEx gamepad2,
+            boolean delivering
     ) {
         double driveStick = Math.abs(-gamepad1.getLeftY()) > ChassisSpeed.JoystickYMargin ? -gamepad1.getLeftY() : 0;
+        if (delivering) {
+            if (Math.abs(gamepad2.getRightX()) > 0.01) {
+                driveStick += gamepad2.getLeftX() * ChassisSpeed.MatchingArmSlowSpeed;
+            } else if (Math.abs(gamepad2.getLeftX()) > 0.01) {
+                driveStick += gamepad2.getLeftX() * ChassisSpeed.MatchingArmSpeed;
+            }
+        }
         double strafeStick = Math.abs(-gamepad1.getLeftX()) > ChassisSpeed.JoystickXMargin ? -gamepad1.getLeftX() : 0;
         double turnStick = gamepad1.getRightX();
         if (driveStick != 0 || strafeStick != 0 || turnStick != 0) {
