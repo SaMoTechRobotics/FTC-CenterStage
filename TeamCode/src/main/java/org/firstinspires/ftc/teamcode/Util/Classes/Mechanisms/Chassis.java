@@ -5,6 +5,8 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+import org.firstinspires.ftc.teamcode.Util.Constants.Auto.DistanceSensorConstants;
 import org.firstinspires.ftc.teamcode.Util.Constants.Robot.ChassisSpeed;
 
 public class Chassis {
@@ -37,6 +39,23 @@ public class Chassis {
         this.rightDistanceSensor = hardwareMap.get(DistanceSensor.class, "rightDistance");
 
         toggleBrake(true);
+    }
+
+    public void update() {
+        telemetry.addData("Left Distance", leftDistanceSensor.getDistance(DistanceUnit.INCH));
+        telemetry.addData("Right Distance", rightDistanceSensor.getDistance(DistanceUnit.INCH));
+        telemetry.addData("Pixel Detected In Claw", pixelDetectedInClaw());
+        telemetry.addData("Pixel Detected", pixelDetected());
+    }
+
+    public boolean pixelDetectedInClaw() {
+        return leftDistanceSensor.getDistance(DistanceUnit.INCH) < DistanceSensorConstants.PixelInClawMaxDistance &&
+                rightDistanceSensor.getDistance(DistanceUnit.INCH) < DistanceSensorConstants.PixelInClawMaxDistance;
+    }
+
+    public boolean pixelDetected() {
+        return leftDistanceSensor.getDistance(DistanceUnit.INCH) < DistanceSensorConstants.PixelDetectedDistance &&
+                rightDistanceSensor.getDistance(DistanceUnit.INCH) < DistanceSensorConstants.PixelDetectedDistance;
     }
 
     /**

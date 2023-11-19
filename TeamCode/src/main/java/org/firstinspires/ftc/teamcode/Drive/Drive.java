@@ -112,17 +112,8 @@ public class Drive extends LinearOpMode {
                 robot.arm.launchDrone();
             }
 
-//            if (Gamepad2.getButton(GamepadKeys.Button.X)) {
-//                robot.claw.primaryClawServo.getController().pwmEnable();
-//            } else {
-//                robot.claw.primaryClawServo.getController().pwmDisable();
-//            }
-
             robot.update();
             telemetry.addData("Robot arm rotation", robot.arm.getRotation());
-            telemetry.addLine();
-            telemetry.addData("Primary servo position", robot.claw.getPrimaryPosition());
-            telemetry.addLine(robot.claw.primaryClawServo.getController().getManufacturer() + "-" + robot.claw.primaryClawServo.getController().getConnectionInfo() + "-" + robot.claw.primaryClawServo.getController().getPwmStatus());
 
             telemetry.addData("Secondary servo position", robot.claw.getSecondaryPosition());
 
