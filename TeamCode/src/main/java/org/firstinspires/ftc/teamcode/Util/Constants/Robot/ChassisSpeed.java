@@ -28,8 +28,8 @@ public class ChassisSpeed {
     public static double MidStrafe = 0.5;
     public static double MinStrafe = 0.25;
 
-    public static Double MatchingArmSpeed = 0.3;
-    public static Double MatchingArmSlowSpeed = 0.15;
+    public static Double MatchingArmSpeed = 0.0; // 0.3
+    public static Double MatchingArmSlowSpeed = 0.0; // 0.15
 
     /**
      * Place speed for when robot is aligning with pole
