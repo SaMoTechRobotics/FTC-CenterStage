@@ -18,6 +18,8 @@ import java.util.Timer;
 @Config
 @TeleOp(name = "Drive")
 public class Drive extends LinearOpMode {
+    public static boolean DebuggingTelemetry = false;
+
     @Override
     public void runOpMode() {
         Robot robot = new Robot(hardwareMap, telemetry);

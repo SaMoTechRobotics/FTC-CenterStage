@@ -1,11 +1,13 @@
 package org.firstinspires.ftc.teamcode.Util.Classes.Mechanisms;
 
+import com.acmerobotics.dashboard.FtcDashboard;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+import org.firstinspires.ftc.teamcode.Drive.Drive;
 import org.firstinspires.ftc.teamcode.Util.Constants.Auto.DistanceSensorConstants;
 import org.firstinspires.ftc.teamcode.Util.Constants.Robot.ChassisSpeed;
 
@@ -42,10 +44,18 @@ public class Chassis {
     }
 
     public void update() {
-        telemetry.addData("Left Distance", leftDistanceSensor.getDistance(DistanceUnit.INCH));
-        telemetry.addData("Right Distance", rightDistanceSensor.getDistance(DistanceUnit.INCH));
-        telemetry.addData("Pixel Detected In Claw", pixelDetectedInClaw());
-        telemetry.addData("Pixel Detected", pixelDetected());
+        if (Drive.DebuggingTelemetry) {
+            Telemetry dashboardTelemetry = FtcDashboard.getInstance().getTelemetry();
+            dashboardTelemetry.addData("ld", Math.min(leftDistanceSensor.getDistance(DistanceUnit.INCH), 20));
+            dashboardTelemetry.addData("rd", Math.min(rightDistanceSensor.getDistance(DistanceUnit.INCH), 20));
+            dashboardTelemetry.addData("Pixel Detected In Claw", pixelDetectedInClaw());
+            dashboardTelemetry.addData("Pixel Detected", pixelDetected());
+            dashboardTelemetry.update();
+            telemetry.addData("Left Distance", leftDistanceSensor.getDistance(DistanceUnit.INCH));
+            telemetry.addData("Right Distance", rightDistanceSensor.getDistance(DistanceUnit.INCH));
+            telemetry.addData("Pixel Detected In Claw", pixelDetectedInClaw());
+            telemetry.addData("Pixel Detected", pixelDetected());
+        }
     }
 
     public boolean pixelDetectedInClaw() {
