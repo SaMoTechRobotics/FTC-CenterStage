@@ -83,9 +83,16 @@ public class Drive extends LinearOpMode {
             }
 
             if (Gamepad2.wasJustPressed(GamepadKeys.Button.RIGHT_BUMPER)) {
+                if (robot.pickUp && !robot.claw.isOpen && robot.arm.getRotation() < ArmRotation.HoldDown) {
+                    robot.arm.setRotation(ArmRotation.HoldDown);
+                    robot.arm.setWristRotation(WristRotation.HoldDown);
+                }
                 robot.claw.close();
             } else if (Gamepad2.wasJustPressed(GamepadKeys.Button.LEFT_BUMPER)) {
                 if (robot.pickUp) {
+                    if (Math.floor(robot.arm.getRotation()) <= ArmRotation.HoldDown + 1.0) {
+                        robot.arm.setRotation(ArmRotation.Down);
+                    }
                     robot.claw.open();
                 } else {
                     robot.claw.openNext();
