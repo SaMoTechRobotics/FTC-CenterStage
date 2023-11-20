@@ -8,9 +8,9 @@ public class ArmRotation {
 
     public static int MaxPickup = 60;
 
-    public static int HighDeliver = 100;
+    public static int HighDeliver = 110;
     public static int MidDeliver = 140;
-    public static int LowDeliver = 180;
+    public static int LowDeliver = 160;
 
     public static int DroneLaunch = 130;
 
