@@ -22,12 +22,12 @@ public final class MecanumDrive {
     public static class Params {
         // drive model parameters
         public double inPerTick = 76.0 / 101085.5;
-        public double lateralInPerTick = 1;
-        public double trackWidthTicks = 0;
+        public double lateralInPerTick = 0.0005758376975630854;
+        public double trackWidthTicks = 15006.649328815938;
 
         // feedforward parameters (in tick units)
-        public double kS = 0;
-        public double kV = 0;
+        public double kS = 0.637733289776234;
+        public double kV = 0.00015007233513335272;
         public double kA = 0;
 
         // path profile parameters (in inches)
@@ -147,13 +147,13 @@ public final class MecanumDrive {
             module.setBulkCachingMode(LynxModule.BulkCachingMode.AUTO);
         }
 
-        leftFront = hardwareMap.get(DcMotorEx.class, "backLeft");
-        leftBack = hardwareMap.get(DcMotorEx.class, "frontLeft");
-        rightBack = hardwareMap.get(DcMotorEx.class, "frontRight");
-        rightFront = hardwareMap.get(DcMotorEx.class, "backRight");
+        leftFront = hardwareMap.get(DcMotorEx.class, "frontLeft");
+        leftBack = hardwareMap.get(DcMotorEx.class, "backLeft");
+        rightBack = hardwareMap.get(DcMotorEx.class, "backRight");
+        rightFront = hardwareMap.get(DcMotorEx.class, "frontRight");
 
-        rightBack.setDirection(DcMotorSimple.Direction.REVERSE);
-        rightFront.setDirection(DcMotorSimple.Direction.REVERSE);
+        leftBack.setDirection(DcMotorSimple.Direction.REVERSE);
+        leftFront.setDirection(DcMotorSimple.Direction.REVERSE);
 
         leftFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         leftBack.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
