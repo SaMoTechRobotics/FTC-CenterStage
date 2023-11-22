@@ -148,6 +148,7 @@ public final class TuningOpModes {
         manager.register(metaForClass(MecanumMotorDirectionDebugger.class), new MecanumMotorDirectionDebugger(dvf));
 
         manager.register(metaForClass(ManualFeedbackTuner.class), ManualFeedbackTuner.class);
+        manager.register(metaForClass(DriftAccuracyTest.class), DriftAccuracyTest.class);
         manager.register(metaForClass(SplineTest.class), SplineTest.class);
         manager.register(metaForClass(LocalizationTest.class), LocalizationTest.class);
 
@@ -158,7 +159,8 @@ public final class TuningOpModes {
                     LateralRampLogger.class,
                     ManualFeedforwardTuner.class,
                     MecanumMotorDirectionDebugger.class,
-                    ManualFeedbackTuner.class
+                    ManualFeedbackTuner.class,
+                    DriftAccuracyTest.class
             )) {
                 configRoot.putVariable(c.getSimpleName(), ReflectionConfig.createVariableFromClass(c));
             }
