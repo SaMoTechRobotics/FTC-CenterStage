@@ -1,11 +1,11 @@
 package org.firstinspires.ftc.teamcode.Drive.Tests;
 
 import com.acmerobotics.dashboard.config.Config;
-import com.arcrobotics.ftclib.gamepad.GamepadEx;
-import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import org.firstinspires.ftc.teamcode.Util.Classes.Lib.GamepadButton;
+import org.firstinspires.ftc.teamcode.Util.Classes.Lib.StatefulGamepad;
 
 
 @Config
@@ -20,7 +20,7 @@ public class MotorTest extends LinearOpMode {
         motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-        GamepadEx Gamepad1 = new GamepadEx(gamepad1);
+        StatefulGamepad gamepad1Buttons = new StatefulGamepad(gamepad1);
 
         telemetry.speak("Initialized Motor Test");
         telemetry.update();
@@ -29,18 +29,18 @@ public class MotorTest extends LinearOpMode {
 
         while (opModeIsActive()) {
 
-            if (Gamepad1.getButton(GamepadKeys.Button.RIGHT_BUMPER)) {
-                motor.setPower(Gamepad1.getLeftY() * SlowSpeed);
+            if (gamepad1Buttons.getButton(GamepadButton.RIGHT_BUMPER)) {
+                motor.setPower(gamepad1.left_stick_y * SlowSpeed);
             } else {
-                motor.setPower(Gamepad1.getLeftY());
+                motor.setPower(gamepad1.left_stick_y);
             }
 
-            if (Gamepad1.getButton(GamepadKeys.Button.A)) {
+            if (gamepad1Buttons.getButton(GamepadButton.A)) {
                 motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
                 motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
             }
 
-            if (Gamepad1.getButton(GamepadKeys.Button.B)) {
+            if (gamepad1Buttons.getButton(GamepadButton.B)) {
                 if (motor.getZeroPowerBehavior() == DcMotor.ZeroPowerBehavior.BRAKE) {
                     motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
                 } else {
@@ -56,7 +56,7 @@ public class MotorTest extends LinearOpMode {
             telemetry.addData("Motor Mode", motor.getMode());
             telemetry.update();
 
-            Gamepad1.readButtons();
+            gamepad1Buttons.update();
         }
     }
 }

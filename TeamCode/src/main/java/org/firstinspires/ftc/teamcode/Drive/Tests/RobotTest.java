@@ -1,14 +1,11 @@
 package org.firstinspires.ftc.teamcode.Drive.Tests;
 
 import com.acmerobotics.dashboard.config.Config;
-import com.arcrobotics.ftclib.gamepad.GamepadEx;
-import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 import org.firstinspires.ftc.teamcode.Util.Classes.Mechanisms.Chassis;
-import org.firstinspires.ftc.teamcode.Util.Constants.Robot.ArmSpeed;
 
 
 @Config
@@ -37,35 +34,35 @@ public class RobotTest extends LinearOpMode {
         Servo claw = hardwareMap.get(Servo.class, "claw");
         Servo wrist = hardwareMap.get(Servo.class, "wrist");
 
-        GamepadEx Gamepad1 = new GamepadEx(gamepad1);
-        GamepadEx Gamepad2 = new GamepadEx(gamepad2);
+//        GamepadEx Gamepad1 = new GamepadEx(gamepad1);
+//        GamepadEx Gamepad2 = new GamepadEx(gamepad2);
 
         boolean clawOpen = false;
 
         waitForStart();
 
         while (opModeIsActive()) {
-            chassis.updateSpeed(
-                    Gamepad1.getButton(GamepadKeys.Button.LEFT_BUMPER),
-                    Gamepad1.getButton(GamepadKeys.Button.RIGHT_BUMPER)
-            );
-
-            chassis.updateWithControls(Gamepad1, Gamepad2, false);
-
-            if (Gamepad2.getButton(GamepadKeys.Button.RIGHT_BUMPER)) {
-                motor.setPower(Gamepad2.getLeftY() * ArmSpeed.Max);
-            } else {
-                motor.setPower(Gamepad2.getLeftY() * armSpeed);
-            }
-
-            if (Gamepad2.wasJustPressed(GamepadKeys.Button.X)) {
-                clawOpen = !clawOpen;
-                claw.setPosition(clawOpen ? ClawOpen : ClawClosed);
-            }
-
-            if (Gamepad2.wasJustPressed(GamepadKeys.Button.Y)) {
-                wrist.setPosition(wrist.getPosition() == WristDown ? WristUp : WristDown);
-            }
+//            chassis.updateSpeed(
+//                    Gamepad1.getButton(GamepadKeys.Button.LEFT_BUMPER),
+//                    Gamepad1.getButton(GamepadKeys.Button.RIGHT_BUMPER)
+//            );
+//
+//            chassis.updateWithControls(Gamepad1, Gamepad2, false);
+//
+//            if (Gamepad2.getButton(GamepadKeys.Button.RIGHT_BUMPER)) {
+//                motor.setPower(Gamepad2.getLeftY() * ArmSpeed.Max);
+//            } else {
+//                motor.setPower(Gamepad2.getLeftY() * armSpeed);
+//            }
+//
+//            if (Gamepad2.wasJustPressed(GamepadKeys.Button.X)) {
+//                clawOpen = !clawOpen;
+//                claw.setPosition(clawOpen ? ClawOpen : ClawClosed);
+//            }
+//
+//            if (Gamepad2.wasJustPressed(GamepadKeys.Button.Y)) {
+//                wrist.setPosition(wrist.getPosition() == WristDown ? WristUp : WristDown);
+//            }
 
 //
 //            if(Gamepad2.wasJustPressed(GamepadKeys.Button.DPAD_UP)) {
@@ -86,7 +83,7 @@ public class RobotTest extends LinearOpMode {
             telemetry.addData("Motor Ticks", motor.getCurrentPosition());
             telemetry.update();
 
-            Gamepad2.readButtons();
+//            Gamepad2.readButtons();
         }
     }
 }

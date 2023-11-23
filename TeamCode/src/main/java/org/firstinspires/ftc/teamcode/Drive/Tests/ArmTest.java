@@ -1,10 +1,10 @@
-package org.firstinspires.ftc.teamcode.Drive;
+package org.firstinspires.ftc.teamcode.Drive.Tests;
 
 import com.acmerobotics.dashboard.config.Config;
-import com.arcrobotics.ftclib.gamepad.GamepadEx;
-import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import org.firstinspires.ftc.teamcode.Util.Classes.Lib.GamepadButton;
+import org.firstinspires.ftc.teamcode.Util.Classes.Lib.StatefulGamepad;
 import org.firstinspires.ftc.teamcode.Util.Classes.Robot;
 import org.firstinspires.ftc.teamcode.Util.Constants.Robot.WristRotation;
 
@@ -16,32 +16,32 @@ public class ArmTest extends LinearOpMode {
     public void runOpMode() {
         Robot robot = new Robot(hardwareMap, telemetry);
 
-        GamepadEx Gamepad1 = new GamepadEx(gamepad1);
-        GamepadEx Gamepad2 = new GamepadEx(gamepad2);
+        StatefulGamepad gamepad1Buttons = new StatefulGamepad(gamepad1);
+        StatefulGamepad gamepad2Buttons = new StatefulGamepad(gamepad2);
 
         waitForStart();
 
         while (opModeIsActive()) {
-            if (Gamepad2.wasJustPressed(GamepadKeys.Button.RIGHT_BUMPER)) {
+            if (gamepad2Buttons.wasJustPressed(GamepadButton.RIGHT_BUMPER)) {
                 robot.claw.close();
-            } else if (Gamepad2.wasJustPressed(GamepadKeys.Button.LEFT_BUMPER)) {
+            } else if (gamepad2Buttons.wasJustPressed(GamepadButton.LEFT_BUMPER)) {
                 robot.claw.open();
             }
 
-            if (Gamepad1.wasJustPressed(GamepadKeys.Button.Y)) {
+            if (gamepad1Buttons.wasJustPressed(GamepadButton.Y)) {
                 robot.arm.testWristDegrees(180, telemetry);
-            } else if (Gamepad1.wasJustPressed(GamepadKeys.Button.A)) {
+            } else if (gamepad1Buttons.wasJustPressed(GamepadButton.A)) {
                 robot.arm.testWristDegrees(0, telemetry);
             }
 
-            if (Gamepad2.wasJustPressed(GamepadKeys.Button.B)) {
+            if (gamepad2Buttons.wasJustPressed(GamepadButton.B)) {
                 robot.arm.setWristRotation(WristRotation.Down);
-            } else if (Gamepad2.wasJustPressed(GamepadKeys.Button.Y)) {
+            } else if (gamepad2Buttons.wasJustPressed(GamepadButton.Y)) {
                 robot.arm.setWristRotation(WristRotation.Up);
             }
 
-            Gamepad1.readButtons();
-            Gamepad2.readButtons();
+            gamepad1Buttons.update();
+            gamepad2Buttons.update();
             telemetry.update();
         }
     }

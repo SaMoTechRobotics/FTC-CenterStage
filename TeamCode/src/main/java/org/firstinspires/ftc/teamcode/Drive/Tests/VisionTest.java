@@ -1,10 +1,10 @@
 package org.firstinspires.ftc.teamcode.Drive.Tests;
 
 import com.acmerobotics.dashboard.config.Config;
-import com.arcrobotics.ftclib.gamepad.GamepadEx;
-import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import org.firstinspires.ftc.teamcode.Util.Classes.Lib.GamepadButton;
+import org.firstinspires.ftc.teamcode.Util.Classes.Lib.StatefulGamepad;
 import org.firstinspires.ftc.teamcode.Util.Classes.Vision.Vision;
 import org.firstinspires.ftc.teamcode.Util.Enums.SpikeLocation;
 import org.firstinspires.ftc.teamcode.Util.Enums.VisionProcessor;
@@ -16,7 +16,7 @@ public class VisionTest extends LinearOpMode {
     public void runOpMode() {
         Vision vision = new Vision(hardwareMap);
 
-        GamepadEx Gamepad1 = new GamepadEx(gamepad1);
+        StatefulGamepad gamepad1Buttons = new StatefulGamepad(gamepad1);
 
         vision.startProcessor(VisionProcessor.SPIKE_LOCATION_DETECTION);
         vision.visionPortal.resumeStreaming();
@@ -28,7 +28,7 @@ public class VisionTest extends LinearOpMode {
         while (opModeIsActive()) {
             spikeLocation = vision.getSpikeLocation();
 
-            if (Gamepad1.wasJustPressed(GamepadKeys.Button.A)) {
+            if (gamepad1Buttons.wasJustPressed(GamepadButton.A)) {
                 vision.toggleProcessorStreamingMode();
             }
 

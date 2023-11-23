@@ -1,14 +1,15 @@
 package org.firstinspires.ftc.teamcode.Drive;
 
 import com.acmerobotics.dashboard.config.Config;
-import com.arcrobotics.ftclib.gamepad.GamepadEx;
-import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
+import org.firstinspires.ftc.teamcode.Util.Classes.Lib.GamepadButton;
+import org.firstinspires.ftc.teamcode.Util.Classes.Lib.StatefulGamepad;
 import org.firstinspires.ftc.teamcode.Util.Classes.Robot;
 import org.firstinspires.ftc.teamcode.Util.Constants.Robot.ArmRotation;
 import org.firstinspires.ftc.teamcode.Util.Constants.Robot.ArmSpeed;
+import org.firstinspires.ftc.teamcode.Util.Constants.Robot.ChassisSpeed;
 import org.firstinspires.ftc.teamcode.Util.Constants.Robot.WristRotation;
 import org.firstinspires.ftc.vision.VisionPortal;
 
@@ -28,67 +29,73 @@ public class Drive extends LinearOpMode {
         builder.setCamera(hardwareMap.get(WebcamName.class, "Webcam 1"));
         VisionPortal visionPortal = builder.build();
 
-        GamepadEx Gamepad1 = new GamepadEx(gamepad1);
-        GamepadEx Gamepad2 = new GamepadEx(gamepad2);
+        StatefulGamepad gamepad1Buttons = new StatefulGamepad(gamepad1);
+        StatefulGamepad gamepad2Buttons = new StatefulGamepad(gamepad2);
 
         Timer timer = new Timer();
 
         waitForStart();
 
         while (opModeIsActive()) {
-            if (Gamepad1.wasJustPressed(GamepadKeys.Button.DPAD_UP)) {
+            if (gamepad1Buttons.wasJustPressed(GamepadButton.DPAD_UP)) {
                 visionPortal.resumeStreaming();
-            } else if (Gamepad1.wasJustPressed(GamepadKeys.Button.DPAD_DOWN)) {
+            } else if (gamepad1Buttons.wasJustPressed(GamepadButton.DPAD_DOWN)) {
                 visionPortal.stopStreaming();
             }
 
-            robot.chassis.updateSpeed(
-                    Gamepad1.getButton(GamepadKeys.Button.LEFT_BUMPER),
-                    Gamepad1.getButton(GamepadKeys.Button.RIGHT_BUMPER)
-            );
+            if (gamepad1Buttons.stateJustChanged(GamepadButton.LEFT_BUMPER) || gamepad1Buttons.stateJustChanged(GamepadButton.RIGHT_BUMPER)) {
+                robot.chassis.updateSpeed(
+                        gamepad1Buttons.getButton(GamepadButton.LEFT_BUMPER),
+                        gamepad1Buttons.getButton(GamepadButton.RIGHT_BUMPER)
+                );
+            }
 
-            robot.chassis.updateWithControls(Gamepad1, Gamepad2, !robot.pickUp);
+            double drivePower = Math.abs(gamepad1.left_stick_y) > ChassisSpeed.JoystickYMargin ? gamepad1.left_stick_y : 0;
+            double strafePower = Math.abs(gamepad1.left_stick_x) > ChassisSpeed.JoystickXMargin ? gamepad1.left_stick_x : 0;
+            double turnPower = Math.abs(gamepad1.right_stick_x) > ChassisSpeed.JoystickXMargin ? gamepad1.right_stick_x : 0;
 
-            if (Math.abs(Gamepad2.getRightX()) > 0.01) {
-                robot.arm.manualRotation(Gamepad2.getRightX() * ArmSpeed.SlowManual);
+            robot.chassis.setManualPower(drivePower, strafePower, turnPower);
+
+            if (Math.abs(gamepad2.right_stick_x) > 0.01) {
+                robot.arm.manualRotation(gamepad2.right_stick_x * ArmSpeed.SlowManual);
                 if (!robot.pickUp) {
                     robot.arm.setGlobalWristRotation(true);
                 }
-            } else if (Math.abs(Gamepad2.getLeftX()) > 0.01) {
-                robot.arm.manualRotation(Gamepad2.getLeftX());
+            } else if (Math.abs(gamepad2.left_stick_x) > 0.01) {
+                robot.arm.manualRotation(gamepad2.left_stick_x);
                 if (!robot.pickUp) {
                     robot.arm.setGlobalWristRotation(true);
                 }
-            } else if (Gamepad2.wasJustReleased(GamepadKeys.Button.DPAD_UP)) {
+            } else if (gamepad2Buttons.wasJustReleased(GamepadButton.DPAD_UP)) {
                 robot.arm.setRotation(ArmRotation.HighDeliver);
                 robot.arm.setGlobalWristRotation(true);
-            } else if (Gamepad2.wasJustReleased(GamepadKeys.Button.DPAD_LEFT)) {
+            } else if (gamepad2Buttons.wasJustReleased(GamepadButton.DPAD_LEFT)) {
                 robot.arm.setRotation(ArmRotation.MidDeliver);
                 robot.arm.setGlobalWristRotation(true);
-            } else if (Gamepad2.wasJustReleased(GamepadKeys.Button.DPAD_DOWN)) {
+            } else if (gamepad2Buttons.wasJustReleased(GamepadButton.DPAD_DOWN)) {
                 robot.arm.setRotation(ArmRotation.LowDeliver);
                 robot.arm.setGlobalWristRotation(true);
-            } else if (Gamepad2.wasJustReleased(GamepadKeys.Button.DPAD_RIGHT)) {
+            } else if (gamepad2Buttons.wasJustReleased(GamepadButton.DPAD_RIGHT)) {
                 robot.arm.setRotation(ArmRotation.Down);
                 robot.arm.setWristPickup(true);
-            } else if (Gamepad1.wasJustReleased(GamepadKeys.Button.B)) {
+            } else if (gamepad1Buttons.wasJustReleased(GamepadButton.B)) {
                 robot.arm.setRotation(ArmRotation.Hang);
                 robot.arm.setWristRotation(WristRotation.Hang);
             } else {
                 robot.arm.holdRotation();
             }
 
-            if (Gamepad2.wasJustReleased(GamepadKeys.Button.A)) {
+            if (gamepad2Buttons.wasJustReleased(GamepadButton.A)) {
                 robot.resetForIntake();
             }
 
-            if (Gamepad2.wasJustPressed(GamepadKeys.Button.RIGHT_BUMPER)) {
+            if (gamepad2Buttons.wasJustPressed(GamepadButton.RIGHT_BUMPER)) {
                 if (robot.pickUp && !robot.claw.isOpen && robot.arm.getRotation() < ArmRotation.HoldDown) {
                     robot.arm.setRotation(ArmRotation.HoldDown);
                     robot.arm.setWristRotation(WristRotation.HoldDown);
                 }
                 robot.claw.close();
-            } else if (Gamepad2.wasJustPressed(GamepadKeys.Button.LEFT_BUMPER)) {
+            } else if (gamepad2Buttons.wasJustPressed(GamepadButton.LEFT_BUMPER)) {
                 if (robot.pickUp) {
                     if (Math.floor(robot.arm.getRotation()) <= ArmRotation.HoldDown + 1.0) {
                         robot.arm.setRotation(ArmRotation.Down);
@@ -100,24 +107,24 @@ public class Drive extends LinearOpMode {
             }
 
 
-            if (Gamepad1.wasJustPressed(GamepadKeys.Button.Y)) {
+            if (gamepad1Buttons.wasJustPressed(GamepadButton.Y)) {
                 robot.arm.setHangingLock(true);
-            } else if (Gamepad1.wasJustPressed(GamepadKeys.Button.A)) {
+            } else if (gamepad1Buttons.wasJustPressed(GamepadButton.A)) {
                 robot.arm.setHangingLock(false);
             }
 
-            if (Gamepad2.wasJustPressed(GamepadKeys.Button.B)) {
+            if (gamepad2Buttons.wasJustPressed(GamepadButton.B)) {
                 robot.arm.setWristRotation(WristRotation.Down);
-            } else if (Gamepad2.wasJustPressed(GamepadKeys.Button.Y)) {
+            } else if (gamepad2Buttons.wasJustPressed(GamepadButton.Y)) {
                 robot.arm.setWristRotation(WristRotation.Up);
-            } else if (Gamepad2.wasJustPressed(GamepadKeys.Button.X)) {
+            } else if (gamepad2Buttons.wasJustPressed(GamepadButton.X)) {
                 robot.arm.setWristRotation(WristRotation.Forward);
             }
 
-            if (Gamepad1.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER) > 0.1 && Gamepad1.wasJustPressed(GamepadKeys.Button.LEFT_BUMPER)) {
+            if (gamepad1.left_trigger > 0.1 && gamepad1Buttons.wasJustPressed(GamepadButton.LEFT_BUMPER)) {
                 robot.prepareDroneLaunch();
             }
-            if (Gamepad1.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER) > 0.1 && Gamepad1.wasJustPressed(GamepadKeys.Button.RIGHT_BUMPER) && robot.droneReady) {
+            if (gamepad1.right_trigger > 0.1 && gamepad1Buttons.wasJustPressed(GamepadButton.RIGHT_BUMPER) && robot.droneReady) {
                 robot.arm.launchDrone();
             }
 
@@ -126,8 +133,8 @@ public class Drive extends LinearOpMode {
 
             telemetry.addData("Secondary servo position", robot.claw.getSecondaryPosition());
 
-            Gamepad1.readButtons();
-            Gamepad2.readButtons();
+            gamepad1Buttons.update();
+            gamepad2Buttons.update();
             telemetry.update();
         }
     }

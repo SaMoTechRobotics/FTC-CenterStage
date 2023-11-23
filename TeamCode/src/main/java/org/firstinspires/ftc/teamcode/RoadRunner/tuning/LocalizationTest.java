@@ -4,11 +4,11 @@ import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.PoseVelocity2d;
 import com.acmerobotics.roadrunner.Vector2d;
 import com.acmerobotics.roadrunner.ftc.Actions;
-import com.arcrobotics.ftclib.gamepad.GamepadEx;
-import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import org.firstinspires.ftc.teamcode.RoadRunner.MecanumDrive;
 import org.firstinspires.ftc.teamcode.RoadRunner.TankDrive;
+import org.firstinspires.ftc.teamcode.Util.Classes.Lib.GamepadButton;
+import org.firstinspires.ftc.teamcode.Util.Classes.Lib.StatefulGamepad;
 
 public class LocalizationTest extends LinearOpMode {
     @Override
@@ -16,12 +16,12 @@ public class LocalizationTest extends LinearOpMode {
         if (TuningOpModes.DRIVE_CLASS.equals(MecanumDrive.class)) {
             MecanumDrive drive = new MecanumDrive(hardwareMap, new Pose2d(0, 0, 0));
 
-            GamepadEx gamepad = new GamepadEx(gamepad1);
+            StatefulGamepad gamepadButtons = new StatefulGamepad(gamepad1);
 
             waitForStart();
 
             while (opModeIsActive()) {
-                if (gamepad.wasJustReleased(GamepadKeys.Button.A)) {
+                if (gamepadButtons.wasJustReleased(GamepadButton.A)) {
                     Actions.runBlocking(
                             drive.actionBuilder(drive.pose)
                                     .strafeToLinearHeading(new Vector2d(0, 0), 0)
@@ -45,9 +45,7 @@ public class LocalizationTest extends LinearOpMode {
                 telemetry.addData("y", drive.pose.position.y);
                 telemetry.addData("heading", drive.pose.heading);
                 telemetry.update();
-                gamepad.readButtons();
-
-
+                gamepadButtons.update();
             }
         } else if (TuningOpModes.DRIVE_CLASS.equals(TankDrive.class)) {
             TankDrive drive = new TankDrive(hardwareMap, new Pose2d(0, 0, 0));
