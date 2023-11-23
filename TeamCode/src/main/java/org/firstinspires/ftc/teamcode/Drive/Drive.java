@@ -66,23 +66,37 @@ public class Drive extends LinearOpMode {
                 if (!robot.pickUp) {
                     robot.arm.setGlobalWristRotation(true);
                 }
-            } else if (gamepad2Buttons.wasJustReleased(GamepadButton.DPAD_UP)) {
-                robot.arm.setRotation(ArmRotation.HighDeliver);
-                robot.arm.setGlobalWristRotation(true);
-            } else if (gamepad2Buttons.wasJustReleased(GamepadButton.DPAD_LEFT)) {
-                robot.arm.setRotation(ArmRotation.MidDeliver);
-                robot.arm.setGlobalWristRotation(true);
-            } else if (gamepad2Buttons.wasJustReleased(GamepadButton.DPAD_DOWN)) {
-                robot.arm.setRotation(ArmRotation.LowDeliver);
-                robot.arm.setGlobalWristRotation(true);
-            } else if (gamepad2Buttons.wasJustReleased(GamepadButton.DPAD_RIGHT)) {
-                robot.arm.setRotation(ArmRotation.Down);
-                robot.arm.setWristPickup(true);
-            } else if (gamepad1Buttons.wasJustReleased(GamepadButton.B)) {
-                robot.arm.setRotation(ArmRotation.Hang);
-                robot.arm.setWristRotation(WristRotation.Hang);
-            } else {
-                robot.arm.holdRotation();
+            } else if (gamepad2.left_trigger < 0.1) {
+                if (gamepad2Buttons.wasJustReleased(GamepadButton.DPAD_UP)) {
+                    robot.arm.setRotation(ArmRotation.HighDeliver);
+                    robot.arm.setGlobalWristRotation(true);
+                } else if (gamepad2Buttons.wasJustReleased(GamepadButton.DPAD_LEFT)) {
+                    robot.arm.setRotation(ArmRotation.MidDeliver);
+                    robot.arm.setGlobalWristRotation(true);
+                } else if (gamepad2Buttons.wasJustReleased(GamepadButton.DPAD_DOWN)) {
+                    robot.arm.setRotation(ArmRotation.LowDeliver);
+                    robot.arm.setGlobalWristRotation(true);
+                } else if (gamepad2Buttons.wasJustReleased(GamepadButton.DPAD_RIGHT)) {
+                    robot.arm.setRotation(ArmRotation.Down);
+                    robot.arm.setWristPickup(true);
+                } else if (gamepad1Buttons.wasJustReleased(GamepadButton.B)) {
+                    robot.arm.setRotation(ArmRotation.Hang);
+                    robot.arm.setWristRotation(WristRotation.Hang);
+                } else {
+                    robot.arm.holdRotation();
+                }
+            }
+
+            if (gamepad2.left_trigger >= 0.1) {
+                if (gamepad2Buttons.wasJustReleased(GamepadButton.DPAD_UP)) {
+                    robot.arm.setRotation(ArmRotation.Stack5);
+                } else if (gamepad2Buttons.wasJustReleased(GamepadButton.DPAD_LEFT)) {
+                    robot.arm.setRotation(ArmRotation.Stack4);
+                } else if (gamepad2Buttons.wasJustReleased(GamepadButton.DPAD_DOWN)) {
+                    robot.arm.setRotation(ArmRotation.Stack3);
+                } else if (gamepad2Buttons.wasJustReleased(GamepadButton.DPAD_RIGHT)) {
+                    robot.arm.setRotation(ArmRotation.Down);
+                }
             }
 
             if (gamepad2Buttons.wasJustReleased(GamepadButton.A)) {
@@ -105,7 +119,6 @@ public class Drive extends LinearOpMode {
                     robot.claw.openNext();
                 }
             }
-
 
             if (gamepad1Buttons.wasJustPressed(GamepadButton.Y)) {
                 robot.arm.setHangingLock(true);
@@ -130,8 +143,6 @@ public class Drive extends LinearOpMode {
 
             robot.update();
             telemetry.addData("Robot arm rotation", robot.arm.getRotation());
-
-            telemetry.addData("Secondary servo position", robot.claw.getSecondaryPosition());
 
             gamepad1Buttons.update();
             gamepad2Buttons.update();
