@@ -39,11 +39,15 @@ public class LocalizationTest extends LinearOpMode {
 
                 drive.updatePoseEstimate();
 
+                drive.drawFieldOverlay();
+
                 telemetry.addData("x", drive.pose.position.x);
                 telemetry.addData("y", drive.pose.position.y);
                 telemetry.addData("heading", drive.pose.heading);
                 telemetry.update();
                 gamepad.readButtons();
+
+
             }
         } else if (TuningOpModes.DRIVE_CLASS.equals(TankDrive.class)) {
             TankDrive drive = new TankDrive(hardwareMap, new Pose2d(0, 0, 0));

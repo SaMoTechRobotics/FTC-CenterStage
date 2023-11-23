@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.RoadRunner;
 
 import androidx.annotation.NonNull;
+import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.canvas.Canvas;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
@@ -406,5 +407,27 @@ public final class MecanumDrive {
                 defaultVelConstraint, defaultAccelConstraint,
                 0.25, 0.1
         );
+    }
+
+    public void drawFieldOverlay() {
+        double x = pose.position.x;
+        double y = pose.position.y;
+        double heading = pose.heading.log();
+        double halfWidth = 6;
+        double halfLength = 7;
+        double[] xPoints = new double[4];
+        double[] yPoints = new double[4];
+        xPoints[0] = x + halfLength * Math.cos(heading) - halfWidth * Math.sin(heading);
+        yPoints[0] = y + halfLength * Math.sin(heading) + halfWidth * Math.cos(heading);
+        xPoints[1] = x + halfLength * Math.cos(heading) + halfWidth * Math.sin(heading);
+        yPoints[1] = y + halfLength * Math.sin(heading) - halfWidth * Math.cos(heading);
+        xPoints[2] = x - halfLength * Math.cos(heading) + halfWidth * Math.sin(heading);
+        yPoints[2] = y - halfLength * Math.sin(heading) - halfWidth * Math.cos(heading);
+        xPoints[3] = x - halfLength * Math.cos(heading) - halfWidth * Math.sin(heading);
+        yPoints[3] = y - halfLength * Math.sin(heading) + halfWidth * Math.cos(heading);
+        TelemetryPacket packet = new TelemetryPacket();
+        Canvas fieldOverlay = packet.fieldOverlay();
+        fieldOverlay.strokePolygon(xPoints, yPoints);
+        FtcDashboard.getInstance().sendTelemetryPacket(packet);
     }
 }
