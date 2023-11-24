@@ -34,6 +34,10 @@ public class Vision {
         visionPortal = builder.build();
     }
 
+    public void stopProcessors() {
+        visionPortal.setProcessorEnabled(spikeMarkDetectionProcessor, false);
+    }
+
     public void toggleProcessorStreamingMode() {
         if (spikeMarkDetectionProcessor != null) spikeMarkDetectionProcessor.toggleStreamingMode();
     }
