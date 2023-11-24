@@ -75,7 +75,7 @@ public class Drive extends LinearOpMode {
 
             robot.chassis.setManualPower(drivePower, strafePower, turnPower);
 
-            if (!robot.pickUp && Math.abs(gamepad2.left_stick_y) > 0.01) {
+            if (Math.floor(robot.arm.getRotation()) > ArmRotation.MinDeliver && Math.abs(gamepad2.left_stick_y) > 0.01) {
                 if (gamepad2.left_trigger > 0.1) {
                     robot.arm.manualRotation(-gamepad2.left_stick_y * ArmSpeed.SlowManual);
                 } else {

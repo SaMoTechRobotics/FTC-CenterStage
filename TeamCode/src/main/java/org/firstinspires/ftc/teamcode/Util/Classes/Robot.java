@@ -42,6 +42,6 @@ public class Robot {
     public void update() {
         chassis.update();
         arm.update();
-        pickUp = arm.getRotation() < ArmRotation.MaxPickup;
+        pickUp = Math.floor(arm.getRotation()) < ArmRotation.MaxPickup;
     }
 }
