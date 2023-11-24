@@ -18,8 +18,10 @@ public abstract class BaseAuto extends LinearOpMode {
 
     private final static Boolean Debug = true;
 
-    private static final AutoSide SIDE = AutoSide.RIGHT;
-    private static final AutoColor COLOR = AutoColor.RED;
+    protected static AutoSide SIDE = AutoSide.RIGHT;
+    protected static AutoColor COLOR = AutoColor.RED;
+
+    protected abstract void setConstants();
 
     protected static class DriveDistances {
         public static Double ToParking = 50.0;
@@ -29,6 +31,8 @@ public abstract class BaseAuto extends LinearOpMode {
 
     @Override
     public void runOpMode() {
+        setConstants();
+        
         RobotStorage.reset(SIDE, COLOR);
         robot = new AutoRobot(hardwareMap, telemetry);
         drive = new MecanumDrive(hardwareMap, RobotStorage.pose);

@@ -7,7 +7,10 @@ import org.firstinspires.ftc.teamcode.Util.Enums.AutoSide;
 
 @Autonomous(name = "AutoBlueLeft", group = "Auto")
 public class AutoBlueLeft extends BaseAuto {
-    AutoSide SIDE = AutoSide.LEFT;
-    AutoColor COLOR = AutoColor.BLUE;
+    @Override
+    protected void setConstants() {
+        SIDE = AutoSide.LEFT;
+        COLOR = AutoColor.BLUE;
+    }
 }
 
