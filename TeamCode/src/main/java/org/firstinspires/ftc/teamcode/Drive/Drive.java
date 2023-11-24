@@ -75,17 +75,20 @@ public class Drive extends LinearOpMode {
 
             robot.chassis.setManualPower(drivePower, strafePower, turnPower);
 
-            if (Math.abs(gamepad2.right_stick_x) > 0.01) {
-                robot.arm.manualRotation(gamepad2.right_stick_x * ArmSpeed.SlowManual);
-                if (!robot.pickUp) {
-                    robot.arm.setGlobalWristRotation(true);
+            if (!robot.pickUp && Math.abs(gamepad2.left_stick_y) > 0.01) {
+                if (gamepad2.left_trigger > 0.1) {
+                    robot.arm.manualRotation(-gamepad2.left_stick_y * ArmSpeed.SlowManual);
+                } else {
+                    robot.arm.manualRotation(-gamepad2.left_stick_y);
                 }
-            } else if (Math.abs(gamepad2.left_stick_x) > 0.01) {
-                robot.arm.manualRotation(gamepad2.left_stick_x);
-                if (!robot.pickUp) {
-                    robot.arm.setGlobalWristRotation(true);
+                robot.arm.setGlobalWristRotation(true);
+            } else if (robot.pickUp && Math.abs(gamepad2.right_stick_y) > 0.01) {
+                if (gamepad2.left_trigger > 0.1) {
+                    robot.arm.manualRotation(gamepad2.right_stick_y * ArmSpeed.SlowPickupSpeed);
+                } else {
+                    robot.arm.manualRotation(gamepad2.right_stick_y * ArmSpeed.PickupSpeed);
                 }
-            } else if (gamepad2.left_trigger < 0.1) {
+            } else if (gamepad2.right_trigger < 0.1) {
                 if (gamepad2Buttons.wasJustReleased(GamepadButton.DPAD_UP)) {
                     robot.arm.setRotation(ArmRotation.HighDeliver);
                     robot.arm.setGlobalWristRotation(true);
@@ -106,7 +109,7 @@ public class Drive extends LinearOpMode {
                 }
             }
 
-            if (gamepad2.left_trigger >= 0.1) {
+            if (gamepad2.right_trigger >= 0.1) {
                 if (gamepad2Buttons.wasJustReleased(GamepadButton.DPAD_UP)) {
                     robot.arm.setRotation(ArmRotation.Stack5);
                 } else if (gamepad2Buttons.wasJustReleased(GamepadButton.DPAD_LEFT)) {
@@ -130,7 +133,7 @@ public class Drive extends LinearOpMode {
                 robot.claw.close();
             } else if (gamepad2Buttons.wasJustPressed(GamepadButton.LEFT_BUMPER)) {
                 if (robot.pickUp) {
-                    if (Math.floor(robot.arm.getRotation()) <= ArmRotation.HoldDown + 1.0) {
+                    if (robot.claw.isOpen) {
                         robot.arm.setRotation(ArmRotation.Down);
                     }
                     robot.claw.open();
