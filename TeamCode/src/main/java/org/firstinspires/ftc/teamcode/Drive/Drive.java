@@ -1,9 +1,13 @@
 package org.firstinspires.ftc.teamcode.Drive;
 
+import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
+import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
+import com.acmerobotics.roadrunner.Vector2d;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
+import org.firstinspires.ftc.teamcode.Util.Classes.Lib.FieldOverlayUtils;
 import org.firstinspires.ftc.teamcode.Util.Classes.Lib.GamepadButton;
 import org.firstinspires.ftc.teamcode.Util.Classes.Lib.StatefulGamepad;
 import org.firstinspires.ftc.teamcode.Util.Classes.Robot;
@@ -20,10 +24,13 @@ import java.util.Timer;
 @TeleOp(name = "Drive")
 public class Drive extends LinearOpMode {
     public static boolean DebuggingTelemetry = false;
+    public static boolean FieldOverlay = false;
+
+    private Robot robot;
 
     @Override
     public void runOpMode() {
-        Robot robot = new Robot(hardwareMap, telemetry);
+        robot = new Robot(hardwareMap, telemetry);
         robot.claw.close();
         VisionPortal.Builder builder = new VisionPortal.Builder();
         builder.setCamera(hardwareMap.get(WebcamName.class, "Webcam 1"));
@@ -147,6 +154,20 @@ public class Drive extends LinearOpMode {
             gamepad1Buttons.update();
             gamepad2Buttons.update();
             telemetry.update();
+
+            if (FieldOverlay) {
+                drawFieldOverlay();
+            }
         }
+    }
+
+    private void drawFieldOverlay() {
+        TelemetryPacket packet = new TelemetryPacket();
+        FieldOverlayUtils.drawChassis(packet.fieldOverlay(), robot.chassis.getPose());
+        FieldOverlayUtils.drawPixel(packet.fieldOverlay(), new Vector2d(32, 0));
+
+//        packet.fieldOverlay().fillRect(0, 0, 20, 5);
+
+        FtcDashboard.getInstance().sendTelemetryPacket(packet);
     }
 }
