@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.Util.Classes.Mechanisms;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
+import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.PoseVelocity2d;
 import com.acmerobotics.roadrunner.Vector2d;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -17,7 +18,7 @@ import org.firstinspires.ftc.teamcode.Util.Constants.Robot.ChassisSpeed;
 
 @Config
 public class Chassis {
-    public static boolean customDrive = true;
+    public static boolean customDrive = false;
 
     private final Telemetry telemetry;
 
@@ -49,8 +50,8 @@ public class Chassis {
         this.wheels.frontLeft.setDirection(DcMotor.Direction.REVERSE);
         this.wheels.backLeft.setDirection(DcMotor.Direction.REVERSE);
 
-        this.leftDistanceSensor = hardwareMap.get(DistanceSensor.class, "leftDistance");
-        this.rightDistanceSensor = hardwareMap.get(DistanceSensor.class, "rightDistance");
+        this.leftDistanceSensor = hardwareMap.get(DistanceSensor.class, "dist2");
+        this.rightDistanceSensor = hardwareMap.get(DistanceSensor.class, "dist3");
 
         drive = new MecanumDrive(hardwareMap, RobotStorage.pose);
 
@@ -58,6 +59,8 @@ public class Chassis {
     }
 
     public void update() {
+        drive.updatePoseEstimate();
+
         if (Drive.DebuggingTelemetry) {
             Telemetry dashboardTelemetry = FtcDashboard.getInstance().getTelemetry();
             dashboardTelemetry.addData("ld", Math.min(leftDistanceSensor.getDistance(DistanceUnit.INCH), 20));
@@ -148,10 +151,10 @@ public class Chassis {
         if (!customDrive) {
             drive.setDrivePowers(new PoseVelocity2d(
                     new Vector2d(
-                            drivePower * speed.linearVel.x,
-                            strafePower * speed.linearVel.y
+                            -drivePower * speed.linearVel.x,
+                            -strafePower * speed.linearVel.y
                     ),
-                    turnPower * speed.angVel
+                    -turnPower * speed.angVel
             ));
         } else {
             double frontLeftPower =
@@ -183,6 +186,10 @@ public class Chassis {
         this.setPower(this.wheels.frontRight, speed);
         this.setPower(this.wheels.backRight, speed);
         this.setPower(this.wheels.backLeft, speed);
+    }
+
+    public Pose2d getPose() {
+        return drive.pose;
     }
 
 
