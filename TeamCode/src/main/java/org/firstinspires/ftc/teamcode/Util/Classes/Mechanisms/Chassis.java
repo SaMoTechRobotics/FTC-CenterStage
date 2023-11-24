@@ -50,8 +50,8 @@ public class Chassis {
         this.wheels.frontLeft.setDirection(DcMotor.Direction.REVERSE);
         this.wheels.backLeft.setDirection(DcMotor.Direction.REVERSE);
 
-        this.leftDistanceSensor = hardwareMap.get(DistanceSensor.class, "dist2");
-        this.rightDistanceSensor = hardwareMap.get(DistanceSensor.class, "dist3");
+        this.leftDistanceSensor = hardwareMap.get(DistanceSensor.class, "dist3");
+        this.rightDistanceSensor = hardwareMap.get(DistanceSensor.class, "dist2");
 
         drive = new MecanumDrive(hardwareMap, RobotStorage.pose);
 
@@ -83,6 +83,49 @@ public class Chassis {
     public boolean pixelDetected() {
         return leftDistanceSensor.getDistance(DistanceUnit.INCH) < DistanceSensorConstants.PixelDetectedDistance &&
                 rightDistanceSensor.getDistance(DistanceUnit.INCH) < DistanceSensorConstants.PixelDetectedDistance;
+    }
+
+    public void alignWithPixel() {
+        double ld = leftDistanceSensor.getDistance(DistanceUnit.INCH);
+        double rd = rightDistanceSensor.getDistance(DistanceUnit.INCH);
+
+        PoseVelocity2d alignSpeed = ChassisSpeed.Min;
+
+        if (isCloseEnough(ld, rd, DistanceSensorConstants.PixelCenteredMargin)) {
+            if (!pixelDetectedInClaw()) {
+                drive.setDrivePowers(
+                        new PoseVelocity2d(
+                                new Vector2d(0, alignSpeed.linearVel.y),
+                                0
+                        )
+                );
+            } else {
+                drive.setDrivePowers(
+                        new PoseVelocity2d(
+                                new Vector2d(0, 0),
+                                0
+                        )
+                );
+            }
+        } else if (ld < rd) {
+            drive.setDrivePowers(
+                    new PoseVelocity2d(
+                            new Vector2d(alignSpeed.linearVel.x, 0),
+                            0
+                    )
+            );
+        } else {
+            drive.setDrivePowers(
+                    new PoseVelocity2d(
+                            new Vector2d(-alignSpeed.linearVel.x, 0),
+                            0
+                    )
+            );
+        }
+    }
+
+    private boolean isCloseEnough(double a, double b, double margin) {
+        return Math.abs(a - b) < margin;
     }
 
     public void setPower(DcMotor motor, double power) {

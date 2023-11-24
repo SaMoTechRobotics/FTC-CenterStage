@@ -26,6 +26,8 @@ public class Drive extends LinearOpMode {
     public static boolean DebuggingTelemetry = false;
     public static boolean FieldOverlay = false;
 
+    public static boolean AutoClose = false;
+
     private Robot robot;
 
     @Override
@@ -60,6 +62,16 @@ public class Drive extends LinearOpMode {
             double drivePower = Math.abs(gamepad1.left_stick_y) > ChassisSpeed.JoystickYMargin ? gamepad1.left_stick_y : 0;
             double strafePower = Math.abs(gamepad1.left_stick_x) > ChassisSpeed.JoystickXMargin ? gamepad1.left_stick_x : 0;
             double turnPower = Math.abs(gamepad1.right_stick_x) > ChassisSpeed.JoystickXMargin ? gamepad1.right_stick_x : 0;
+
+            boolean anyActiveJoystick = drivePower != 0 || strafePower != 0 || turnPower != 0;
+
+//            if (gamepad1.left_trigger > 0.1 && !anyActiveJoystick && robot.claw.isOpen) {
+//                if (robot.chassis.pixelDetectedInClaw()) {
+//                    robot.claw.close();
+//                } else if (robot.chassis.pixelDetected()) {
+//                    robot.chassis.alignWithPixel();
+//                }
+//            }
 
             robot.chassis.setManualPower(drivePower, strafePower, turnPower);
 
@@ -124,6 +136,10 @@ public class Drive extends LinearOpMode {
                     robot.claw.open();
                 } else {
                     robot.claw.openNext();
+                }
+            } else if (AutoClose) {
+                if (robot.chassis.pixelDetectedInClaw() && robot.claw.isOpen) {
+                    robot.claw.close();
                 }
             }
 
