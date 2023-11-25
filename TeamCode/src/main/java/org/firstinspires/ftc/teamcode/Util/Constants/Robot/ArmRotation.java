@@ -24,8 +24,8 @@ public class ArmRotation {
     public static double PeriodDivider = 2.0;
     public static double StartDivider = 4.0;
 
-    public static double Stack5 = 10;
-    public static double Stack4 = 20;
-    public static double Stack3 = 30;
+    public static double Stack5 = 7;
+    public static double Stack4 = 5;
+    public static double Stack3 = 3;
 }
 
