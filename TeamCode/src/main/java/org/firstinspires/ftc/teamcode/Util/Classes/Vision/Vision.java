@@ -8,12 +8,14 @@ import org.firstinspires.ftc.teamcode.Util.Classes.Vision.Processors.SpikeLocati
 import org.firstinspires.ftc.teamcode.Util.Enums.SpikeLocation;
 import org.firstinspires.ftc.teamcode.Util.Enums.VisionProcessor;
 import org.firstinspires.ftc.vision.VisionPortal;
+import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 
 public class Vision {
     private final CameraName webcam;
 
     public VisionPortal visionPortal = null;
     SpikeLocationDetectionProcessor spikeMarkDetectionProcessor = null;
+    AprilTagProcessor aprilTagProcessor = null;
 
     public Vision(HardwareMap hardwareMap) {
         webcam = hardwareMap.get(WebcamName.class, "Webcam 1");
@@ -29,9 +31,22 @@ public class Vision {
                 builder.addProcessor(spikeMarkDetectionProcessor);
                 break;
             case APRIL_TAG_DETECTION:
+                aprilTagProcessor = new AprilTagProcessor.Builder().build();
+                builder.addProcessor(aprilTagProcessor);
                 break;
         }
         visionPortal = builder.build();
+    }
+
+    public void setProcessorEnabled(VisionProcessor processor, boolean enabled) {
+        switch (processor) {
+            case SPIKE_LOCATION_DETECTION:
+                visionPortal.setProcessorEnabled(spikeMarkDetectionProcessor, enabled);
+                break;
+            case APRIL_TAG_DETECTION:
+                visionPortal.setProcessorEnabled(aprilTagProcessor, enabled);
+                break;
+        }
     }
 
     public void stopProcessors() {
@@ -49,6 +64,10 @@ public class Vision {
     public SpikeLocation getSpikeLocation() {
         if (spikeMarkDetectionProcessor != null) return spikeMarkDetectionProcessor.location;
         return SpikeLocation.CENTER;
+    }
+
+    public AprilTagProcessor getAprilTagProcessor() {
+        return aprilTagProcessor;
     }
 
     public void close() {

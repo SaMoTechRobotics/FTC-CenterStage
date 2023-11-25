@@ -6,15 +6,17 @@ import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Vector2d;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.teamcode.Util.Classes.Lib.FieldOverlayUtils;
 import org.firstinspires.ftc.teamcode.Util.Classes.Lib.GamepadButton;
 import org.firstinspires.ftc.teamcode.Util.Classes.Lib.StatefulGamepad;
 import org.firstinspires.ftc.teamcode.Util.Classes.Robot;
+import org.firstinspires.ftc.teamcode.Util.Classes.Storage.RobotStorage;
+import org.firstinspires.ftc.teamcode.Util.Classes.Vision.Vision;
 import org.firstinspires.ftc.teamcode.Util.Constants.Robot.ArmRotation;
 import org.firstinspires.ftc.teamcode.Util.Constants.Robot.ArmSpeed;
 import org.firstinspires.ftc.teamcode.Util.Constants.Robot.ChassisSpeed;
 import org.firstinspires.ftc.teamcode.Util.Constants.Robot.WristRotation;
+import org.firstinspires.ftc.teamcode.Util.Enums.VisionProcessor;
 import org.firstinspires.ftc.vision.VisionPortal;
 
 import java.util.Timer;
@@ -25,6 +27,7 @@ import java.util.Timer;
 public class Drive extends LinearOpMode {
     public static boolean DebuggingTelemetry = false;
     public static boolean FieldOverlay = false;
+    public static boolean ResetPose = true;
 
     public static boolean AutoClose = false;
 
@@ -32,11 +35,14 @@ public class Drive extends LinearOpMode {
 
     @Override
     public void runOpMode() {
+        if (ResetPose) RobotStorage.reset();
         robot = new Robot(hardwareMap, telemetry);
         robot.claw.close();
-        VisionPortal.Builder builder = new VisionPortal.Builder();
-        builder.setCamera(hardwareMap.get(WebcamName.class, "Webcam 1"));
-        VisionPortal visionPortal = builder.build();
+//        VisionPortal.Builder builder = new VisionPortal.Builder();
+//        builder.setCamera(hardwareMap.get(WebcamName.class, "Webcam 1"));
+//        VisionPortal visionPortal = builder.build();
+        Vision vision = new Vision(hardwareMap);
+        vision.startProcessor(VisionProcessor.APRIL_TAG_DETECTION);
 
         StatefulGamepad gamepad1Buttons = new StatefulGamepad(gamepad1);
         StatefulGamepad gamepad2Buttons = new StatefulGamepad(gamepad2);
@@ -47,9 +53,13 @@ public class Drive extends LinearOpMode {
 
         while (opModeIsActive()) {
             if (gamepad1Buttons.wasJustPressed(GamepadButton.DPAD_UP)) {
-                visionPortal.resumeStreaming();
+                vision.setProcessorEnabled(VisionProcessor.APRIL_TAG_DETECTION, true);
+                vision.visionPortal.resumeStreaming();
             } else if (gamepad1Buttons.wasJustPressed(GamepadButton.DPAD_DOWN)) {
-                visionPortal.stopStreaming();
+                vision.setProcessorEnabled(VisionProcessor.APRIL_TAG_DETECTION, false);
+                if (vision.visionPortal.getCameraState() == VisionPortal.CameraState.STREAMING) {
+                    vision.visionPortal.stopStreaming();
+                }
             }
 
             if (gamepad1Buttons.stateJustChanged(GamepadButton.LEFT_BUMPER) || gamepad1Buttons.stateJustChanged(GamepadButton.RIGHT_BUMPER)) {
@@ -77,16 +87,16 @@ public class Drive extends LinearOpMode {
 
             if (Math.floor(robot.arm.getRotation()) > ArmRotation.MinDeliver && Math.abs(gamepad2.left_stick_y) > 0.01) {
                 if (gamepad2.left_trigger > 0.1) {
-                    robot.arm.manualRotation(-gamepad2.left_stick_y * ArmSpeed.SlowManual);
+                    robot.arm.manualRotation(-gamepad2.left_stick_y * ArmSpeed.DeliverSpeed);
                 } else {
-                    robot.arm.manualRotation(-gamepad2.left_stick_y);
+                    robot.arm.manualRotation(-gamepad2.left_stick_y * ArmSpeed.SlowDeliverSpeed);
                 }
                 robot.arm.setGlobalWristRotation(true);
             } else if (robot.pickUp && Math.abs(gamepad2.right_stick_y) > 0.01) {
                 if (gamepad2.left_trigger > 0.1) {
-                    robot.arm.manualRotation(gamepad2.right_stick_y * ArmSpeed.SlowPickupSpeed);
-                } else {
                     robot.arm.manualRotation(gamepad2.right_stick_y * ArmSpeed.PickupSpeed);
+                } else {
+                    robot.arm.manualRotation(gamepad2.right_stick_y * ArmSpeed.SlowPickupSpeed);
                 }
             } else if (gamepad2.right_trigger < 0.1) {
                 if (gamepad2Buttons.wasJustReleased(GamepadButton.DPAD_UP)) {
