@@ -1,14 +1,20 @@
 package org.firstinspires.ftc.teamcode.Util.Classes.Vision;
 
 import android.util.Size;
+import com.acmerobotics.roadrunner.Pose2d;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.CameraName;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.teamcode.Util.Classes.Vision.Processors.SpikeLocationDetectionProcessor;
-import org.firstinspires.ftc.teamcode.Util.Enums.SpikeLocation;
+import org.firstinspires.ftc.teamcode.Util.Constants.Auto.BoardAlignmentConstants;
+import org.firstinspires.ftc.teamcode.Util.Enums.BoardPosition;
 import org.firstinspires.ftc.teamcode.Util.Enums.VisionProcessor;
 import org.firstinspires.ftc.vision.VisionPortal;
+import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
+import org.firstinspires.ftc.vision.apriltag.AprilTagPoseFtc;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
+
+import java.util.List;
 
 public class Vision {
     private final CameraName frontCamera;
@@ -64,9 +70,48 @@ public class Vision {
 
     }
 
-    public SpikeLocation getSpikeLocation() {
+    public BoardPosition getSpikeLocation() {
         if (spikeMarkDetectionProcessor != null) return spikeMarkDetectionProcessor.location;
-        return SpikeLocation.CENTER;
+        return BoardPosition.CENTER;
+    }
+
+    public boolean isBoardDetected() {
+        if (aprilTagProcessor == null) return false;
+        return !aprilTagProcessor.getDetections().isEmpty();
+    }
+
+    public boolean isBoardDetected(BoardPosition location) {
+        if (aprilTagProcessor == null) return false;
+        List<AprilTagDetection> currentDetections = aprilTagProcessor.getDetections();
+        for (AprilTagDetection detection : currentDetections) {
+            for (int tag : location.getTagNumbers()) {
+                if (detection.id == tag) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    public Pose2d getBoardAlignedPose(Pose2d robotPose, BoardPosition location) {
+        if (aprilTagProcessor == null) return robotPose;
+        List<AprilTagDetection> currentDetections = aprilTagProcessor.getDetections();
+        if (currentDetections.isEmpty()) return robotPose;
+        AprilTagDetection goalDetection = null;
+        for (AprilTagDetection detection : currentDetections) {
+            for (int tag : location.getTagNumbers()) {
+                if (detection.id == tag) {
+                    goalDetection = detection;
+                    break;
+                }
+            }
+        }
+        if (goalDetection == null) return robotPose;
+        AprilTagPoseFtc aprilTagPose = goalDetection.ftcPose;
+        double x = robotPose.position.x - aprilTagPose.y + Math.cos(robotPose.heading.log()) * BoardAlignmentConstants.minDistanceFromBoard;
+        double y = robotPose.position.y + aprilTagPose.x + Math.sin(robotPose.heading.log()) * BoardAlignmentConstants.minDistanceFromBoard;
+        double heading = Math.toRadians(-aprilTagPose.yaw);
+        return new Pose2d(x, y, heading);
     }
 
     public AprilTagProcessor getAprilTagProcessor() {
