@@ -12,13 +12,15 @@ import org.firstinspires.ftc.teamcode.Util.Enums.VisionProcessor;
 @Config
 @TeleOp(name = "Vision Test", group = "Tests")
 public class VisionTest extends LinearOpMode {
+    public static VisionProcessor processor = VisionProcessor.SPIKE_LOCATION_DETECTION;
+
     @Override
     public void runOpMode() {
         Vision vision = new Vision(hardwareMap);
 
         StatefulGamepad gamepad1Buttons = new StatefulGamepad(gamepad1);
 
-        vision.startProcessor(VisionProcessor.SPIKE_LOCATION_DETECTION);
+        vision.startProcessor(processor);
         vision.visionPortal.resumeStreaming();
 
         SpikeLocation spikeLocation;
@@ -26,13 +28,19 @@ public class VisionTest extends LinearOpMode {
         waitForStart();
 
         while (opModeIsActive()) {
-            spikeLocation = vision.getSpikeLocation();
 
             if (gamepad1Buttons.wasJustPressed(GamepadButton.A)) {
                 vision.toggleProcessorStreamingMode();
             }
 
-            telemetry.addData("Spike Location", spikeLocation);
+            if (processor == VisionProcessor.APRIL_TAG_DETECTION) {
+            }
+
+
+            if (processor == VisionProcessor.SPIKE_LOCATION_DETECTION) {
+                spikeLocation = vision.getSpikeLocation();
+                telemetry.addData("Spike Location", spikeLocation);
+            }
             telemetry.update();
 
             sleep(20);
