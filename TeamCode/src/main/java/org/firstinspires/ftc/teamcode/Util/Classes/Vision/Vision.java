@@ -11,26 +11,29 @@ import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 
 public class Vision {
-    private final CameraName webcam;
+    private final CameraName frontCamera;
+    private final CameraName backCamera;
 
     public VisionPortal visionPortal = null;
     SpikeLocationDetectionProcessor spikeMarkDetectionProcessor = null;
     AprilTagProcessor aprilTagProcessor = null;
 
     public Vision(HardwareMap hardwareMap) {
-        webcam = hardwareMap.get(WebcamName.class, "Webcam 1");
+        frontCamera = hardwareMap.get(WebcamName.class, "Webcam 1");
+        backCamera = hardwareMap.get(WebcamName.class, "Webcam 2");
     }
 
     public void startProcessor(VisionProcessor processingMode) {
         VisionPortal.Builder builder = new VisionPortal.Builder();
         builder.setCameraResolution(new Size(1280, 720));
-        builder.setCamera(webcam);
         switch (processingMode) {
             case SPIKE_LOCATION_DETECTION:
+                builder.setCamera(frontCamera);
                 spikeMarkDetectionProcessor = new SpikeLocationDetectionProcessor();
                 builder.addProcessor(spikeMarkDetectionProcessor);
                 break;
             case APRIL_TAG_DETECTION:
+                builder.setCamera(backCamera);
                 aprilTagProcessor = new AprilTagProcessor.Builder().build();
                 builder.addProcessor(aprilTagProcessor);
                 break;
