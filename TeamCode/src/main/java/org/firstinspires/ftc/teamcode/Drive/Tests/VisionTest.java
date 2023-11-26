@@ -6,13 +6,14 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import org.firstinspires.ftc.teamcode.Util.Classes.Lib.GamepadButton;
 import org.firstinspires.ftc.teamcode.Util.Classes.Lib.StatefulGamepad;
 import org.firstinspires.ftc.teamcode.Util.Classes.Vision.Vision;
-import org.firstinspires.ftc.teamcode.Util.Enums.SpikeLocation;
+import org.firstinspires.ftc.teamcode.Util.Enums.BoardPosition;
 import org.firstinspires.ftc.teamcode.Util.Enums.VisionProcessor;
+import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 
 @Config
 @TeleOp(name = "Vision Test", group = "Tests")
 public class VisionTest extends LinearOpMode {
-    public static VisionProcessor processor = VisionProcessor.SPIKE_LOCATION_DETECTION;
+    public static VisionProcessor processor = VisionProcessor.APRIL_TAG_DETECTION;
 
     @Override
     public void runOpMode() {
@@ -23,7 +24,7 @@ public class VisionTest extends LinearOpMode {
         vision.startProcessor(processor);
         vision.visionPortal.resumeStreaming();
 
-        SpikeLocation spikeLocation;
+        BoardPosition boardPosition;
 
         waitForStart();
 
@@ -34,12 +35,17 @@ public class VisionTest extends LinearOpMode {
             }
 
             if (processor == VisionProcessor.APRIL_TAG_DETECTION) {
+                for (AprilTagDetection detection : vision.getAprilTagProcessor().getDetections()) {
+                    telemetry.addLine(String.format("\n==== (ID %d)", detection.id));
+                    telemetry.addLine(String.format("XYZ %6.1f %6.1f %6.1f  (inch)", detection.ftcPose.x, detection.ftcPose.y, detection.ftcPose.z));
+                    telemetry.addLine(String.format("PRY %6.1f %6.1f %6.1f  (deg)", detection.ftcPose.pitch, detection.ftcPose.roll, detection.ftcPose.yaw));
+                }
             }
 
 
             if (processor == VisionProcessor.SPIKE_LOCATION_DETECTION) {
-                spikeLocation = vision.getSpikeLocation();
-                telemetry.addData("Spike Location", spikeLocation);
+                boardPosition = vision.getSpikeLocation();
+                telemetry.addData("Spike Location", boardPosition);
             }
             telemetry.update();
 
