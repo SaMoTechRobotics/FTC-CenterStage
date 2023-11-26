@@ -5,13 +5,13 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import org.firstinspires.ftc.robotcore.internal.camera.calibration.CameraCalibration;
 import org.firstinspires.ftc.teamcode.Util.Constants.Auto.SpikeLocationDetectionConstants;
-import org.firstinspires.ftc.teamcode.Util.Enums.SpikeLocation;
+import org.firstinspires.ftc.teamcode.Util.Enums.BoardPosition;
 import org.firstinspires.ftc.vision.VisionProcessor;
 import org.opencv.core.*;
 import org.opencv.imgproc.Imgproc;
 
 public class SpikeLocationDetectionProcessor implements VisionProcessor {
-    public SpikeLocation location = SpikeLocation.CENTER;
+    public BoardPosition location = BoardPosition.CENTER;
 
     public Boolean streamingOverlayMode = true;
 
@@ -54,11 +54,11 @@ public class SpikeLocationDetectionProcessor implements VisionProcessor {
         // Find the region with the highest average pixel value
         double maxMean = Math.max(Math.max(mean1.val[0], mean2.val[0]), mean3.val[0]);
         if (maxMean == mean1.val[0]) {
-            location = SpikeLocation.LEFT;
+            location = BoardPosition.LEFT;
         } else if (maxMean == mean2.val[0]) {
-            location = SpikeLocation.CENTER;
+            location = BoardPosition.CENTER;
         } else if (maxMean == mean3.val[0]) {
-            location = SpikeLocation.RIGHT;
+            location = BoardPosition.RIGHT;
         }
 
         if (streamingOverlayMode) {
@@ -85,9 +85,9 @@ public class SpikeLocationDetectionProcessor implements VisionProcessor {
 
         int x = onscreenWidth / 2;
 
-        if (location == SpikeLocation.LEFT) {
+        if (location == BoardPosition.LEFT) {
             x = onscreenWidth / 6;
-        } else if (location == SpikeLocation.RIGHT) {
+        } else if (location == BoardPosition.RIGHT) {
             x = 5 * onscreenWidth / 6;
         }
 

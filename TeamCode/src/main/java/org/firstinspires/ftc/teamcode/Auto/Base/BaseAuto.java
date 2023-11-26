@@ -8,7 +8,7 @@ import org.firstinspires.ftc.teamcode.Util.Classes.AutoRobot;
 import org.firstinspires.ftc.teamcode.Util.Classes.Storage.RobotStorage;
 import org.firstinspires.ftc.teamcode.Util.Enums.AutoColor;
 import org.firstinspires.ftc.teamcode.Util.Enums.AutoSide;
-import org.firstinspires.ftc.teamcode.Util.Enums.SpikeLocation;
+import org.firstinspires.ftc.teamcode.Util.Enums.BoardPosition;
 import org.firstinspires.ftc.teamcode.Util.Enums.VisionProcessor;
 
 @Config
@@ -27,12 +27,12 @@ public abstract class BaseAuto extends LinearOpMode {
         public static Double ToParking = 50.0;
     }
 
-    SpikeLocation spikeLocation = SpikeLocation.CENTER;
+    BoardPosition boardPosition = BoardPosition.CENTER;
 
     @Override
     public void runOpMode() {
         setConstants();
-        
+
         RobotStorage.reset(SIDE, COLOR);
         robot = new AutoRobot(hardwareMap, telemetry);
         drive = new MecanumDrive(hardwareMap, RobotStorage.pose);
@@ -47,8 +47,8 @@ public abstract class BaseAuto extends LinearOpMode {
         while (!isStarted()) {
             telemetry.addLine("Color: " + COLOR + " Side: " + SIDE);
             telemetry.addData("Status", "Initialized for " + Math.round(timer.seconds()));
-            spikeLocation = robot.vision.getSpikeLocation();
-            telemetry.addData("Spike Location", spikeLocation.toString());
+            boardPosition = robot.vision.getSpikeLocation();
+            telemetry.addData("Spike Location", boardPosition.toString());
             telemetry.update();
         }
 
