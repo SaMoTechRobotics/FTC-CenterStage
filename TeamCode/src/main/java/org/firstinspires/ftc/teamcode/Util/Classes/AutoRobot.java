@@ -18,10 +18,10 @@ public class AutoRobot {
     public Arm arm;
     public Claw claw;
 
-    public AutoRobot(HardwareMap hardwareMap, Telemetry telemetry) {
+    public AutoRobot(HardwareMap hardwareMap, Telemetry telemetry, Pose2d pose) {
         vision = new Vision(hardwareMap);
 
-        drive = new MecanumDrive(hardwareMap, new Pose2d(0, 0, 0));
+        drive = new MecanumDrive(hardwareMap, pose);
 
         arm = new Arm(hardwareMap, telemetry);
         claw = new Claw(hardwareMap, telemetry);
