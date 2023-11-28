@@ -49,6 +49,8 @@ public class Drive extends LinearOpMode {
 
         Timer timer = new Timer();
 
+        boolean wristLevelingEnabled = true;
+
         waitForStart();
 
         while (opModeIsActive()) {
@@ -91,23 +93,27 @@ public class Drive extends LinearOpMode {
                 } else {
                     robot.arm.manualRotation(-gamepad2.left_stick_y * ArmSpeed.SlowDeliverSpeed);
                 }
-                robot.arm.setGlobalWristRotation(true);
+                robot.arm.setGlobalWristRotation(wristLevelingEnabled);
             } else if (robot.pickUp && Math.abs(gamepad2.right_stick_y) > 0.01) {
                 if (gamepad2.left_trigger > 0.1) {
                     robot.arm.manualRotation(gamepad2.right_stick_y * ArmSpeed.PickupSpeed);
                 } else {
                     robot.arm.manualRotation(gamepad2.right_stick_y * ArmSpeed.SlowPickupSpeed);
                 }
+                robot.arm.setGlobalWristRotation(wristLevelingEnabled);
             } else if (gamepad2.right_trigger < 0.1) {
                 if (gamepad2Buttons.wasJustReleased(GamepadButton.DPAD_UP)) {
                     robot.arm.setRotation(ArmRotation.HighDeliver);
                     robot.arm.setGlobalWristRotation(true);
+                    wristLevelingEnabled = true;
                 } else if (gamepad2Buttons.wasJustReleased(GamepadButton.DPAD_LEFT)) {
                     robot.arm.setRotation(ArmRotation.MidDeliver);
                     robot.arm.setGlobalWristRotation(true);
+                    wristLevelingEnabled = true;
                 } else if (gamepad2Buttons.wasJustReleased(GamepadButton.DPAD_DOWN)) {
                     robot.arm.setRotation(ArmRotation.LowDeliver);
                     robot.arm.setGlobalWristRotation(true);
+                    wristLevelingEnabled = true;
                 } else if (gamepad2Buttons.wasJustReleased(GamepadButton.DPAD_RIGHT)) {
                     robot.arm.setRotation(ArmRotation.Down);
                     robot.arm.setWristPickup(true);
@@ -165,9 +171,14 @@ public class Drive extends LinearOpMode {
             if (gamepad2Buttons.wasJustPressed(GamepadButton.B)) {
                 robot.arm.setWristRotation(WristRotation.Down);
             } else if (gamepad2Buttons.wasJustPressed(GamepadButton.Y)) {
+                wristLevelingEnabled = false;
+                robot.arm.setGlobalWristRotation(false);
                 robot.arm.setWristRotation(WristRotation.Up);
+                robot.arm.setRotation(ArmRotation.BackDown, ArmSpeed.DeliverSpeed);
             } else if (gamepad2Buttons.wasJustPressed(GamepadButton.X)) {
-                robot.arm.setWristRotation(WristRotation.Forward);
+                wristLevelingEnabled = true;
+                robot.arm.setRotation(ArmRotation.LowDeliver);
+                robot.arm.setGlobalWristRotation(true);
             }
 
             if (gamepad1.left_trigger > 0.1 && gamepad1Buttons.wasJustPressed(GamepadButton.LEFT_BUMPER)) {
@@ -178,6 +189,7 @@ public class Drive extends LinearOpMode {
             }
 
             robot.update();
+            if (robot.pickUp) wristLevelingEnabled = true;
             telemetry.addData("Robot arm rotation", robot.arm.getRotation());
 
             gamepad1Buttons.update();
