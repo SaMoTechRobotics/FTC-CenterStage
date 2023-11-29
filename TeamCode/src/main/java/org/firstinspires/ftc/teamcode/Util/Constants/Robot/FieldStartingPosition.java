@@ -7,6 +7,6 @@ public class FieldStartingPosition {
     public static Double BlueY = 62.0;
     public static Double RedY = -62.0;
 
-    public static Double BlueRot = 180.0;
-    public static Double RedRot = 0.0;
+    public static Double BlueRot = 90.0;
+    public static Double RedRot = 270.0;
 }

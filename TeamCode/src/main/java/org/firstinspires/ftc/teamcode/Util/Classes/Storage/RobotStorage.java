@@ -16,7 +16,7 @@ public class RobotStorage {
         double x = side == AutoSide.LEFT ? FieldStartingPosition.LeftX : FieldStartingPosition.RightX;
         double y = color == AutoColor.BLUE ? FieldStartingPosition.BlueY : FieldStartingPosition.RedY;
         double rot = color == AutoColor.BLUE ? FieldStartingPosition.BlueRot : FieldStartingPosition.RedRot;
-        pose = new Pose2d(x, y, rot);
+        pose = new Pose2d(x, y, Math.toRadians(rot));
         return pose;
     }
 }
