@@ -5,6 +5,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import org.firstinspires.ftc.robotcore.internal.camera.calibration.CameraCalibration;
 import org.firstinspires.ftc.teamcode.Util.Constants.Auto.SpikeLocationDetectionConstants;
+import org.firstinspires.ftc.teamcode.Util.Enums.AutoColor;
 import org.firstinspires.ftc.teamcode.Util.Enums.BoardPosition;
 import org.firstinspires.ftc.vision.VisionProcessor;
 import org.opencv.core.*;
@@ -13,14 +14,13 @@ import org.opencv.imgproc.Imgproc;
 public class SpikeLocationDetectionProcessor implements VisionProcessor {
     public BoardPosition location = BoardPosition.CENTER;
 
-    public Boolean streamingOverlayMode = true;
+    private static AutoColor color = AutoColor.BLUE;
 
-//    public Scalar lower = new Scalar(130, 0, 0);
-//    public Scalar upper = new Scalar(255, 130, 130);
+    public Boolean streamingOverlayMode = true;
 
     private Mat rawMat = new Mat();
     private final Mat colMat = new Mat();
-    private final Mat redMat = new Mat();
+    private final Mat valMat = new Mat();
 
     @Override
     public void init(int width, int height, CameraCalibration calibration) {
@@ -28,6 +28,10 @@ public class SpikeLocationDetectionProcessor implements VisionProcessor {
 
     public void toggleStreamingMode() {
         streamingOverlayMode = !streamingOverlayMode;
+    }
+
+    public void setColor(AutoColor color) {
+        this.color = color;
     }
 
     @Override
@@ -38,8 +42,12 @@ public class SpikeLocationDetectionProcessor implements VisionProcessor {
         // Convert the frame to RGB
         Imgproc.cvtColor(frame, colMat, Imgproc.COLOR_RGBA2RGB);
 
-        // Filter out everything but red
-        Core.inRange(colMat, SpikeLocationDetectionConstants.lowerRed, SpikeLocationDetectionConstants.upperRed, redMat);
+        // Filter out everything but the color wanted
+        if (color == AutoColor.BLUE) {
+            Core.inRange(colMat, SpikeLocationDetectionConstants.lowerBlue, SpikeLocationDetectionConstants.upperBlue, valMat);
+        } else {
+            Core.inRange(colMat, SpikeLocationDetectionConstants.lowerRed, SpikeLocationDetectionConstants.upperRed, valMat);
+        }
 
         // The 3 sections of the frame
         Rect region1 = new Rect(new Point(0, 0), new Point(frame.cols() / 3, frame.rows()));
@@ -47,9 +55,9 @@ public class SpikeLocationDetectionProcessor implements VisionProcessor {
         Rect region3 = new Rect(new Point(2 * frame.cols() / 3, 0), new Point(frame.cols(), frame.rows()));
 
         // Compute the average pixel value of each region
-        Scalar mean1 = Core.mean(redMat.submat(region1));
-        Scalar mean2 = Core.mean(redMat.submat(region2));
-        Scalar mean3 = Core.mean(redMat.submat(region3));
+        Scalar mean1 = Core.mean(valMat.submat(region1));
+        Scalar mean2 = Core.mean(valMat.submat(region2));
+        Scalar mean3 = Core.mean(valMat.submat(region3));
 
         // Find the region with the highest average pixel value
         double maxMean = Math.max(Math.max(mean1.val[0], mean2.val[0]), mean3.val[0]);
@@ -63,7 +71,7 @@ public class SpikeLocationDetectionProcessor implements VisionProcessor {
 
         if (streamingOverlayMode) {
             // Display the mask
-            redMat.copyTo(frame);
+            valMat.copyTo(frame);
         } else {
             // Display the raw frame
             rawMat.copyTo(frame);
