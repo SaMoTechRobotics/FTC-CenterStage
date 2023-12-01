@@ -13,7 +13,13 @@ public class RobotStorage {
     }
 
     public static Pose2d reset(AutoSide side, AutoColor color) {
-        double x = side == AutoSide.LEFT ? FieldStartingPosition.LeftX : FieldStartingPosition.RightX;
+        double x;
+        if (color == AutoColor.BLUE) {
+            x = side == AutoSide.LEFT ? FieldStartingPosition.BlueLeftX : FieldStartingPosition.BlueRightX;
+        } else {
+            x = side == AutoSide.LEFT ? FieldStartingPosition.RedLeftX : FieldStartingPosition.RedRightX;
+
+        }
         double y = color == AutoColor.BLUE ? FieldStartingPosition.BlueY : FieldStartingPosition.RedY;
         double rot = color == AutoColor.BLUE ? FieldStartingPosition.BlueRot : FieldStartingPosition.RedRot;
         pose = new Pose2d(x, y, Math.toRadians(rot));
