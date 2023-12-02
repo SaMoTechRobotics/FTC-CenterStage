@@ -109,12 +109,17 @@ public abstract class BaseAuto extends LinearOpMode {
                 case CENTER:
                     Actions.runBlocking(
                             robot.drive.actionBuilder(robot.drive.pose)
-                                    .strafeToLinearHeading(new Vector2d(-38, 54), Math.toRadians(270))
+                                    .strafeToLinearHeading(new Vector2d(-40, 54), Math.toRadians(270))
                                     .turnTo(Math.toRadians(90))
-                                    .strafeToLinearHeading(new Vector2d(-40, 16), Math.toRadians(90))
+                                    .strafeToLinearHeading(new Vector2d(-40, 17), Math.toRadians(90))
                                     .build()
                     );
                     robot.claw.openNext();
+                    Actions.runBlocking(
+                            robot.drive.actionBuilder(robot.drive.pose)
+                                    .lineToY(14)
+                                    .build()
+                    );
                     break;
                 case RIGHT:
                     Actions.runBlocking(

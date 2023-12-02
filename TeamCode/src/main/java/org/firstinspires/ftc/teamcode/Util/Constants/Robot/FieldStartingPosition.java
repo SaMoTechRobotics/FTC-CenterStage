@@ -1,12 +1,18 @@
 package org.firstinspires.ftc.teamcode.Util.Constants.Robot;
 
+import com.acmerobotics.dashboard.config.Config;
+
+@Config
 public class FieldStartingPosition {
-    public static Double LeftX = 32.0;
-    public static Double RightX = -32.0;
+    public static Double RedLeftX = 12.0;
+    public static Double RedRightX = -48.0 + 6.5;
 
-    public static Double BlueY = 62.0;
-    public static Double RedY = -62.0;
+    public static Double BlueLeftX = 12.0;
+    public static Double BlueRightX = -24.0 - 6.5 - 1;
 
-    public static Double BlueRot = 90.0;
-    public static Double RedRot = 270.0;
+    public static Double BlueY = 63.5;
+    public static Double RedY = -63.5;
+
+    public static Double BlueRot = 270.0;
+    public static Double RedRot = 90.0;
 }
