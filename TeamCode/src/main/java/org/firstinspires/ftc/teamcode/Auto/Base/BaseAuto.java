@@ -36,6 +36,8 @@ public abstract class BaseAuto extends LinearOpMode {
 
     public static Double[] PrepDeliverY = new Double[]{38.0, 33.0, 32.0};
     public static Double[] DeliverY = new Double[]{40.0, 33.0, 28.0};
+    public static Double LeftBonus = 1.0;
+    public static Double RightBonus = 1.0;
     public static Double PrepDeliverX = 34.0;
     public static Double DeliverX = 38.0;
     public static Double ExtraDeliverX = 44.0;
@@ -261,7 +263,14 @@ public abstract class BaseAuto extends LinearOpMode {
             if (robot.vision.isBoardDetected(boardPosition)) {
                 Optional<AprilTagPoseFtc> tpose = robot.vision.getBoardPose(boardPosition);
                 if (tpose.isPresent()) {
-                    Vector2d newPose = new Vector2d(robot.drive.pose.position.x + (tpose.get().y - BoardAlignmentConstants.DistFromBoard), robot.drive.pose.position.y - tpose.get().x);
+                    Double margin = 0.0;
+//                    if (boardPosition == BoardPosition.RIGHT) {
+//                        margin = RightBonus;
+//                    } else if (boardPosition == BoardPosition.LEFT) {
+//                        margin = LeftBonus;
+//                    }
+
+                    Vector2d newPose = new Vector2d(robot.drive.pose.position.x + (tpose.get().y - BoardAlignmentConstants.DistFromBoard), robot.drive.pose.position.y - (tpose.get().x + margin));
                     Rotation2d heading = robot.drive.pose.heading.plus(Math.toRadians(tpose.get().yaw));
 
                     Actions.runBlocking(
