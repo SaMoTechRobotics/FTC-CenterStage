@@ -16,6 +16,7 @@ public class ArmRotation {
     public static int DroneLaunch = 136;
 
     public static int HoldDown = 10;
+    public static int AutoHoldDown = 4;
 
     public static int Down = 0;
 
