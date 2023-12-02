@@ -40,4 +40,6 @@ public class ChassisSpeed {
     public static double JoystickYMargin = 0.1;
     public static double JoystickXMargin = 0.15;
 
+    public static Double BoardAlignmentSpeed = 0.2;
+
 }

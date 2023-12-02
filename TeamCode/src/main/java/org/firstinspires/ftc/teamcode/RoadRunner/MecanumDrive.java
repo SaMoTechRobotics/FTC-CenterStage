@@ -33,11 +33,13 @@ public final class MecanumDrive {
 
         // path profile parameters (in inches)
         public double maxWheelVel = 20;
+        public double slowWheelVel = 15;
         public double minProfileAccel = -30;
         public double maxProfileAccel = 50;
 
         // turn profile parameters (in radians)
         public double maxAngVel = Math.PI; // shared with path
+        public double slowAngVel = Math.PI; // shared with path
         public double maxAngAccel = Math.PI;
 
         // path controller gains
@@ -61,6 +63,11 @@ public final class MecanumDrive {
             new MinVelConstraint(Arrays.asList(
                     kinematics.new WheelVelConstraint(PARAMS.maxWheelVel),
                     new AngularVelConstraint(PARAMS.maxAngVel)
+            ));
+    public final VelConstraint slowVelConstraint =
+            new MinVelConstraint(Arrays.asList(
+                    kinematics.new WheelVelConstraint(PARAMS.slowWheelVel),
+                    new AngularVelConstraint(PARAMS.slowAngVel)
             ));
     public final AccelConstraint defaultAccelConstraint =
             new ProfileAccelConstraint(PARAMS.minProfileAccel, PARAMS.maxProfileAccel);

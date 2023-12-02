@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.Util.Classes.Vision;
 import android.util.Size;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import org.firstinspires.ftc.robotcore.external.ClassFactory;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.CameraName;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.teamcode.Util.Classes.Vision.Processors.SpikeLocationDetectionProcessor;
@@ -19,12 +20,15 @@ import java.util.List;
 import java.util.Optional;
 
 public class Vision {
-    private final CameraName frontCamera;
-    private final CameraName backCamera;
+    private final WebcamName frontCamera;
+    private final WebcamName backCamera;
 
     public VisionPortal visionPortal = null;
+    public VisionPortal visionPortal2 = null;
     SpikeLocationDetectionProcessor spikeMarkDetectionProcessor = null;
     AprilTagProcessor aprilTagProcessor = null;
+
+    private boolean multiProcessor = false;
 
     public Vision(HardwareMap hardwareMap) {
         frontCamera = hardwareMap.get(WebcamName.class, "Webcam 1");
@@ -50,7 +54,40 @@ public class Vision {
                 builder.addProcessor(aprilTagProcessor);
                 break;
         }
+        if (visionPortal == null) visionPortal = builder.build();
+        else visionPortal2 = builder.build();
+    }
+
+    public void startProcessors() {
+        multiProcessor = true;
+        VisionPortal.Builder builder = new VisionPortal.Builder();
+        builder.setCameraResolution(new Size(1280, 720));
+        CameraName switchableCamera = ClassFactory.getInstance()
+                .getCameraManager().nameForSwitchableCamera(frontCamera, backCamera);
+        builder.setCamera(switchableCamera);
+        spikeMarkDetectionProcessor = new SpikeLocationDetectionProcessor();
+        builder.addProcessor(spikeMarkDetectionProcessor);
+        aprilTagProcessor = new AprilTagProcessor.Builder()
+                .setLensIntrinsics(913.562, 913.562, 650.769, 346.753)
+                .setDrawCubeProjection(true)
+                .setDrawAxes(true)
+                .build();
+        builder.addProcessor(aprilTagProcessor);
         visionPortal = builder.build();
+    }
+
+    public void setActiveCamera(VisionProcessor processor) {
+        if (!multiProcessor) return;
+        if (visionPortal.getCameraState() != VisionPortal.CameraState.STREAMING) return;
+        if (processor == VisionProcessor.APRIL_TAG_DETECTION) {
+//            visionPortal.setProcessorEnabled(aprilTagProcessor, true);
+//            visionPortal.setProcessorEnabled(spikeMarkDetectionProcessor, false);
+            visionPortal.setActiveCamera(backCamera);
+        } else {
+//            visionPortal.setProcessorEnabled(aprilTagProcessor, false);
+//            visionPortal.setProcessorEnabled(spikeMarkDetectionProcessor, true);
+            visionPortal.setActiveCamera(frontCamera);
+        }
     }
 
     public void setColor(AutoColor color) {
@@ -140,6 +177,11 @@ public class Vision {
 
     public AprilTagProcessor getAprilTagProcessor() {
         return aprilTagProcessor;
+    }
+
+    public void nextPortal() {
+        visionPortal.close();
+        visionPortal = visionPortal2;
     }
 
     public void close() {
