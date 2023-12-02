@@ -5,7 +5,7 @@ import org.firstinspires.ftc.teamcode.Auto.Base.BaseAuto;
 import org.firstinspires.ftc.teamcode.Util.Enums.AutoColor;
 import org.firstinspires.ftc.teamcode.Util.Enums.AutoSide;
 
-@Autonomous(name = "AutoBlueRight", group = "Auto")
+@Autonomous(name = "AutoBlue", group = "Auto")
 public class AutoBlueRight extends BaseAuto {
     @Override
     protected void setConstants() {
