@@ -7,6 +7,7 @@ import org.firstinspires.ftc.robotcore.external.hardware.camera.CameraName;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.teamcode.Util.Classes.Vision.Processors.SpikeLocationDetectionProcessor;
 import org.firstinspires.ftc.teamcode.Util.Constants.Auto.BoardAlignmentConstants;
+import org.firstinspires.ftc.teamcode.Util.Enums.AutoColor;
 import org.firstinspires.ftc.teamcode.Util.Enums.BoardPosition;
 import org.firstinspires.ftc.teamcode.Util.Enums.VisionProcessor;
 import org.firstinspires.ftc.vision.VisionPortal;
@@ -15,6 +16,7 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagPoseFtc;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 
 import java.util.List;
+import java.util.Optional;
 
 public class Vision {
     private final CameraName frontCamera;
@@ -40,11 +42,19 @@ public class Vision {
                 break;
             case APRIL_TAG_DETECTION:
                 builder.setCamera(backCamera);
-                aprilTagProcessor = new AprilTagProcessor.Builder().build();
+                aprilTagProcessor = new AprilTagProcessor.Builder()
+                        .setLensIntrinsics(913.562, 913.562, 650.769, 346.753)
+                        .setDrawCubeProjection(true)
+                        .setDrawAxes(true)
+                        .build();
                 builder.addProcessor(aprilTagProcessor);
                 break;
         }
         visionPortal = builder.build();
+    }
+
+    public void setColor(AutoColor color) {
+        if (spikeMarkDetectionProcessor != null) spikeMarkDetectionProcessor.setColor(color);
     }
 
     public void setProcessorEnabled(VisionProcessor processor, boolean enabled) {
@@ -93,6 +103,20 @@ public class Vision {
         return false;
     }
 
+    public Optional<AprilTagPoseFtc> getBoardPose(BoardPosition location) {
+        if (aprilTagProcessor != null && !aprilTagProcessor.getDetections().isEmpty()) {
+            for (AprilTagDetection detection : aprilTagProcessor.getDetections()) {
+                for (int tag : location.getTagNumbers()) {
+                    if (detection.id == tag) {
+//                        return Optional.of(new Pose2d(detection.ftcPose.x, detection.ftcPose.y, Math.toRadians(detection.ftcPose.yaw)));
+                        return Optional.of(detection.ftcPose);
+                    }
+                }
+            }
+        }
+        return Optional.empty();
+    }
+
     public Pose2d getBoardAlignedPose(Pose2d robotPose, BoardPosition location) {
         if (aprilTagProcessor == null) return robotPose;
         List<AprilTagDetection> currentDetections = aprilTagProcessor.getDetections();
@@ -108,9 +132,9 @@ public class Vision {
         }
         if (goalDetection == null) return robotPose;
         AprilTagPoseFtc aprilTagPose = goalDetection.ftcPose;
-        double x = robotPose.position.x - aprilTagPose.y + Math.cos(robotPose.heading.log()) * BoardAlignmentConstants.minDistanceFromBoard;
-        double y = robotPose.position.y + aprilTagPose.x + Math.sin(robotPose.heading.log()) * BoardAlignmentConstants.minDistanceFromBoard;
-        double heading = Math.toRadians(-aprilTagPose.yaw);
+        double x = robotPose.position.x - aprilTagPose.y + BoardAlignmentConstants.minDistanceFromBoard;
+        double y = robotPose.position.y + aprilTagPose.x;
+        double heading = robotPose.heading.log() + Math.toRadians(aprilTagPose.yaw);
         return new Pose2d(x, y, heading);
     }
 

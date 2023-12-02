@@ -72,12 +72,13 @@ public class PlacePixelTest extends LinearOpMode {
                     telemetry.addData("Y", pose.position.y);
                     telemetry.addData("Heading", Math.toDegrees(pose.heading.log()));
                     telemetry.update();
-                    if (gamepad1.a) {
+                    Optional<AprilTagPoseFtc> tpose = robot.vision.getBoardPose(Side);
+                    if (gamepad1.a && tpose.isPresent()) {
                         Actions.runBlocking(
                                 robot.drive.actionBuilder(robot.drive.pose)
-                                        .strafeToLinearHeading(new Vector2d(pose.position.x, pose.position.y), pose.heading)
-                                        .turnTo(pose.heading)
-
+                                        .turn(Math.toRadians(tpose.get().yaw))
+//                                        .turnTo(pose.heading)
+//                                        .strafeToLinearHeading(new Vector2d(pose.position.x, pose.position.y), pose.heading)
                                         .build());
                     }
                 }
