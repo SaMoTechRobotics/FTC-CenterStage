@@ -181,10 +181,10 @@ public class Drive extends LinearOpMode {
                 robot.arm.setGlobalWristRotation(true);
             }
 
-            if (gamepad1.left_trigger > 0.1 && gamepad1Buttons.wasJustPressed(GamepadButton.LEFT_BUMPER)) {
-                robot.prepareDroneLaunch();
-            }
-            if (gamepad1.right_trigger > 0.1 && gamepad1Buttons.wasJustPressed(GamepadButton.RIGHT_BUMPER) && robot.droneReady) {
+//            if (gamepad1.left_trigger > 0.1 && gamepad1Buttons.wasJustPressed(GamepadButton.LEFT_BUMPER)) {
+//                robot.prepareDroneLaunch();
+//            }
+            if (gamepad1.right_trigger > 0.1 && gamepad1Buttons.wasJustPressed(GamepadButton.RIGHT_BUMPER)) {
                 robot.arm.launchDrone();
             }
 
