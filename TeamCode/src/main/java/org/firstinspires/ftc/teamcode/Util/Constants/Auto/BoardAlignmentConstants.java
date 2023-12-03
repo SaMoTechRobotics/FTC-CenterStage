@@ -6,5 +6,5 @@ import com.acmerobotics.dashboard.config.Config;
 public class BoardAlignmentConstants {
     public static double minDistanceFromBoard = 2.0;
 
-    public static Double DistFromBoard = 18.0;
+    public static Double DistFromBoard = 20.0;
 }

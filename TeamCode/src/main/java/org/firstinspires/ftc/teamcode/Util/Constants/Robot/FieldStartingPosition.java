@@ -4,7 +4,7 @@ import com.acmerobotics.dashboard.config.Config;
 
 @Config
 public class FieldStartingPosition {
-    public static Double RedLeftX = 12.0;
+    public static Double RedLeftX = -48.0 + 6.5;
     public static Double RedRightX = -48.0 + 6.5;
 
     public static Double BlueLeftX = 12.0;

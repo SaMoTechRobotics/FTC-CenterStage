@@ -182,7 +182,7 @@ public class PlacePixelTest extends LinearOpMode {
                 if (robot.vision.isBoardDetected(Side)) {
                     Optional<AprilTagPoseFtc> tpose = robot.vision.getBoardPose(Side);
                     if (tpose.isPresent()) {
-                        Vector2d newPose = new Vector2d(robot.drive.pose.position.x + (tpose.get().y - BoardAlignmentConstants.DistFromBoard), robot.drive.pose.position.y - tpose.get().x);
+                        Vector2d newPose = new Vector2d(robot.drive.pose.position.x + (tpose.get().y - BoardAlignmentConstants.DistFromBoard), robot.drive.pose.position.y - (tpose.get().x + 4));
                         Rotation2d heading = robot.drive.pose.heading.plus(Math.toRadians(tpose.get().yaw));
 
                         Actions.runBlocking(
