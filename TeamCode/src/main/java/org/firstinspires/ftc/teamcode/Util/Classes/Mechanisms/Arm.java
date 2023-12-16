@@ -107,6 +107,10 @@ public class Arm {
         return armMotor.getCurrentPosition() * (90.0 / ArmRotation.TicksAt90Degrees);
     }
 
+    public double getArmTicks() {
+        return armMotor.getCurrentPosition();
+    }
+
     public double getWristRotation() {
         return wristServo.getPosition();
     }

@@ -191,6 +191,7 @@ public class Drive extends LinearOpMode {
             robot.update();
             if (robot.pickUp) wristLevelingEnabled = true;
             telemetry.addData("Robot arm rotation", robot.arm.getRotation());
+            telemetry.addData("Robot arm ticks", robot.arm.getArmTicks());
 
             gamepad1Buttons.update();
             gamepad2Buttons.update();
