@@ -6,6 +6,7 @@ import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Vector2d;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.CRServo;
 import org.firstinspires.ftc.teamcode.Util.Classes.Lib.FieldOverlayUtils;
 import org.firstinspires.ftc.teamcode.Util.Classes.Lib.GamepadButton;
 import org.firstinspires.ftc.teamcode.Util.Classes.Lib.StatefulGamepad;
@@ -31,6 +32,9 @@ public class Drive extends LinearOpMode {
 
     public static boolean AutoClose = false;
 
+    public static double IntakeZero = 0;
+    public static double IntakeSpeed = 1;
+
     private Robot robot;
 
     @Override
@@ -38,6 +42,10 @@ public class Drive extends LinearOpMode {
         if (ResetPose) RobotStorage.reset();
         robot = new Robot(hardwareMap, telemetry);
         robot.claw.close();
+
+        CRServo leftIntakeServo = hardwareMap.get(CRServo.class, "intake0");
+        CRServo rightIntakeServo = hardwareMap.get(CRServo.class, "intake1");
+
 //        VisionPortal.Builder builder = new VisionPortal.Builder();
 //        builder.setCamera(hardwareMap.get(WebcamName.class, "Webcam 1"));
 //        VisionPortal visionPortal = builder.build();
@@ -62,6 +70,17 @@ public class Drive extends LinearOpMode {
                 if (vision.visionPortal.getCameraState() == VisionPortal.CameraState.STREAMING) {
                     vision.visionPortal.stopStreaming();
                 }
+            }
+
+            if (gamepad1.right_trigger > 0.1) {
+                leftIntakeServo.setPower(IntakeSpeed);
+                rightIntakeServo.setPower(-IntakeSpeed);
+            } else if (gamepad1.left_trigger > 0.1) {
+                leftIntakeServo.setPower(-IntakeSpeed);
+                rightIntakeServo.setPower(IntakeSpeed);
+            } else {
+                leftIntakeServo.setPower(IntakeZero);
+                rightIntakeServo.setPower(IntakeZero);
             }
 
             if (gamepad1Buttons.stateJustChanged(GamepadButton.LEFT_BUMPER) || gamepad1Buttons.stateJustChanged(GamepadButton.RIGHT_BUMPER)) {
