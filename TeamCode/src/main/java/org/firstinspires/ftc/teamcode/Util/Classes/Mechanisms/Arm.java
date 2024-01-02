@@ -103,6 +103,10 @@ public class Arm {
         droneServo.setPosition(ClawPosition.DroneRelease);
     }
 
+    public void lockDrone() {
+        droneServo.setPosition(ClawPosition.DroneLock);
+    }
+
     public double getRotation() {
         return armMotor.getCurrentPosition() * (90.0 / ArmRotation.TicksAt90Degrees);
     }

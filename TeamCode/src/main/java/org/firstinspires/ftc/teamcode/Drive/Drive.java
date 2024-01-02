@@ -119,7 +119,7 @@ public class Drive extends LinearOpMode {
                 } else {
                     robot.arm.manualRotation(gamepad2.right_stick_y * ArmSpeed.SlowPickupSpeed);
                 }
-                robot.arm.setGlobalWristRotation(wristLevelingEnabled);
+                robot.arm.setGlobalWristRotation(false);
             } else if (gamepad2.right_trigger < 0.1) {
                 if (gamepad2Buttons.wasJustReleased(GamepadButton.DPAD_UP)) {
                     robot.arm.setRotation(ArmRotation.HighDeliver);
@@ -203,8 +203,10 @@ public class Drive extends LinearOpMode {
 //            if (gamepad1.left_trigger > 0.1 && gamepad1Buttons.wasJustPressed(GamepadButton.LEFT_BUMPER)) {
 //                robot.prepareDroneLaunch();
 //            }
-            if (gamepad1.right_trigger > 0.1 && gamepad1Buttons.wasJustPressed(GamepadButton.RIGHT_BUMPER)) {
+            if (gamepad1.right_trigger > 0.1 && gamepad1Buttons.getButton(GamepadButton.RIGHT_BUMPER)) {
                 robot.arm.launchDrone();
+            } else {
+                robot.arm.lockDrone();
             }
 
             robot.update();

@@ -12,5 +12,5 @@ public class ClawPosition {
     public static int WaitTime = 300;
 
     public static Double DroneLock = 0.0;
-    public static Double DroneRelease = 0.2;
+    public static Double DroneRelease = 0.5;
 }
