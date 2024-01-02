@@ -4,7 +4,7 @@ import com.acmerobotics.dashboard.config.Config;
 
 @Config
 public class WristRotation {
-    public static Double ArmComplementAngle = 0.0; // 105.0
+    public static Double ArmComplementAngle = 10.0; // 105.0
     public static Double PickupComplementAngle = 180.0;
 
     public static Double PositionAt0Degrees = 0.3;
