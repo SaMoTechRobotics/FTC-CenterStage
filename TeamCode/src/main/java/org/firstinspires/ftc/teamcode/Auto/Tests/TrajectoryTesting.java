@@ -17,12 +17,12 @@ import org.firstinspires.ftc.teamcode.Util.Enums.AutoSide;
 public class TrajectoryTesting extends LinearOpMode {
     private AutoRobot robot;
 
-    protected static AutoSide SIDE = AutoSide.RIGHT;
+    protected static AutoSide SIDE = AutoSide.FAR;
     protected static AutoColor COLOR = AutoColor.BLUE;
 
     @Override
     public void runOpMode() {
-        RobotStorage.reset(SIDE, COLOR);
+        RobotStorage.setPose(RobotStorage.getStartPose(SIDE, COLOR));
         robot = new AutoRobot(hardwareMap, telemetry, RobotStorage.pose);
 
         ElapsedTime timer = new ElapsedTime();

@@ -4,15 +4,15 @@ import com.acmerobotics.dashboard.config.Config;
 
 @Config
 public class FieldStartingPosition {
-    public static Double RedLeftX = -48.0 + 6.5;
-    public static Double RedRightX = -48.0 + 6.5;
+    public static double RedFarX = -48.0 + 6.5;
+    public static double RedNearX = -48.0 + 6.5;
 
-    public static Double BlueLeftX = 12.0;
-    public static Double BlueRightX = -24.0 - 6.5 - 1;
+    public static double BlueNearX = 12.0;
+    public static double BlueFarX = -30;
 
-    public static Double BlueY = 63.5;
-    public static Double RedY = -63.5;
+    public static double BlueY = 63.5;
+    public static double RedY = -63.5;
 
-    public static Double BlueRot = 270.0;
-    public static Double RedRot = 90.0;
+    public static double BlueRot = 270.0;
+    public static double RedRot = 90.0;
 }

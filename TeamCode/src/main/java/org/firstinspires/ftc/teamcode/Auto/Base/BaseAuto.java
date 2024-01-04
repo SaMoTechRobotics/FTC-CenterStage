@@ -1,10 +1,7 @@
 package org.firstinspires.ftc.teamcode.Auto.Base;
 
 import com.acmerobotics.dashboard.config.Config;
-import com.acmerobotics.roadrunner.PoseVelocity2d;
-import com.acmerobotics.roadrunner.Rotation2d;
-import com.acmerobotics.roadrunner.SleepAction;
-import com.acmerobotics.roadrunner.Vector2d;
+import com.acmerobotics.roadrunner.*;
 import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -20,6 +17,7 @@ import org.firstinspires.ftc.teamcode.Util.Enums.BoardPosition;
 import org.firstinspires.ftc.teamcode.Util.Enums.VisionProcessor;
 import org.firstinspires.ftc.vision.apriltag.AprilTagPoseFtc;
 
+import java.lang.Math;
 import java.util.Optional;
 import java.util.Timer;
 
@@ -29,7 +27,7 @@ public abstract class BaseAuto extends LinearOpMode {
 
     private final static Boolean Debug = true;
 
-    protected static AutoSide SIDE = AutoSide.RIGHT;
+    protected static AutoSide SIDE = AutoSide.FAR;
     protected static AutoColor COLOR = AutoColor.RED;
 
     protected abstract void setConstants();
@@ -54,12 +52,11 @@ public abstract class BaseAuto extends LinearOpMode {
     public void runOpMode() {
         setConstants();
 
-        RobotStorage.reset(SIDE, COLOR);
+        Pose2d startPose = RobotStorage.getStartPose(SIDE, COLOR);
+        RobotStorage.setPose(startPose);
         robot = new AutoRobot(hardwareMap, telemetry, RobotStorage.pose);
 //
         robot.vision.startProcessor(VisionProcessor.SPIKE_LOCATION_DETECTION);
-//        robot.vision.startProcessors();
-//        robot.vision.setActiveCamera(VisionProcessor.SPIKE_LOCATION_DETECTION);
         robot.vision.setColor(COLOR);
 
         if (Debug) {
@@ -72,7 +69,6 @@ public abstract class BaseAuto extends LinearOpMode {
         int c = COLOR.value;
 
         double outRot = COLOR == AutoColor.BLUE ? 270 : 90;
-//        Pose2d v = new Pose2d(1, COLOR.value, COLOR.value);
         Timer t = new Timer();
 
         while (!isStarted()) {
@@ -101,7 +97,6 @@ public abstract class BaseAuto extends LinearOpMode {
         );
 
 
-//        if (SIDE == AutoSide.RIGHT) {
         if (COLOR == AutoColor.BLUE) {
             switch (boardPosition) {
                 case LEFT:
@@ -224,36 +219,6 @@ public abstract class BaseAuto extends LinearOpMode {
                     break;
             }
         }
-//        } else {
-//            switch (boardPosition) {
-//                case LEFT:
-//                    Actions.runBlocking(
-//                            robot.drive.actionBuilder(robot.drive.pose)
-//                                    .strafeToLinearHeading(new Vector2d(-36, 36 * c), Math.toRadians(90))
-//                                    .strafeToLinearHeading(new Vector2d(-32, 34 * c), Math.toRadians(30))
-//                                    .build()
-//                    );
-//                    robot.claw.openNext();
-//                    break;
-//                case CENTER:
-//                    Actions.runBlocking(
-//                            robot.drive.actionBuilder(robot.drive.pose)
-//                                    .strafeToLinearHeading(new Vector2d(-36, 24 * c), Math.toRadians(90))
-//                                    .build()
-//                    );
-//                    robot.claw.openNext();
-//                    break;
-//                case RIGHT:
-//                    Actions.runBlocking(
-//                            robot.drive.actionBuilder(robot.drive.pose)
-//                                    .lineToY(28)
-//                                    .turn(Math.toRadians(30))
-//                                    .build()
-//                    );
-//                    robot.claw.openNext();
-//                    break;
-//            }
-//        }
 
         robot.vision.startProcessor(VisionProcessor.APRIL_TAG_DETECTION);
 

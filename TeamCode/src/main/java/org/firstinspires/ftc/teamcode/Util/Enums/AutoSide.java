@@ -1,8 +1,8 @@
 package org.firstinspires.ftc.teamcode.Util.Enums;
 
 public enum AutoSide {
-    LEFT(-1),
-    RIGHT(1);
+    NEAR(-1),
+    FAR(1);
 
     public final int value;
 

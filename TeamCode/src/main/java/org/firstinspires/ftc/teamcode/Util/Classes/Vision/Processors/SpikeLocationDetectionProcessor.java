@@ -16,7 +16,7 @@ public class SpikeLocationDetectionProcessor implements VisionProcessor {
     public BoardPosition location = BoardPosition.CENTER;
 
     private static AutoColor color = AutoColor.BLUE;
-    private static AutoSide side = AutoSide.RIGHT;
+    private static AutoSide side = AutoSide.FAR;
 
     public Boolean streamingOverlayMode = true;
 
