@@ -44,7 +44,7 @@ public abstract class BaseAuto extends LinearOpMode {
     public static Vector2d ParkPositionPos = new Vector2d(50, 36);
 
     public static Double AlignWithBoardTime = 2.0;
-    public static Double PushBoardTime = 1.0;
+    public static Double PushBoardTime = 0.5;
 
     BoardPosition boardPosition = BoardPosition.CENTER;
 
@@ -107,7 +107,7 @@ public abstract class BaseAuto extends LinearOpMode {
                     Actions.runBlocking(
                             robot.drive.actionBuilder(robot.drive.pose)
                                     .strafeToLinearHeading(new Vector2d(-36, 48 * c), Math.toRadians(outRot))
-                                    .splineToSplineHeading(new Pose2d(-36 + 6, 40, Math.toRadians(270 + 45)), Math.toRadians(270 + 45))
+                                    .splineToSplineHeading(new Pose2d(-36 + 6, 38, Math.toRadians(270 + 45)), Math.toRadians(270 + 45))
                                     .build()
                     );
                     robot.claw.openNext();
@@ -123,7 +123,7 @@ public abstract class BaseAuto extends LinearOpMode {
                     Actions.runBlocking(
                             robot.drive.actionBuilder(robot.drive.pose)
                                     .turnTo(Math.toRadians(90))
-                                    .strafeToLinearHeading(new Vector2d(-36, 16 * c), Math.toRadians(90))
+                                    .strafeToLinearHeading(new Vector2d(-36, 13 * c), Math.toRadians(90))
                                     .build()
                     );
                     robot.claw.openNext();
@@ -138,7 +138,7 @@ public abstract class BaseAuto extends LinearOpMode {
                     Actions.runBlocking(
                             robot.drive.actionBuilder(robot.drive.pose)
                                     .strafeToLinearHeading(new Vector2d(-36, 48 * c), Math.toRadians(outRot))
-                                    .splineToSplineHeading(new Pose2d(-36 - 6, 40, Math.toRadians(270 - 45)), Math.toRadians(270 + 45))
+                                    .splineToSplineHeading(new Pose2d(-36 - 4, 38, Math.toRadians(270 - 45)), Math.toRadians(270 + 45))
                                     .build()
                     );
                     robot.claw.openNext();
@@ -240,7 +240,7 @@ public abstract class BaseAuto extends LinearOpMode {
         Actions.runBlocking(
                 robot.drive.actionBuilder(robot.drive.pose)
                         .setReversed(true)
-                        .strafeToLinearHeading(new Vector2d(0, CrossFieldY * c), Math.toRadians(180))
+                        .strafeToLinearHeading(new Vector2d(0, (CrossFieldY - 1) * c), Math.toRadians(180))
                         .strafeToLinearHeading(new Vector2d(PrepDeliverX, CrossFieldY * c), Math.toRadians(180))
                         .strafeToLinearHeading(new Vector2d(PrepDeliverX, boardDeliverY * c), Math.toRadians(180))
                         .build()
