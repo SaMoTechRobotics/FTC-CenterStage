@@ -120,7 +120,8 @@ public class Drive extends LinearOpMode {
                     robot.arm.manualRotation(gamepad2.right_stick_y * ArmSpeed.SlowPickupSpeed);
                 }
                 robot.arm.setGlobalWristRotation(false);
-            } else if (gamepad2.right_trigger < 0.1) {
+            } else {
+//                else if (gamepad2.right_trigger < 0.1) {
                 if (gamepad2Buttons.wasJustReleased(GamepadButton.DPAD_UP)) {
                     robot.arm.setRotation(ArmRotation.HighDeliver);
                     robot.arm.setGlobalWristRotation(true);
@@ -144,17 +145,25 @@ public class Drive extends LinearOpMode {
                 }
             }
 
-            if (gamepad2.right_trigger >= 0.1) {
-                if (gamepad2Buttons.wasJustReleased(GamepadButton.DPAD_UP)) {
-                    robot.arm.setRotation(ArmRotation.Stack5);
-                } else if (gamepad2Buttons.wasJustReleased(GamepadButton.DPAD_LEFT)) {
-                    robot.arm.setRotation(ArmRotation.Stack4);
-                } else if (gamepad2Buttons.wasJustReleased(GamepadButton.DPAD_DOWN)) {
-                    robot.arm.setRotation(ArmRotation.Stack3);
-                } else if (gamepad2Buttons.wasJustReleased(GamepadButton.DPAD_RIGHT)) {
-                    robot.arm.setRotation(ArmRotation.Down);
-                }
+//            if (gamepad2.right_trigger >= 0.1) {
+            if (gamepad1Buttons.wasJustReleased(GamepadButton.DPAD_UP)) {
+                robot.arm.setRotation(ArmRotation.Stack5);
+                robot.arm.setWristRotation(WristRotation.StackDown);
+                robot.claw.open();
+            } else if (gamepad1Buttons.wasJustReleased(GamepadButton.DPAD_LEFT)) {
+                robot.arm.setRotation(ArmRotation.Stack4);
+                robot.arm.setWristRotation(WristRotation.StackDown);
+                robot.claw.open();
+            } else if (gamepad1Buttons.wasJustReleased(GamepadButton.DPAD_DOWN)) {
+                robot.arm.setRotation(ArmRotation.Stack3);
+                robot.arm.setWristRotation(WristRotation.Down);
+                robot.claw.open();
+            } else if (gamepad1Buttons.wasJustReleased(GamepadButton.DPAD_RIGHT)) {
+                robot.arm.setRotation(ArmRotation.Down);
+                robot.arm.setWristRotation(WristRotation.Down);
+                robot.claw.open();
             }
+//            }
 
             if (gamepad2Buttons.wasJustReleased(GamepadButton.A)) {
                 robot.resetForIntake();
