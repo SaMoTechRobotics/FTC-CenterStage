@@ -32,13 +32,13 @@ public abstract class BaseAuto extends LinearOpMode {
 
     protected abstract void setConstants();
 
-    public static Double CrossFieldY = 13.0;
+    public static Double CrossFieldY = 10.0;
 
     public static Double[] PrepDeliverY = new Double[]{38.0, 33.0, 29.0};
     public static Double[] DeliverY = new Double[]{40.0, 33.0, 28.0};
     public static Double LeftBonus = 1.0;
     public static Double RightBonus = 1.0;
-    public static Double PrepDeliverX = 34.0;
+    public static Double PrepDeliverX = 36.0;
     public static Double DeliverX = 38.0;
 
     public static Vector2d ParkPositionPos = new Vector2d(50, 36);
@@ -82,7 +82,6 @@ public abstract class BaseAuto extends LinearOpMode {
         waitForStart();
 
         robot.vision.close();
-//        robot.vision.nextPortal();
 
         robot.claw.close();
 
@@ -96,35 +95,31 @@ public abstract class BaseAuto extends LinearOpMode {
                 200
         );
 
+        Actions.runBlocking(
+                robot.drive.actionBuilder(robot.drive.pose)
+                        .strafeToLinearHeading(new Vector2d(-36, 60 * c), Math.toRadians(outRot))
+                        .build()
+        );
 
         if (COLOR == AutoColor.BLUE) {
             switch (boardPosition) {
                 case LEFT:
                     Actions.runBlocking(
                             robot.drive.actionBuilder(robot.drive.pose)
-                                    .strafeToLinearHeading(new Vector2d(-38, 48 * c), Math.toRadians(outRot))
-                                    .strafeToLinearHeading(new Vector2d(-36, 42 * c), Math.toRadians(outRot))
-                                    .turn(Math.toRadians(60))
-                                    .lineToX(-35)
+                                    .strafeToLinearHeading(new Vector2d(-36, 48 * c), Math.toRadians(outRot))
+                                    .splineToSplineHeading(new Pose2d(-36 + 6, 40, Math.toRadians(270 + 45)), Math.toRadians(270 + 45))
                                     .build()
                     );
                     robot.claw.openNext();
                     Actions.runBlocking(
                             robot.drive.actionBuilder(robot.drive.pose)
-                                    .lineToX(-36)
-                                    .turn(Math.toRadians(-60))
-                                    .strafeToLinearHeading(new Vector2d(-36, 42 * c), Math.toRadians(outRot))
+                                    .lineToY(48)
+                                    .turn(Math.toRadians(-45))
                                     .strafeToLinearHeading(new Vector2d(-36, CrossFieldY * c), Math.toRadians(outRot))
                                     .build()
                     );
                     break;
                 case CENTER:
-                    Actions.runBlocking(
-                            robot.drive.actionBuilder(robot.drive.pose)
-                                    .strafeToLinearHeading(new Vector2d(-38, 54 * c), Math.toRadians(outRot))
-                                    .turnTo(Math.toRadians(90))
-                                    .build()
-                    );
                     Actions.runBlocking(
                             robot.drive.actionBuilder(robot.drive.pose)
                                     .turnTo(Math.toRadians(90))
@@ -134,25 +129,23 @@ public abstract class BaseAuto extends LinearOpMode {
                     robot.claw.openNext();
                     Actions.runBlocking(
                             robot.drive.actionBuilder(robot.drive.pose)
-                                    .lineToY(12 * c)
+                                    .lineToY(10)
+                                    .strafeToLinearHeading(new Vector2d(-36, CrossFieldY * c), Math.toRadians(90))
                                     .build()
                     );
                     break;
                 case RIGHT:
                     Actions.runBlocking(
                             robot.drive.actionBuilder(robot.drive.pose)
-                                    .strafeToLinearHeading(new Vector2d(-44
-                                            , 47 * c), Math.toRadians(outRot))
-                                    .turn(Math.toRadians(-30))
-                                    .lineToY(40.5 * c)
+                                    .strafeToLinearHeading(new Vector2d(-36, 48 * c), Math.toRadians(outRot))
+                                    .splineToSplineHeading(new Pose2d(-36 - 6, 40, Math.toRadians(270 - 45)), Math.toRadians(270 + 45))
                                     .build()
                     );
                     robot.claw.openNext();
                     Actions.runBlocking(
                             robot.drive.actionBuilder(robot.drive.pose)
-                                    .lineToY(47 * c)
-                                    .turn(Math.toRadians(30))
-                                    .strafeToLinearHeading(new Vector2d(-36, 47 * c), Math.toRadians(outRot))
+                                    .lineToY(48)
+                                    .turn(Math.toRadians(45))
                                     .strafeToLinearHeading(new Vector2d(-36, CrossFieldY * c), Math.toRadians(outRot))
                                     .build()
                     );
@@ -224,29 +217,11 @@ public abstract class BaseAuto extends LinearOpMode {
 
         Actions.runBlocking(
                 robot.drive.actionBuilder(robot.drive.pose)
-//                        .strafeToLinearHeading(new Vector2d(-36, 36), Math.toRadians(90))
-//                        .strafeToLinearHeading(new Vector2d(-36, CrossFieldY), Math.toRadians(180))
-//                        .lineToY(CrossFieldY)
-//                        .turnTo(Math.toRadians(180))
-//                        .turn(Math.toRadians(-90))
-                        .strafeToLinearHeading(new Vector2d(-36, CrossFieldY * c), Math.toRadians(180))
+                        .strafeToLinearHeading(new Vector2d(-35.9, CrossFieldY * c), Math.toRadians(180))
                         .build()
         );
 
-//        robot.vision.startProcessor(VisionProcessor.APRIL_TAG_DETECTION);
         robot.vision.setActiveCamera(VisionProcessor.APRIL_TAG_DETECTION);
-
-        Actions.runBlocking(
-                robot.drive.actionBuilder(robot.drive.pose)
-                        .strafeToLinearHeading(new Vector2d(-35.9, 12 * c), Math.toRadians(180))
-                        .build()
-        );
-
-//        Actions.runBlocking(
-//                robot.drive.actionBuilder(robot.drive.pose)
-//                        .strafeToLinearHeading(new Vector2d(-40, 20), Math.toRadians(90))
-//                        .build()
-//        );
 
         Double boardDeliverY = DeliverY[1];
         Double prepBoardDeliverY = PrepDeliverY[1];
@@ -271,14 +246,6 @@ public abstract class BaseAuto extends LinearOpMode {
                         .build()
         );
 
-//
-//        Actions.runBlocking(
-//                robot.drive.actionBuilder(robot.drive.pose)
-//                        .strafeToLinearHeading(new Vector2d(PrepDeliverX, 36), Math.toRadians(180))
-//                        .build()
-//        );
-
-
         Actions.runBlocking(
                 robot.drive.actionBuilder(robot.drive.pose)
                         .strafeToLinearHeading(new Vector2d(DeliverX, prepBoardDeliverY * c), Math.toRadians(180))
@@ -301,7 +268,7 @@ public abstract class BaseAuto extends LinearOpMode {
             if (robot.vision.isBoardDetected(boardPosition)) {
                 Optional<AprilTagPoseFtc> tpose = robot.vision.getBoardPose(boardPosition);
                 if (tpose.isPresent()) {
-                    Double margin = 0.0;
+                    double margin = 0.0;
 //                    if (boardPosition == BoardPosition.RIGHT) {
 //                        margin = RightBonus;
 //                    } else if (boardPosition == BoardPosition.LEFT) {
