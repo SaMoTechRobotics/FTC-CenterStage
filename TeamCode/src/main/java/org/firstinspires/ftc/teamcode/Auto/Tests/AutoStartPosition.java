@@ -13,11 +13,11 @@ import org.firstinspires.ftc.teamcode.Util.Enums.AutoSide;
 
 @Config
 @Autonomous(name = "AutoStartPosition", group = "Tests")
-public abstract class AutoStartPosition extends LinearOpMode {
+public class AutoStartPosition extends LinearOpMode {
     private AutoRobot robot;
 
     public static AutoSide SIDE = AutoSide.FAR;
-    public static AutoColor COLOR = AutoColor.BLUE;
+    public static AutoColor COLOR = AutoColor.RED;
 
     @Override
     public void runOpMode() {
@@ -27,6 +27,10 @@ public abstract class AutoStartPosition extends LinearOpMode {
 
         int c = COLOR.value;
         double outRot = COLOR == AutoColor.BLUE ? 270 : 90;
+
+        while (!isStarted()) {
+            idle();
+        }
 
         waitForStart();
 
