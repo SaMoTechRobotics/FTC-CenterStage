@@ -207,6 +207,6 @@ public class Arm {
     }
 
     private double degreesToWristPosition(double degrees) {
-        return (degrees * (Math.abs(WristRotation.PositionAt180Degrees - WristRotation.PositionAt0Degrees)) / 180.0 + WristRotation.PositionAt0Degrees);
+        return (degrees * (Math.abs(WristRotation.PositionAt90Degrees - WristRotation.PositionAt0Degrees)) / 90.0 + WristRotation.PositionAt0Degrees);
     }
 }
