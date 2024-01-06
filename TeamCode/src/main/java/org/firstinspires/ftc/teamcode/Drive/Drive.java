@@ -28,6 +28,7 @@ import java.util.Timer;
 public class Drive extends LinearOpMode {
     public static boolean DebuggingTelemetry = false;
     public static boolean FieldOverlay = false;
+    public static boolean VisionEnabled = false;
     public static boolean ResetPose = true;
 
     public static boolean AutoClose = false;
@@ -50,7 +51,9 @@ public class Drive extends LinearOpMode {
 //        builder.setCamera(hardwareMap.get(WebcamName.class, "Webcam 1"));
 //        VisionPortal visionPortal = builder.build();
         Vision vision = new Vision(hardwareMap);
-        vision.startProcessor(VisionProcessor.APRIL_TAG_DETECTION);
+        if (VisionEnabled) {
+            vision.startProcessor(VisionProcessor.APRIL_TAG_DETECTION);
+        }
 
         StatefulGamepad gamepad1Buttons = new StatefulGamepad(gamepad1);
         StatefulGamepad gamepad2Buttons = new StatefulGamepad(gamepad2);
@@ -62,13 +65,15 @@ public class Drive extends LinearOpMode {
         waitForStart();
 
         while (opModeIsActive()) {
-            if (gamepad1Buttons.wasJustPressed(GamepadButton.DPAD_UP)) {
-                vision.setProcessorEnabled(VisionProcessor.APRIL_TAG_DETECTION, true);
-                vision.visionPortal.resumeStreaming();
-            } else if (gamepad1Buttons.wasJustPressed(GamepadButton.DPAD_DOWN)) {
-                vision.setProcessorEnabled(VisionProcessor.APRIL_TAG_DETECTION, false);
-                if (vision.visionPortal.getCameraState() == VisionPortal.CameraState.STREAMING) {
-                    vision.visionPortal.stopStreaming();
+            if (VisionEnabled) {
+                if (gamepad1Buttons.wasJustPressed(GamepadButton.DPAD_UP)) {
+                    vision.setProcessorEnabled(VisionProcessor.APRIL_TAG_DETECTION, true);
+                    vision.visionPortal.resumeStreaming();
+                } else if (gamepad1Buttons.wasJustPressed(GamepadButton.DPAD_DOWN)) {
+                    vision.setProcessorEnabled(VisionProcessor.APRIL_TAG_DETECTION, false);
+                    if (vision.visionPortal.getCameraState() == VisionPortal.CameraState.STREAMING) {
+                        vision.visionPortal.stopStreaming();
+                    }
                 }
             }
 
