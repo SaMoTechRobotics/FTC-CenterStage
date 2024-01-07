@@ -370,6 +370,11 @@ public abstract class BaseAuto extends LinearOpMode {
                         .build()
         );
 
+        robot.vision.close();
+
+        telemetry.addLine("Auto Finished in " + Math.round(timer.seconds()) + " seconds");
+        telemetry.update();
+        
         while (opModeIsActive()) {
             idle();
         }

@@ -185,6 +185,8 @@ public class Vision {
     }
 
     public void close() {
-        visionPortal.close();
+        if (visionPortal != null) {
+            visionPortal.close();
+        }
     }
 }
