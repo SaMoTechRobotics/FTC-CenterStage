@@ -8,7 +8,7 @@ public class FieldStartingPosition {
     public static double RedNearX = -48.0 + 6.5;
 
     public static double BlueNearX = 12.0;
-    public static double BlueFarX = -31;
+    public static double BlueFarX = -32;
 
     public static double BlueY = 63.5;
     public static double RedY = -63.5;
