@@ -25,7 +25,7 @@ import java.util.Timer;
 public abstract class BaseAuto extends LinearOpMode {
     private AutoRobot robot;
 
-    public static boolean FakeFail = true;
+    public static boolean FakeFail = !true;
 
     private final static Boolean Debug = true;
 
@@ -41,6 +41,7 @@ public abstract class BaseAuto extends LinearOpMode {
     public static Double LeftBonus = 1.0;
     public static Double RightBonus = 1.0;
     public static Double PrepDeliverX = 39.0;
+    public static Double CrossFieldX = 42.0;
     public static Double DeliverX = 38.0;
 
     public static Vector2d ParkPositionPos = new Vector2d(56, 36);
@@ -102,6 +103,7 @@ public abstract class BaseAuto extends LinearOpMode {
                 200
         );
 
+        ElapsedTime delayTimer = new ElapsedTime();
         if (FakeFail) {
             robot.drive.setDrivePowers(
                     new PoseVelocity2d(
@@ -113,15 +115,24 @@ public abstract class BaseAuto extends LinearOpMode {
                     )
             );
 
-            ElapsedTime fakeBadAuto = new ElapsedTime();
 
             if (boardPosition == BoardPosition.CENTER) {
-                while (fakeBadAuto.seconds() < 7) {
+                while (delayTimer.seconds() < 7) {
                     robot.drive.updatePoseEstimate();
                 }
             } else {
-                while (fakeBadAuto.seconds() < 6) {
+                while (delayTimer.seconds() < 6) {
                     robot.drive.updatePoseEstimate();
+                }
+            }
+        } else {
+            if (boardPosition == BoardPosition.CENTER) {
+                while (delayTimer.seconds() < 7) {
+                    idle();
+                }
+            } else {
+                while (delayTimer.seconds() < 6) {
+                    idle();
                 }
             }
         }
@@ -135,7 +146,7 @@ public abstract class BaseAuto extends LinearOpMode {
 
         switch (boardPosition) {
             case LEFT:
-                double leftX = -36 + (c == 1 ? 4 : -6);
+                double leftX = -36 + (c == 1 ? 5 : -6);
                 Actions.runBlocking(
                         robot.drive.actionBuilder(robot.drive.pose)
                                 .strafeToLinearHeading(new Vector2d(-36, 48 * c), Math.toRadians(outRot))
@@ -247,8 +258,10 @@ public abstract class BaseAuto extends LinearOpMode {
                     robot.drive.actionBuilder(robot.drive.pose)
                             .splineToLinearHeading(new Pose2d(-36, 24 * c, Math.toRadians(outRot)), Math.toRadians(outRot))
                             .splineToLinearHeading(new Pose2d(-24, CrossFieldY * c, Math.toRadians(0)), Math.toRadians(0))
-                            .strafeToLinearHeading(new Vector2d(PrepDeliverX, CrossFieldY * c), Math.toRadians(0))
+                            .strafeToLinearHeading(new Vector2d(8, CrossFieldY * c), Math.toRadians(0))
+                            .strafeToLinearHeading(new Vector2d(CrossFieldX, CrossFieldY * c), Math.toRadians(180))
                             .splineToLinearHeading(new Pose2d(PrepDeliverX, boardDeliverY * c, Math.toRadians(180)), Math.toRadians(180))
+//                            .strafeToLinearHeading(new Vector2d(PrepDeliverX, boardDeliverY * c), Math.toRadians(180))
                             .build()
             );
         }
@@ -374,7 +387,7 @@ public abstract class BaseAuto extends LinearOpMode {
 
         telemetry.addLine("Auto Finished in " + Math.round(timer.seconds()) + " seconds");
         telemetry.update();
-        
+
         while (opModeIsActive()) {
             idle();
         }

@@ -23,8 +23,10 @@ public class MeepMeepTesting {
 //                                        .lineToLinearHeading(new Pose2d(-36, 48, Math.toRadians(270 + 45)))
                                         .lineToLinearHeading(new Pose2d(-36, 48, Math.toRadians(270 + 45)))
                                         .splineToSplineHeading(new Pose2d(-24, 12, Math.toRadians(0)), Math.toRadians(0))
-                                        .lineToLinearHeading(new Pose2d(28, 12, Math.toRadians(0)))
-                                        .splineToLinearHeading(new Pose2d(36, 36, Math.toRadians(180)), Math.toRadians(180))
+                                        .lineToLinearHeading(new Pose2d(0, 12, Math.toRadians(0)))
+                                        .lineToLinearHeading(new Pose2d(40, 12, Math.toRadians(180)))
+                                        .splineToLinearHeading(new Pose2d(39, 36, Math.toRadians(180)), Math.toRadians(180))
+//                                        .splineToLinearHeading(new Pose2d(36, 36, Math.toRadians(180)), Math.toRadians(180))
                                         .build()
                 );
 
