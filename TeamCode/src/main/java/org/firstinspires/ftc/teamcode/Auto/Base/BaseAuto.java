@@ -25,6 +25,8 @@ import java.util.Timer;
 public abstract class BaseAuto extends LinearOpMode {
     private AutoRobot robot;
 
+    public static boolean FakeFail = true;
+
     private final static Boolean Debug = true;
 
     protected static AutoSide SIDE = AutoSide.FAR;
@@ -32,19 +34,19 @@ public abstract class BaseAuto extends LinearOpMode {
 
     protected abstract void setConstants();
 
-    public static Double CrossFieldY = 10.0;
+    public static Double CrossFieldY = 9.0;
 
-    public static Double[] PrepDeliverY = new Double[]{38.0, 33.0, 29.0};
+    public static Double[] PrepDeliverY = new Double[]{37.0, 33.0, 29.0};
     public static Double[] DeliverY = new Double[]{40.0, 33.0, 28.0};
     public static Double LeftBonus = 1.0;
     public static Double RightBonus = 1.0;
     public static Double PrepDeliverX = 39.0;
     public static Double DeliverX = 38.0;
 
-    public static Vector2d ParkPositionPos = new Vector2d(52, 36);
+    public static Vector2d ParkPositionPos = new Vector2d(56, 36);
 
     public static Double AlignWithBoardTime = 2.0;
-    public static Double PushBoardTime = 0.2;
+    public static Double PushBoardTime = 0.5;
 
     BoardPosition boardPosition = BoardPosition.CENTER;
 
@@ -100,20 +102,28 @@ public abstract class BaseAuto extends LinearOpMode {
                 200
         );
 
-        robot.drive.setDrivePowers(
-                new PoseVelocity2d(
-                        new Vector2d(
-                                0.06,
-                                0
-                        ),
-                        0.08
-                )
-        );
+        if (FakeFail) {
+            robot.drive.setDrivePowers(
+                    new PoseVelocity2d(
+                            new Vector2d(
+                                    0.06,
+                                    0
+                            ),
+                            -0.08 * c
+                    )
+            );
 
-        ElapsedTime fakeBadAuto = new ElapsedTime();
+            ElapsedTime fakeBadAuto = new ElapsedTime();
 
-        while (fakeBadAuto.seconds() < 9) {
-            robot.drive.updatePoseEstimate();
+            if (boardPosition == BoardPosition.CENTER) {
+                while (fakeBadAuto.seconds() < 7) {
+                    robot.drive.updatePoseEstimate();
+                }
+            } else {
+                while (fakeBadAuto.seconds() < 6) {
+                    robot.drive.updatePoseEstimate();
+                }
+            }
         }
 
 
@@ -125,16 +135,22 @@ public abstract class BaseAuto extends LinearOpMode {
 
         switch (boardPosition) {
             case LEFT:
+                double leftX = -36 + (c == 1 ? 4 : -6);
                 Actions.runBlocking(
                         robot.drive.actionBuilder(robot.drive.pose)
                                 .strafeToLinearHeading(new Vector2d(-36, 48 * c), Math.toRadians(outRot))
-                                .splineToSplineHeading(new Pose2d(-36 + (c == 1 ? 6 : -6), 38 * c, Math.toRadians(outRot + 45)), Math.toRadians(outRot + 45))
+                                .splineToSplineHeading(new Pose2d(leftX, 38 * c, Math.toRadians(outRot + 45)), Math.toRadians(outRot + 45))
+                                .build()
+                );
+                Actions.runBlocking(
+                        robot.drive.actionBuilder(robot.drive.pose)
+                                .strafeToLinearHeading(new Vector2d(leftX, 38 * c), Math.toRadians(outRot + 45), robot.drive.slowVelConstraint, robot.drive.slowAccelConstraint)
                                 .build()
                 );
                 robot.claw.openNext();
                 Actions.runBlocking(
                         robot.drive.actionBuilder(robot.drive.pose)
-                                .strafeToLinearHeading(new Vector2d(-36, 48 * c), Math.toRadians(outRot + 45))
+                                .strafeToLinearHeading(new Vector2d(c == 1 ? -40 : -36, 48 * c), Math.toRadians(outRot + 45))
 //                                .lineToY(48 * c)
                                 .turn(Math.toRadians(-45))
 //                                .strafeToLinearHeading(new Vector2d(-36, CrossFieldY * c), Math.toRadians(outRot))
@@ -147,6 +163,11 @@ public abstract class BaseAuto extends LinearOpMode {
                                 .strafeToLinearHeading(new Vector2d(-36, 13 * c), Math.toRadians(outRot - 180))
                                 .build()
                 );
+                Actions.runBlocking(
+                        robot.drive.actionBuilder(robot.drive.pose)
+                                .strafeToLinearHeading(new Vector2d(-36, 13 * c), Math.toRadians(outRot - 180), robot.drive.slowVelConstraint, robot.drive.slowAccelConstraint)
+                                .build()
+                );
                 robot.claw.openNext();
                 Actions.runBlocking(
                         robot.drive.actionBuilder(robot.drive.pose)
@@ -156,16 +177,22 @@ public abstract class BaseAuto extends LinearOpMode {
                 );
                 break;
             case RIGHT:
+                double rightX = -36 - (c == 1 ? 6 : -6);
                 Actions.runBlocking(
                         robot.drive.actionBuilder(robot.drive.pose)
                                 .strafeToLinearHeading(new Vector2d(-36, 48 * c), Math.toRadians(outRot))
-                                .splineToSplineHeading(new Pose2d(-36 - (c == 1 ? 4 : -6), 38 * c, Math.toRadians(outRot - 45)), Math.toRadians(outRot + 45))
+                                .splineToSplineHeading(new Pose2d(rightX, 38 * c, Math.toRadians(outRot - 45)), Math.toRadians(outRot + 45))
+                                .build()
+                );
+                Actions.runBlocking(
+                        robot.drive.actionBuilder(robot.drive.pose)
+                                .strafeToLinearHeading(new Vector2d(rightX, 38 * c), Math.toRadians(outRot - 45), robot.drive.slowVelConstraint, robot.drive.slowAccelConstraint)
                                 .build()
                 );
                 robot.claw.openNext();
                 Actions.runBlocking(
                         robot.drive.actionBuilder(robot.drive.pose)
-                                .strafeToLinearHeading(new Vector2d(-40, 48 * c), Math.toRadians(outRot - 45))
+                                .strafeToLinearHeading(new Vector2d(c == 1 ? -36 : -40, 48 * c), Math.toRadians(outRot - 45))
 //                                .lineToY(48 * c)
                                 .turn(Math.toRadians(45))
 //                                .strafeToLinearHeading(new Vector2d(-36, CrossFieldY * c), Math.toRadians(outRot))
@@ -226,6 +253,12 @@ public abstract class BaseAuto extends LinearOpMode {
             );
         }
 
+        Actions.runBlocking(
+                robot.drive.actionBuilder(robot.drive.pose)
+                        .strafeToLinearHeading(new Vector2d(PrepDeliverX, boardDeliverY * c), Math.toRadians(180), robot.drive.slowVelConstraint, robot.drive.slowAccelConstraint)
+                        .build()
+        );
+
         robot.arm.setRotation(ArmRotation.AutoDeliver);
         robot.arm.setGlobalWristRotation(true);
         robot.arm.update();
@@ -249,13 +282,14 @@ public abstract class BaseAuto extends LinearOpMode {
 //                        margin = LeftBonus;
 //                    }
 
-                    Vector2d newPose = new Vector2d(robot.drive.pose.position.x + (tpose.get().y - BoardAlignmentConstants.DistFromBoard), robot.drive.pose.position.y - (tpose.get().x + margin));
+                    Vector2d newPose = new Vector2d(robot.drive.pose.position.x + (tpose.get().y - (BoardAlignmentConstants.DistFromBoard + 1)), robot.drive.pose.position.y - (tpose.get().x + margin));
                     Rotation2d heading = robot.drive.pose.heading.plus(Math.toRadians(tpose.get().yaw));
 
                     Actions.runBlocking(
                             robot.drive.actionBuilder(robot.drive.pose)
                                     .strafeToLinearHeading(newPose, heading, robot.drive.slowVelConstraint, robot.drive.slowAccelConstraint)
-                                    .build());
+                                    .build()
+                    );
 
                     aligned = true;
                 }
@@ -291,6 +325,20 @@ public abstract class BaseAuto extends LinearOpMode {
         );
 
         robot.drive.setDrivePowers(new PoseVelocity2d(new Vector2d(0, 0), 0));
+//
+//        Actions.runBlocking(
+//                robot.drive.actionBuilder(robot.drive.pose)
+//                        .strafeTo(new Vector2d(robot.drive.pose.position.x, robot.drive.pose.position.y - 5))
+//                        .build()
+//        );
+//
+//        robot.arm.setRotation(ArmRotation.AutoDeliverLow);
+//
+//        Actions.runBlocking(
+//                robot.drive.actionBuilder(robot.drive.pose)
+//                        .strafeTo(new Vector2d(robot.drive.pose.position.x, robot.drive.pose.position.y + 8))
+//                        .build()
+//        );
 
         robot.claw.open();
 
