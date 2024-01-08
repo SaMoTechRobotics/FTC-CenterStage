@@ -25,7 +25,7 @@ import java.util.Timer;
 public abstract class BaseAuto extends LinearOpMode {
     private AutoRobot robot;
 
-    public static boolean FakeFail = !true;
+    public static boolean FakeFail = true;
 
     private final static Boolean Debug = true;
 
@@ -40,7 +40,7 @@ public abstract class BaseAuto extends LinearOpMode {
     public static Double[] DeliverY = new Double[]{40.0, 33.0, 28.0};
     public static Double LeftBonus = 1.0;
     public static Double RightBonus = 1.0;
-    public static Double PrepDeliverX = 39.0;
+    public static Double PrepDeliverX = 41.0;
     public static Double CrossFieldX = 42.0;
     public static Double DeliverX = 38.0;
 
