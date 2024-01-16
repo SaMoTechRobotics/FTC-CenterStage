@@ -23,7 +23,7 @@ public class ArmRotation {
 
     public static int Down = 0;
 
-    public static int BackDown = 175;
+    public static int BackDown = 176;
 
     public static int Hang = 90;
     public static int HangingLock = 10;

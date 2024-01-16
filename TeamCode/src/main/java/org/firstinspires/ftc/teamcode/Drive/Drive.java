@@ -42,7 +42,7 @@ public class Drive extends LinearOpMode {
     public void runOpMode() {
         if (ResetPose) RobotStorage.reset();
         robot = new Robot(hardwareMap, telemetry);
-        robot.claw.close();
+        robot.claw.open();
 
         CRServo leftIntakeServo = hardwareMap.get(CRServo.class, "intake0");
         CRServo rightIntakeServo = hardwareMap.get(CRServo.class, "intake1");
@@ -108,6 +108,19 @@ public class Drive extends LinearOpMode {
 //                    robot.chassis.alignWithPixel();
 //                }
 //            }
+
+//            DcMotor armMotor = hardwareMap.get(DcMotor.class, "arm");
+//
+//
+//            if (Math.abs(gamepad2.left_stick_y) > 0.01) {
+//                armMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+//                armMotor.setPower(gamepad2.left_stick_y);
+//            } else if (armMotor.getMode() == DcMotor.RunMode.RUN_USING_ENCODER) {
+//                armMotor.setTargetPosition(armMotor.getCurrentPosition());
+//                armMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+//                armMotor.setPower(0.5);
+//            }
+
 
             robot.chassis.setManualPower(drivePower, strafePower, turnPower);
 
@@ -206,7 +219,7 @@ public class Drive extends LinearOpMode {
             } else if (gamepad2Buttons.wasJustPressed(GamepadButton.Y)) {
                 wristLevelingEnabled = false;
                 robot.arm.setGlobalWristRotation(false);
-                robot.arm.setWristRotation(WristRotation.Up);
+                robot.arm.setWristRotation(WristRotation.PickupBack);
                 robot.arm.setRotation(ArmRotation.BackDown, ArmSpeed.DeliverSpeed);
             } else if (gamepad2Buttons.wasJustPressed(GamepadButton.X)) {
                 wristLevelingEnabled = true;
