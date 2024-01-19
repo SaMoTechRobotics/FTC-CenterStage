@@ -9,7 +9,7 @@ import org.firstinspires.ftc.teamcode.Util.Classes.AutoRobot;
 import org.firstinspires.ftc.teamcode.Util.Classes.Storage.RobotStorage;
 import org.firstinspires.ftc.teamcode.Util.Constants.Auto.BoardAlignmentConstants;
 import org.firstinspires.ftc.teamcode.Util.Constants.Robot.ArmRotation;
-import org.firstinspires.ftc.teamcode.Util.Constants.Robot.ChassisSpeed;
+import org.firstinspires.ftc.teamcode.Util.Constants.Robot.ArmSpeed;
 import org.firstinspires.ftc.teamcode.Util.Constants.Robot.WristRotation;
 import org.firstinspires.ftc.teamcode.Util.Enums.AutoColor;
 import org.firstinspires.ftc.teamcode.Util.Enums.AutoSide;
@@ -36,15 +36,23 @@ public abstract class BaseAuto extends LinearOpMode {
 
     public static Double CrossFieldY = 9.0;
 
+    // Right, Center, Left on blue side
+    public static Double[] AlignmentOffsetsBLUE = new Double[]{-6.5, 5.5, 6.5};
+    // Left Center Right on red side
+    public static Double[] AlignmentOffsetsRED = new Double[]{7.0, -5.5, -6.5};
+
     public static Double[] PrepDeliverY = new Double[]{37.0, 33.0, 29.0};
     public static Double[] DeliverY = new Double[]{40.0, 33.0, 28.0};
+
     public static Double LeftBonus = 1.0;
     public static Double RightBonus = 1.0;
-    public static Double PrepDeliverX = 41.0;
+    public static Double PrepDeliverX = 39.0;
     public static Double CrossFieldX = 42.0;
     public static Double DeliverX = 38.0;
 
     public static Vector2d ParkPositionPos = new Vector2d(56, 36);
+
+    public static double ParkX = 58;
 
     public static Double AlignWithBoardTime = 2.0;
     public static Double PushBoardTime = 0.5;
@@ -225,7 +233,32 @@ public abstract class BaseAuto extends LinearOpMode {
         Double boardDeliverY = DeliverY[1];
         Double prepBoardDeliverY = PrepDeliverY[1];
 
-        switch (boardPosition) {
+        BoardPosition targetTag = BoardPosition.CENTER;
+        double alignmentOffset = COLOR == AutoColor.BLUE ? AlignmentOffsetsBLUE[1] : AlignmentOffsetsRED[1];
+
+        if (boardPosition == BoardPosition.CENTER) {
+            if (COLOR == AutoColor.BLUE) {
+                targetTag = BoardPosition.RIGHT;
+            } else {
+                targetTag = BoardPosition.LEFT;
+            }
+        } else {
+            if (COLOR == AutoColor.BLUE) {
+                if (boardPosition == BoardPosition.LEFT) {
+                    alignmentOffset = AlignmentOffsetsBLUE[2];
+                } else {
+                    alignmentOffset = AlignmentOffsetsBLUE[0];
+                }
+            } else {
+                if (boardPosition == BoardPosition.LEFT) {
+                    alignmentOffset = AlignmentOffsetsRED[0];
+                } else {
+                    alignmentOffset = AlignmentOffsetsRED[2];
+                }
+            }
+        }
+
+        switch (targetTag) {
             case LEFT:
                 if (COLOR == AutoColor.BLUE) {
                     boardDeliverY = DeliverY[0];
@@ -250,7 +283,8 @@ public abstract class BaseAuto extends LinearOpMode {
             Actions.runBlocking(
                     robot.drive.actionBuilder(robot.drive.pose)
                             .strafeToLinearHeading(new Vector2d(PrepDeliverX, CrossFieldY * c), Math.toRadians(180))
-                            .splineToConstantHeading(new Vector2d(PrepDeliverX, boardDeliverY * c), Math.toRadians(180))
+//                            .splineToConstantHeading(new Vector2d(PrepDeliverX, boardDeliverY * c), Math.toRadians(180))
+                            .strafeToLinearHeading(new Vector2d(PrepDeliverX, boardDeliverY * c), Math.toRadians(180))
                             .build()
             );
         } else {
@@ -260,11 +294,14 @@ public abstract class BaseAuto extends LinearOpMode {
                             .splineToLinearHeading(new Pose2d(-24, CrossFieldY * c, Math.toRadians(0)), Math.toRadians(0))
                             .strafeToLinearHeading(new Vector2d(8, CrossFieldY * c), Math.toRadians(0))
                             .strafeToLinearHeading(new Vector2d(CrossFieldX, CrossFieldY * c), Math.toRadians(180))
-                            .splineToLinearHeading(new Pose2d(PrepDeliverX, boardDeliverY * c, Math.toRadians(180)), Math.toRadians(180))
-//                            .strafeToLinearHeading(new Vector2d(PrepDeliverX, boardDeliverY * c), Math.toRadians(180))
+//                            .splineToLinearHeading(new Pose2d(PrepDeliverX, boardDeliverY * c, Math.toRadians(180)), Math.toRadians(180))
+                            .strafeToLinearHeading(new Vector2d(PrepDeliverX, boardDeliverY * c), Math.toRadians(180))
                             .build()
             );
         }
+
+        robot.arm.setRotation(ArmRotation.AutoDeliver);
+        robot.arm.setGlobalWristRotation(true);
 
         Actions.runBlocking(
                 robot.drive.actionBuilder(robot.drive.pose)
@@ -272,28 +309,31 @@ public abstract class BaseAuto extends LinearOpMode {
                         .build()
         );
 
-        robot.arm.setRotation(ArmRotation.AutoDeliver);
-        robot.arm.setGlobalWristRotation(true);
         robot.arm.update();
 
         Actions.runBlocking(
                 new SleepAction(1)
         );
 
+        robot.arm.setRotation(ArmRotation.AutoDeliverLow, ArmSpeed.Min);
+        robot.arm.update();
+
+        Actions.runBlocking(
+                new SleepAction(1)
+        );
+
+        robot.arm.setRotation(ArmRotation.AutoDeliverLow, ArmSpeed.Max);
+
         ElapsedTime time = new ElapsedTime();
 
         boolean aligned = false;
         while (opModeIsActive()) {
             if (time.seconds() > AlignWithBoardTime) break;
-            if (robot.vision.isBoardDetected(boardPosition)) {
-                Optional<AprilTagPoseFtc> tpose = robot.vision.getBoardPose(boardPosition);
+            robot.arm.update();
+            if (robot.vision.isBoardDetected(targetTag)) {
+                Optional<AprilTagPoseFtc> tpose = robot.vision.getBoardPose(targetTag);
                 if (tpose.isPresent()) {
                     double margin = 0.0;
-//                    if (boardPosition == BoardPosition.RIGHT) {
-//                        margin = RightBonus;
-//                    } else if (boardPosition == BoardPosition.LEFT) {
-//                        margin = LeftBonus;
-//                    }
 
                     Vector2d newPose = new Vector2d(robot.drive.pose.position.x + (tpose.get().y - (BoardAlignmentConstants.DistFromBoard + 1)), robot.drive.pose.position.y - (tpose.get().x + margin));
                     Rotation2d heading = robot.drive.pose.heading.plus(Math.toRadians(tpose.get().yaw));
@@ -308,36 +348,23 @@ public abstract class BaseAuto extends LinearOpMode {
                 }
             }
         }
-//
-//        Actions.runBlocking(
-//                robot.drive.actionBuilder(robot.drive.pose)
-//                        .strafeToLinearHeading(new Vector2d(DeliverX, boardDeliverY), Math.toRadians(180))
-//                        .build()
-//        );
-//
-//        Actions.runBlocking(
-//                robot.drive.actionBuilder(robot.drive.pose)
-//                        .strafeToLinearHeading(new Vector2d(ExtraDeliverX, boardDeliverY), Math.toRadians(180))
-//                        .build()
-//        );
-
-
-//                new ParallelAction(
-//                        telemetryPacket -> {
-//                            robot.arm.update();
-//                            return false;
-//                        }
-//                false)
 
         robot.arm.update();
 
-        robot.drive.setDrivePowers(new PoseVelocity2d(new Vector2d(-ChassisSpeed.BoardAlignmentSpeed, 0), 0));
-
         Actions.runBlocking(
-                new SleepAction(PushBoardTime)
+                robot.drive.actionBuilder(robot.drive.pose)
+                        .strafeTo(new Vector2d(robot.drive.pose.position.x, robot.drive.pose.position.y + alignmentOffset), robot.drive.slowVelConstraint, robot.drive.slowAccelConstraint)
+                        .build()
         );
 
-        robot.drive.setDrivePowers(new PoseVelocity2d(new Vector2d(0, 0), 0));
+
+//        robot.drive.setDrivePowers(new PoseVelocity2d(new Vector2d(-ChassisSpeed.BoardAlignmentSpeed, 0), 0));
+
+//        Actions.runBlocking(
+//                new SleepAction(PushBoardTime)
+//        );
+
+//        robot.drive.setDrivePowers(new PoseVelocity2d(new Vector2d(0, 0), 0));
 //
 //        Actions.runBlocking(
 //                robot.drive.actionBuilder(robot.drive.pose)
@@ -360,13 +387,13 @@ public abstract class BaseAuto extends LinearOpMode {
                 new SleepAction(0.5)
         );
 
-        robot.arm.setRotation(ArmRotation.AutoDeliver - 10);
+        robot.arm.setRotation(ArmRotation.AutoDeliver);
 
         Actions.runBlocking(
                 new SleepAction(1)
         );
 
-        robot.arm.setRotation(ArmRotation.AutoDeliver);
+        robot.arm.setRotation(ArmRotation.AutoDeliverLow);
 
         Actions.runBlocking(
                 new SleepAction(0.5)
@@ -379,7 +406,7 @@ public abstract class BaseAuto extends LinearOpMode {
                 robot.drive.actionBuilder(robot.drive.pose)
 //                        .strafeToLinearHeading(new Vector2d(robot.drive.pose.position.x, ParkPositionPos.y), Math.toRadians(180))
 //                        .strafeToLinearHeading(new Vector2d(ParkPositionPos.x, robot.drive.pose.position.y), Math.toRadians(180))
-                        .lineToX(ParkPositionPos.x)
+                        .lineToX(ParkX)
                         .build()
         );
 
