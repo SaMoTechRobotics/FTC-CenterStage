@@ -82,7 +82,7 @@ public abstract class BaseAuto extends LinearOpMode {
         double outRot = COLOR == AutoColor.BLUE ? 270 : 90;
         Timer t = new Timer();
 
-        while (!isStarted()) {
+        while (!isStarted() && !isStopRequested()) {
             telemetry.addLine("Color: " + COLOR + " Side: " + SIDE);
             telemetry.addData("Status", "Initialized for " + Math.round(timer.seconds()));
             boardPosition = robot.vision.getSpikeLocation();
