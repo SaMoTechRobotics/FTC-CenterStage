@@ -41,10 +41,19 @@ public final class MecanumDrive {
         public double slowMinProfileAccel = -20;
         public double slowMaxProfileAccel = 30;
 
+        public double fastWheelVel = 100;
+
+        public double fastMinProfileAccel = -30;
+        public double fastMaxProfileAccel = 100; //50
+
+
         // turn profile parameters (in radians)
         public double maxAngVel = 2 * Math.PI; // shared with path
+        public double fastMaxAngVel = 2 * Math.PI; // shared with path
         public double slowAngVel = Math.PI; // shared with path
+        public double fastAngVel = 4 * Math.PI; // shared with path
         public double maxAngAccel = Math.PI;
+        public double fastMaxAngAccel = 2 * Math.PI;
 
         // path controller gains
         public double axialGain = 10.0;
@@ -61,9 +70,11 @@ public final class MecanumDrive {
     public final MecanumKinematics kinematics = new MecanumKinematics(
             PARAMS.inPerTick * PARAMS.trackWidthTicks, PARAMS.inPerTick / PARAMS.lateralInPerTick);
 
-    public final TurnConstraints defaultTurnConstraints = new TurnConstraints(
+    public TurnConstraints defaultTurnConstraints = new TurnConstraints(
             PARAMS.maxAngVel, -PARAMS.maxAngAccel, PARAMS.maxAngAccel);
-    public final VelConstraint defaultVelConstraint =
+    public final TurnConstraints fastTurnConstraints = new TurnConstraints(
+            PARAMS.fastMaxAngVel, -PARAMS.fastMaxAngAccel, PARAMS.fastMaxAngAccel);
+    public VelConstraint defaultVelConstraint =
             new MinVelConstraint(Arrays.asList(
                     kinematics.new WheelVelConstraint(PARAMS.maxWheelVel),
                     new AngularVelConstraint(PARAMS.maxAngVel)
@@ -73,10 +84,18 @@ public final class MecanumDrive {
                     kinematics.new WheelVelConstraint(PARAMS.slowWheelVel),
                     new AngularVelConstraint(PARAMS.slowAngVel)
             ));
+    public final VelConstraint fastVelConstraint =
+            new MinVelConstraint(Arrays.asList(
+                    kinematics.new WheelVelConstraint(PARAMS.fastWheelVel),
+                    new AngularVelConstraint(PARAMS.fastAngVel)
+            ));
+
     public final AccelConstraint slowAccelConstraint =
             new ProfileAccelConstraint(PARAMS.slowMinProfileAccel, PARAMS.slowMaxProfileAccel);
-    public final AccelConstraint defaultAccelConstraint =
+    public AccelConstraint defaultAccelConstraint =
             new ProfileAccelConstraint(PARAMS.minProfileAccel, PARAMS.maxProfileAccel);
+    public final AccelConstraint fastAccelConstraint =
+            new ProfileAccelConstraint(PARAMS.fastMinProfileAccel, PARAMS.fastMaxProfileAccel);
 
     public final DcMotorEx leftFront, leftBack, rightBack, rightFront;
 

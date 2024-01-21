@@ -27,6 +27,8 @@ public abstract class BaseAuto extends LinearOpMode {
 
     public static boolean FakeFail = true;
 
+    public static boolean SuperAuto = true;
+
     private final static Boolean Debug = true;
 
     protected static AutoSide SIDE = AutoSide.FAR;
@@ -66,7 +68,12 @@ public abstract class BaseAuto extends LinearOpMode {
         Pose2d startPose = RobotStorage.getStartPose(SIDE, COLOR);
         RobotStorage.setPose(startPose);
         robot = new AutoRobot(hardwareMap, telemetry, RobotStorage.pose);
-//
+        if (SuperAuto) {
+            robot.drive.defaultVelConstraint = robot.drive.fastVelConstraint;
+            robot.drive.defaultAccelConstraint = robot.drive.fastAccelConstraint;
+            robot.drive.defaultTurnConstraints = robot.drive.fastTurnConstraints;
+        }
+
         robot.vision.startProcessor(VisionProcessor.SPIKE_LOCATION_DETECTION);
         robot.vision.setColor(COLOR);
 
@@ -87,6 +94,7 @@ public abstract class BaseAuto extends LinearOpMode {
             telemetry.addData("Status", "Initialized for " + Math.round(timer.seconds()));
             boardPosition = robot.vision.getSpikeLocation();
             telemetry.addData("Spike Location", boardPosition.toString());
+            telemetry.addData("Super Auto", SuperAuto);
             telemetry.update();
         }
 
@@ -111,36 +119,38 @@ public abstract class BaseAuto extends LinearOpMode {
                 200
         );
 
-        ElapsedTime delayTimer = new ElapsedTime();
-        if (FakeFail) {
-            robot.drive.setDrivePowers(
-                    new PoseVelocity2d(
-                            new Vector2d(
-                                    0.06,
-                                    0
-                            ),
-                            -0.08 * c
-                    )
-            );
+        if (!SuperAuto) {
+            ElapsedTime delayTimer = new ElapsedTime();
+            if (FakeFail) {
+                robot.drive.setDrivePowers(
+                        new PoseVelocity2d(
+                                new Vector2d(
+                                        0.06,
+                                        0
+                                ),
+                                -0.08 * c
+                        )
+                );
 
 
-            if (boardPosition == BoardPosition.CENTER) {
-                while (delayTimer.seconds() < 7) {
-                    robot.drive.updatePoseEstimate();
+                if (boardPosition == BoardPosition.CENTER) {
+                    while (delayTimer.seconds() < 7) {
+                        robot.drive.updatePoseEstimate();
+                    }
+                } else {
+                    while (delayTimer.seconds() < 6) {
+                        robot.drive.updatePoseEstimate();
+                    }
                 }
             } else {
-                while (delayTimer.seconds() < 6) {
-                    robot.drive.updatePoseEstimate();
-                }
-            }
-        } else {
-            if (boardPosition == BoardPosition.CENTER) {
-                while (delayTimer.seconds() < 7) {
-                    idle();
-                }
-            } else {
-                while (delayTimer.seconds() < 6) {
-                    idle();
+                if (boardPosition == BoardPosition.CENTER) {
+                    while (delayTimer.seconds() < 7) {
+                        idle();
+                    }
+                } else {
+                    while (delayTimer.seconds() < 6) {
+                        idle();
+                    }
                 }
             }
         }
