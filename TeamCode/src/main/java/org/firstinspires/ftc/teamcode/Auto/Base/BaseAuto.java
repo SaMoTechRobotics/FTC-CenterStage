@@ -27,7 +27,8 @@ public abstract class BaseAuto extends LinearOpMode {
 
     public static boolean FakeFail = true;
 
-    public static boolean SuperAuto = true;
+    public static boolean SuperAuto = false;
+    public static boolean FastAuto = true;
 
     private final static Boolean Debug = true;
 
@@ -59,6 +60,11 @@ public abstract class BaseAuto extends LinearOpMode {
     public static Double AlignWithBoardTime = 2.0;
     public static Double PushBoardTime = 0.5;
 
+
+    public static double StackY = 4;
+    public static double StackX = -68;
+    public static double PrepStackX = -58;
+
     BoardPosition boardPosition = BoardPosition.CENTER;
 
     @Override
@@ -68,7 +74,7 @@ public abstract class BaseAuto extends LinearOpMode {
         Pose2d startPose = RobotStorage.getStartPose(SIDE, COLOR);
         RobotStorage.setPose(startPose);
         robot = new AutoRobot(hardwareMap, telemetry, RobotStorage.pose);
-        if (SuperAuto) {
+        if (FastAuto) {
             robot.drive.defaultVelConstraint = robot.drive.fastVelConstraint;
             robot.drive.defaultAccelConstraint = robot.drive.fastAccelConstraint;
             robot.drive.defaultTurnConstraints = robot.drive.fastTurnConstraints;
@@ -300,10 +306,10 @@ public abstract class BaseAuto extends LinearOpMode {
         } else {
             Actions.runBlocking(
                     robot.drive.actionBuilder(robot.drive.pose)
-                            .splineToLinearHeading(new Pose2d(-36, 24 * c, Math.toRadians(outRot)), Math.toRadians(outRot))
-                            .splineToLinearHeading(new Pose2d(-24, CrossFieldY * c, Math.toRadians(0)), Math.toRadians(0))
-                            .strafeToLinearHeading(new Vector2d(8, CrossFieldY * c), Math.toRadians(0))
-                            .strafeToLinearHeading(new Vector2d(CrossFieldX, CrossFieldY * c), Math.toRadians(180))
+                            .splineTo(new Vector2d(-36, 20 * c), Math.toRadians(outRot))
+                            .splineTo(new Vector2d(-24, CrossFieldY * c), Math.toRadians(0))
+//                            .splineTo(new Vector2d(12, CrossFieldY * c), Math.toRadians(0))
+                            .strafeToLinearHeading(new Vector2d(CrossFieldX, CrossFieldY * c), Math.toRadians(0))
 //                            .splineToLinearHeading(new Pose2d(PrepDeliverX, boardDeliverY * c, Math.toRadians(180)), Math.toRadians(180))
                             .strafeToLinearHeading(new Vector2d(PrepDeliverX, boardDeliverY * c), Math.toRadians(180))
                             .build()
@@ -400,25 +406,70 @@ public abstract class BaseAuto extends LinearOpMode {
         robot.arm.setRotation(ArmRotation.AutoDeliver);
 
         Actions.runBlocking(
-                new SleepAction(1)
+                new SleepAction(0.2)
         );
-
-        robot.arm.setRotation(ArmRotation.AutoDeliverLow);
-
-        Actions.runBlocking(
-                new SleepAction(0.5)
-        );
+//
+//        robot.arm.setRotation(ArmRotation.AutoDeliverLow);
+//
+//        Actions.runBlocking(
+//                new SleepAction(0.5)
+//        );
 
         robot.arm.setRotation(ArmRotation.Down);
         robot.arm.setWristRotation(WristRotation.Down);
 
-        Actions.runBlocking(
-                robot.drive.actionBuilder(robot.drive.pose)
+        if (!SuperAuto) {
+            Actions.runBlocking(
+                    robot.drive.actionBuilder(robot.drive.pose)
 //                        .strafeToLinearHeading(new Vector2d(robot.drive.pose.position.x, ParkPositionPos.y), Math.toRadians(180))
 //                        .strafeToLinearHeading(new Vector2d(ParkPositionPos.x, robot.drive.pose.position.y), Math.toRadians(180))
-                        .lineToX(ParkX)
-                        .build()
-        );
+                            .lineToX(ParkX)
+                            .build()
+            );
+        } else {
+            Actions.runBlocking(
+                    robot.drive.actionBuilder(robot.drive.pose)
+                            .splineToLinearHeading(new Pose2d(42, CrossFieldY * c, Math.toRadians(180)), Math.toRadians(0))
+                            .strafeToLinearHeading(new Vector2d(-59, CrossFieldY * c), Math.toRadians(180))
+                            .build()
+            );
+
+            robot.claw.open();
+            robot.arm.setRotation(ArmRotation.Stack4);
+
+            Actions.runBlocking(
+                    robot.drive.actionBuilder(robot.drive.pose)
+                            .strafeToLinearHeading(new Vector2d(PrepStackX, StackY * c), Math.toRadians(180), robot.drive.slowVelConstraint, robot.drive.slowAccelConstraint)
+                            .strafeToLinearHeading(new Vector2d(StackX, StackY * c), Math.toRadians(180), robot.drive.slowVelConstraint, robot.drive.slowAccelConstraint)
+                            .build()
+            );
+
+
+            robot.arm.setRotation(ArmRotation.Stack3);
+
+            robot.claw.close();
+
+            Actions.runBlocking(
+                    new SleepAction(0.5)
+            );
+
+            robot.claw.close();
+
+            Actions.runBlocking(
+                    robot.drive.actionBuilder(robot.drive.pose)
+                            .splineToLinearHeading(new Pose2d(42, CrossFieldY * c, Math.toRadians(180)), Math.toRadians(180))
+                            .splineTo(new Vector2d(60, CrossFieldY * c), Math.toRadians(90))
+                            .build()
+            );
+
+            robot.claw.open();
+
+            Actions.runBlocking(
+                    robot.drive.actionBuilder(robot.drive.pose)
+                            .strafeTo(new Vector2d(62, 7 * c))
+                            .build()
+            );
+        }
 
         robot.vision.close();
 
