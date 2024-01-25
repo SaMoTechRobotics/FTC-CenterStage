@@ -28,6 +28,10 @@ public final class MecanumDrive {
         public double lateralInPerTick = 0.0005758376975630854;
         public double trackWidthTicks = 21877.222006513308;
 
+        //Coefficient for proportionate heading correction. This is just a guess.
+        //If you see a lot of oscillation or bot spins out of control, try smaller.
+        public double headingCorrectionCoefficient = 2;
+
         // feedforward parameters (in tick units)
         public double kS = 0.7512713410616052;
         public double kV = 0.00010269914801726239;

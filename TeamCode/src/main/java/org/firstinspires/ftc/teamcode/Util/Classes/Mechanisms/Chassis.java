@@ -8,7 +8,9 @@ import com.acmerobotics.roadrunner.Vector2d;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.IMU;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.Drive.Drive;
 import org.firstinspires.ftc.teamcode.RoadRunner.MecanumDrive;
@@ -18,11 +20,13 @@ import org.firstinspires.ftc.teamcode.Util.Constants.Robot.ChassisSpeed;
 
 @Config
 public class Chassis {
-    public static boolean customDrive = false;
+    public static boolean headingFix = true;
 
     private final Telemetry telemetry;
 
     MecanumDrive drive;
+
+    IMU imu;
 
     public Wheels wheels;
 
@@ -32,6 +36,9 @@ public class Chassis {
     public double turnSpeed = ChassisSpeed.MidTurn;
     public double strafeSpeed = ChassisSpeed.MidStrafe;
     public boolean brake = true;
+
+    private boolean lockHeading = false;
+    private double startHeading = 0;
 
     public DistanceSensor leftDistanceSensor;
     public DistanceSensor rightDistanceSensor;
@@ -54,6 +61,8 @@ public class Chassis {
         this.rightDistanceSensor = hardwareMap.get(DistanceSensor.class, "dist2");
 
         drive = new MecanumDrive(hardwareMap, RobotStorage.pose);
+
+        imu = hardwareMap.get(IMU.class, "imu");
 
         toggleBrake(true);
     }
@@ -191,7 +200,35 @@ public class Chassis {
 //    }
 
     public void setManualPower(double drivePower, double strafePower, double turnPower) {
-        if (!customDrive) {
+        if (turnPower != 0) { // If started turning
+            lockHeading = false;
+        } else if (!lockHeading && (drivePower != 0 || strafePower != 0)) { // If not already starting holding heading and robot is moving without rotation
+            lockHeading = true;
+            startHeading = getCurrentHeadingRadians(); // Get current heading from imu, this is the heading that will be locked for strafing or driving
+        } else if (lockHeading && drivePower == 0 && strafePower == 0) { // If heading is locked but should not be anymore
+            lockHeading = false;
+        }
+
+        // If heading lock is enabled
+        if (headingFix && lockHeading) {
+
+            double headingError = getCurrentHeadingRadians() - startHeading; // The current heading from imu - the starting (target) heading
+
+            // Which way to rotate to correct
+            if (headingError > Math.PI) headingError -= Math.PI;
+            else if (headingError < -Math.PI) headingError += Math.PI;
+
+            // How fast to rotate to correct
+            double headingCorrectionPower = -MecanumDrive.PARAMS.headingCorrectionCoefficient * headingError;
+
+            drive.setDrivePowers(new PoseVelocity2d(
+                    new Vector2d(
+                            -drivePower * speed.linearVel.x,
+                            -strafePower * speed.linearVel.y
+                    ),
+                    headingCorrectionPower
+            ));
+        } else {
             drive.setDrivePowers(new PoseVelocity2d(
                     new Vector2d(
                             -drivePower * speed.linearVel.x,
@@ -199,29 +236,11 @@ public class Chassis {
                     ),
                     -turnPower * speed.angVel
             ));
-        } else {
-            double frontLeftPower =
-                    (drivePower * this.driveSpeed) +
-                            (turnPower * this.turnSpeed) +
-                            (strafePower * this.strafeSpeed);
-            double frontRightPower =
-                    (drivePower * this.driveSpeed) -
-                            (turnPower * this.turnSpeed) -
-                            (strafePower * this.strafeSpeed);
-            double backLeftPower =
-                    (drivePower * this.driveSpeed) +
-                            (turnPower * this.turnSpeed) -
-                            (strafePower * this.strafeSpeed);
-            double backRightPower =
-                    (drivePower * this.driveSpeed) -
-                            (turnPower * this.turnSpeed) +
-                            (strafePower * this.strafeSpeed);
-
-            this.setPower(this.wheels.frontLeft, frontLeftPower);
-            this.setPower(this.wheels.frontRight, frontRightPower);
-            this.setPower(this.wheels.backLeft, backLeftPower);
-            this.setPower(this.wheels.backRight, backRightPower);
         }
+    }
+
+    private double getCurrentHeadingRadians() {
+        return imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
     }
 
     public void setPowerAllMotors(Double speed) {
