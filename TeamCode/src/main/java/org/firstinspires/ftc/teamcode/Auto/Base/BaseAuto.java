@@ -10,6 +10,7 @@ import org.firstinspires.ftc.teamcode.Util.Classes.Storage.RobotStorage;
 import org.firstinspires.ftc.teamcode.Util.Constants.Auto.BoardAlignmentConstants;
 import org.firstinspires.ftc.teamcode.Util.Constants.Robot.ArmRotation;
 import org.firstinspires.ftc.teamcode.Util.Constants.Robot.ArmSpeed;
+import org.firstinspires.ftc.teamcode.Util.Constants.Robot.ChassisSpeed;
 import org.firstinspires.ftc.teamcode.Util.Constants.Robot.WristRotation;
 import org.firstinspires.ftc.teamcode.Util.Enums.AutoColor;
 import org.firstinspires.ftc.teamcode.Util.Enums.AutoSide;
@@ -25,10 +26,10 @@ import java.util.Timer;
 public abstract class BaseAuto extends LinearOpMode {
     private AutoRobot robot;
 
-    public static boolean FakeFail = true;
+    public static boolean FakeFail = false;
 
     public static boolean SuperAuto = false;
-    public static boolean FastAuto = true;
+    public static boolean FastAuto = false;
 
     private final static Boolean Debug = true;
 
@@ -40,12 +41,12 @@ public abstract class BaseAuto extends LinearOpMode {
     public static Double CrossFieldY = 9.0;
 
     // Right, Center, Left on blue side
-    public static Double[] AlignmentOffsetsBLUE = new Double[]{-6.5, 5.5, 6.5};
+    public static Double[] AlignmentOffsetsBLUE = new Double[]{-5.5, 6.0, 6.0};
     // Left Center Right on red side
-    public static Double[] AlignmentOffsetsRED = new Double[]{7.0, -5.5, -6.5};
+    public static Double[] AlignmentOffsetsRED = new Double[]{5.5, -5.0, -5.0};
 
-    public static Double[] PrepDeliverY = new Double[]{37.0, 33.0, 29.0};
-    public static Double[] DeliverY = new Double[]{40.0, 33.0, 28.0};
+    public static Double[] PrepDeliverY = new Double[]{37.0, 35.0, 32.0};
+    public static Double[] DeliverY = new Double[]{40.0, 33.0, 31.0};
 
     public static Double LeftBonus = 1.0;
     public static Double RightBonus = 1.0;
@@ -55,9 +56,9 @@ public abstract class BaseAuto extends LinearOpMode {
 
     public static Vector2d ParkPositionPos = new Vector2d(56, 36);
 
-    public static double ParkX = 58;
+    public static double ParkX = 62;
 
-    public static Double AlignWithBoardTime = 2.0;
+    public static Double AlignWithBoardTime = 2.5;
     public static Double PushBoardTime = 0.5;
 
 
@@ -140,21 +141,21 @@ public abstract class BaseAuto extends LinearOpMode {
 
 
                 if (boardPosition == BoardPosition.CENTER) {
-                    while (delayTimer.seconds() < 7) {
+                    while (delayTimer.seconds() < 9) {
                         robot.drive.updatePoseEstimate();
                     }
                 } else {
-                    while (delayTimer.seconds() < 6) {
+                    while (delayTimer.seconds() < 8) {
                         robot.drive.updatePoseEstimate();
                     }
                 }
             } else {
                 if (boardPosition == BoardPosition.CENTER) {
-                    while (delayTimer.seconds() < 7) {
+                    while (delayTimer.seconds() < 9) {
                         idle();
                     }
                 } else {
-                    while (delayTimer.seconds() < 6) {
+                    while (delayTimer.seconds() < 8) {
                         idle();
                     }
                 }
@@ -354,15 +355,28 @@ public abstract class BaseAuto extends LinearOpMode {
                     Vector2d newPose = new Vector2d(robot.drive.pose.position.x + (tpose.get().y - (BoardAlignmentConstants.DistFromBoard + 1)), robot.drive.pose.position.y - (tpose.get().x + margin));
                     Rotation2d heading = robot.drive.pose.heading.plus(Math.toRadians(tpose.get().yaw));
 
+                    aligned = true;
+
                     Actions.runBlocking(
                             robot.drive.actionBuilder(robot.drive.pose)
                                     .strafeToLinearHeading(newPose, heading, robot.drive.slowVelConstraint, robot.drive.slowAccelConstraint)
                                     .build()
                     );
-
-                    aligned = true;
                 }
             }
+        }
+
+        if (!aligned) {
+            telemetry.addLine("ERROR: APRIL TAG CAMERA NOT WORKING!!!");
+            telemetry.update();
+
+            robot.drive.setDrivePowers(new PoseVelocity2d(new Vector2d(-ChassisSpeed.BoardAlignmentSpeed, 0), 0));
+
+            Actions.runBlocking(
+                    new SleepAction(PushBoardTime)
+            );
+
+            robot.drive.setDrivePowers(new PoseVelocity2d(new Vector2d(0, 0), 0));
         }
 
         robot.arm.update();
