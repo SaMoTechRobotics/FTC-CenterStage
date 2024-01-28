@@ -20,7 +20,7 @@ import org.firstinspires.ftc.teamcode.Util.Constants.Robot.ChassisSpeed;
 
 @Config
 public class Chassis {
-    public static boolean headingFix = true;
+    public static boolean headingFix = false;
 
     private final Telemetry telemetry;
 
@@ -202,6 +202,7 @@ public class Chassis {
     public void setManualPower(double drivePower, double strafePower, double turnPower) {
         if (turnPower != 0) { // If started turning
             lockHeading = false;
+            startHeading = getCurrentHeadingRadians(); // Get current heading from imu, this is the heading that will be locked for strafing or driving
         } else if (!lockHeading && (drivePower != 0 || strafePower != 0)) { // If not already starting holding heading and robot is moving without rotation
             lockHeading = true;
             startHeading = getCurrentHeadingRadians(); // Get current heading from imu, this is the heading that will be locked for strafing or driving
