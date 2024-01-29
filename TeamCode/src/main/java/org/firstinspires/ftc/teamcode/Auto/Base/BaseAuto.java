@@ -58,7 +58,7 @@ public abstract class BaseAuto extends LinearOpMode {
 
     public static double ParkX = 62;
 
-    public static Double AlignWithBoardTime = 2.5;
+    public static Double AlignWithBoardTime = 3.0;
     public static Double PushBoardTime = 0.5;
 
 

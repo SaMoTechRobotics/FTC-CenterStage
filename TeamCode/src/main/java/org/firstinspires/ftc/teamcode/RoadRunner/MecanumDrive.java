@@ -52,7 +52,7 @@ public final class MecanumDrive {
 
 
         // turn profile parameters (in radians)
-        public double maxAngVel = 2 * Math.PI; // shared with path
+        public double maxAngVel = Math.PI; // shared with path
         public double fastMaxAngVel = 2 * Math.PI; // shared with path
         public double slowAngVel = Math.PI; // shared with path
         public double fastAngVel = 4 * Math.PI; // shared with path
@@ -62,7 +62,7 @@ public final class MecanumDrive {
         // path controller gains
         public double axialGain = 10.0;
         public double lateralGain = 20.0;
-        public double headingGain = 10.0; // shared with turn
+        public double headingGain = 20.0; // shared with turn
 
         public double axialVelGain = 0.0;
         public double lateralVelGain = 0.0;
