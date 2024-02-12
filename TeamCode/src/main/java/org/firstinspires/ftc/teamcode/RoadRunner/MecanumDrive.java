@@ -30,7 +30,7 @@ public final class MecanumDrive {
 
         //Coefficient for proportionate heading correction. This is just a guess.
         //If you see a lot of oscillation or bot spins out of control, try smaller.
-        public double headingCorrectionCoefficient = 2;
+        public double headingCorrectionCoefficient = 1;
 
         // feedforward parameters (in tick units)
         public double kS = 0.7512713410616052;

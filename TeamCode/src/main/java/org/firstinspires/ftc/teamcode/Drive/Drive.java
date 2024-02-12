@@ -6,19 +6,15 @@ import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Vector2d;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.CRServo;
 import org.firstinspires.ftc.teamcode.Util.Classes.Lib.FieldOverlayUtils;
 import org.firstinspires.ftc.teamcode.Util.Classes.Lib.GamepadButton;
 import org.firstinspires.ftc.teamcode.Util.Classes.Lib.StatefulGamepad;
 import org.firstinspires.ftc.teamcode.Util.Classes.Robot;
 import org.firstinspires.ftc.teamcode.Util.Classes.Storage.RobotStorage;
-import org.firstinspires.ftc.teamcode.Util.Classes.Vision.Vision;
 import org.firstinspires.ftc.teamcode.Util.Constants.Robot.ArmRotation;
 import org.firstinspires.ftc.teamcode.Util.Constants.Robot.ArmSpeed;
 import org.firstinspires.ftc.teamcode.Util.Constants.Robot.ChassisSpeed;
 import org.firstinspires.ftc.teamcode.Util.Constants.Robot.WristRotation;
-import org.firstinspires.ftc.teamcode.Util.Enums.VisionProcessor;
-import org.firstinspires.ftc.vision.VisionPortal;
 
 import java.util.Timer;
 
@@ -31,8 +27,6 @@ public class Drive extends LinearOpMode {
     public static boolean VisionEnabled = false;
     public static boolean ResetPose = true;
 
-    public static boolean AutoClose = false;
-
     public static double IntakeZero = 0;
     public static double IntakeSpeed = 1;
 
@@ -44,16 +38,13 @@ public class Drive extends LinearOpMode {
         robot = new Robot(hardwareMap, telemetry);
         robot.claw.open();
 
-        CRServo leftIntakeServo = hardwareMap.get(CRServo.class, "intake0");
-        CRServo rightIntakeServo = hardwareMap.get(CRServo.class, "intake1");
-
 //        VisionPortal.Builder builder = new VisionPortal.Builder();
 //        builder.setCamera(hardwareMap.get(WebcamName.class, "Webcam 1"));
 //        VisionPortal visionPortal = builder.build();
-        Vision vision = new Vision(hardwareMap);
-        if (VisionEnabled) {
-            vision.startProcessor(VisionProcessor.APRIL_TAG_DETECTION);
-        }
+//        Vision vision = new Vision(hardwareMap);
+//        if (VisionEnabled) {
+//            vision.startProcessor(VisionProcessor.APRIL_TAG_DETECTION);
+//        }
 
         StatefulGamepad gamepad1Buttons = new StatefulGamepad(gamepad1);
         StatefulGamepad gamepad2Buttons = new StatefulGamepad(gamepad2);
@@ -65,28 +56,17 @@ public class Drive extends LinearOpMode {
         waitForStart();
 
         while (opModeIsActive()) {
-            if (VisionEnabled) {
-                if (gamepad1Buttons.wasJustPressed(GamepadButton.DPAD_UP)) {
-                    vision.setProcessorEnabled(VisionProcessor.APRIL_TAG_DETECTION, true);
-                    vision.visionPortal.resumeStreaming();
-                } else if (gamepad1Buttons.wasJustPressed(GamepadButton.DPAD_DOWN)) {
-                    vision.setProcessorEnabled(VisionProcessor.APRIL_TAG_DETECTION, false);
-                    if (vision.visionPortal.getCameraState() == VisionPortal.CameraState.STREAMING) {
-                        vision.visionPortal.stopStreaming();
-                    }
-                }
-            }
-
-            if (gamepad1.right_trigger > 0.1) {
-                leftIntakeServo.setPower(IntakeSpeed);
-                rightIntakeServo.setPower(-IntakeSpeed);
-            } else if (gamepad1.left_trigger > 0.1) {
-                leftIntakeServo.setPower(-IntakeSpeed);
-                rightIntakeServo.setPower(IntakeSpeed);
-            } else {
-                leftIntakeServo.setPower(IntakeZero);
-                rightIntakeServo.setPower(IntakeZero);
-            }
+//            if (VisionEnabled) {
+//                if (gamepad1Buttons.wasJustPressed(GamepadButton.DPAD_UP)) {
+//                    vision.setProcessorEnabled(VisionProcessor.APRIL_TAG_DETECTION, true);
+//                    vision.visionPortal.resumeStreaming();
+//                } else if (gamepad1Buttons.wasJustPressed(GamepadButton.DPAD_DOWN)) {
+//                    vision.setProcessorEnabled(VisionProcessor.APRIL_TAG_DETECTION, false);
+//                    if (vision.visionPortal.getCameraState() == VisionPortal.CameraState.STREAMING) {
+//                        vision.visionPortal.stopStreaming();
+//                    }
+//                }
+//            }
 
             if (gamepad1Buttons.stateJustChanged(GamepadButton.LEFT_BUMPER) || gamepad1Buttons.stateJustChanged(GamepadButton.RIGHT_BUMPER)) {
                 robot.chassis.updateSpeed(
@@ -201,10 +181,6 @@ public class Drive extends LinearOpMode {
                     robot.claw.open();
                 } else {
                     robot.claw.openNext();
-                }
-            } else if (AutoClose) {
-                if (robot.chassis.pixelDetectedInClaw() && robot.claw.isOpen) {
-                    robot.claw.close();
                 }
             }
 

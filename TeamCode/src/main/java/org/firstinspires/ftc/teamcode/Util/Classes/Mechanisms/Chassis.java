@@ -1,21 +1,17 @@
 package org.firstinspires.ftc.teamcode.Util.Classes.Mechanisms;
 
-import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.PoseVelocity2d;
 import com.acmerobotics.roadrunner.Vector2d;
+import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.IMU;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
-import org.firstinspires.ftc.teamcode.Drive.Drive;
 import org.firstinspires.ftc.teamcode.RoadRunner.MecanumDrive;
 import org.firstinspires.ftc.teamcode.Util.Classes.Storage.RobotStorage;
-import org.firstinspires.ftc.teamcode.Util.Constants.Auto.DistanceSensorConstants;
 import org.firstinspires.ftc.teamcode.Util.Constants.Robot.ChassisSpeed;
 
 @Config
@@ -40,9 +36,6 @@ public class Chassis {
     private boolean lockHeading = false;
     private double startHeading = 0;
 
-    public DistanceSensor leftDistanceSensor;
-    public DistanceSensor rightDistanceSensor;
-
     public Chassis(HardwareMap hardwareMap, Telemetry telemetry) {
         this.telemetry = telemetry;
 
@@ -57,80 +50,21 @@ public class Chassis {
         this.wheels.frontLeft.setDirection(DcMotor.Direction.REVERSE);
         this.wheels.backLeft.setDirection(DcMotor.Direction.REVERSE);
 
-        this.leftDistanceSensor = hardwareMap.get(DistanceSensor.class, "dist3");
-        this.rightDistanceSensor = hardwareMap.get(DistanceSensor.class, "dist2");
-
         drive = new MecanumDrive(hardwareMap, RobotStorage.pose);
 
         imu = hardwareMap.get(IMU.class, "imu");
+        imu.initialize(new IMU.Parameters(
+                new RevHubOrientationOnRobot(
+                        RevHubOrientationOnRobot.LogoFacingDirection.LEFT,
+                        RevHubOrientationOnRobot.UsbFacingDirection.UP
+                )
+        ));
 
         toggleBrake(true);
     }
 
     public void update() {
         drive.updatePoseEstimate();
-
-        if (Drive.DebuggingTelemetry) {
-            Telemetry dashboardTelemetry = FtcDashboard.getInstance().getTelemetry();
-            dashboardTelemetry.addData("ld", Math.min(leftDistanceSensor.getDistance(DistanceUnit.INCH), 20));
-            dashboardTelemetry.addData("rd", Math.min(rightDistanceSensor.getDistance(DistanceUnit.INCH), 20));
-            dashboardTelemetry.addData("Pixel Detected In Claw", pixelDetectedInClaw());
-            dashboardTelemetry.addData("Pixel Detected", pixelDetected());
-            dashboardTelemetry.update();
-            telemetry.addData("Left Distance", leftDistanceSensor.getDistance(DistanceUnit.INCH));
-            telemetry.addData("Right Distance", rightDistanceSensor.getDistance(DistanceUnit.INCH));
-            telemetry.addData("Pixel Detected In Claw", pixelDetectedInClaw());
-            telemetry.addData("Pixel Detected", pixelDetected());
-        }
-    }
-
-    public boolean pixelDetectedInClaw() {
-        return leftDistanceSensor.getDistance(DistanceUnit.INCH) < DistanceSensorConstants.PixelInClawMaxDistance &&
-                rightDistanceSensor.getDistance(DistanceUnit.INCH) < DistanceSensorConstants.PixelInClawMaxDistance;
-    }
-
-    public boolean pixelDetected() {
-        return leftDistanceSensor.getDistance(DistanceUnit.INCH) < DistanceSensorConstants.PixelDetectedDistance &&
-                rightDistanceSensor.getDistance(DistanceUnit.INCH) < DistanceSensorConstants.PixelDetectedDistance;
-    }
-
-    public void alignWithPixel() {
-        double ld = leftDistanceSensor.getDistance(DistanceUnit.INCH);
-        double rd = rightDistanceSensor.getDistance(DistanceUnit.INCH);
-
-        PoseVelocity2d alignSpeed = ChassisSpeed.Min;
-
-        if (isCloseEnough(ld, rd, DistanceSensorConstants.PixelCenteredMargin)) {
-            if (!pixelDetectedInClaw()) {
-                drive.setDrivePowers(
-                        new PoseVelocity2d(
-                                new Vector2d(0, alignSpeed.linearVel.y),
-                                0
-                        )
-                );
-            } else {
-                drive.setDrivePowers(
-                        new PoseVelocity2d(
-                                new Vector2d(0, 0),
-                                0
-                        )
-                );
-            }
-        } else if (ld < rd) {
-            drive.setDrivePowers(
-                    new PoseVelocity2d(
-                            new Vector2d(alignSpeed.linearVel.x, 0),
-                            0
-                    )
-            );
-        } else {
-            drive.setDrivePowers(
-                    new PoseVelocity2d(
-                            new Vector2d(-alignSpeed.linearVel.x, 0),
-                            0
-                    )
-            );
-        }
     }
 
     private boolean isCloseEnough(double a, double b, double margin) {

@@ -21,7 +21,7 @@ public class Robot {
     public Boolean droneReady = false;
 
     public Robot(HardwareMap hardwareMap, Telemetry telemetry) {
-        vision = new Vision(hardwareMap);
+//        vision = new Vision(hardwareMap);
         
         chassis = new Chassis(hardwareMap, telemetry);
         arm = new Arm(hardwareMap, telemetry);
