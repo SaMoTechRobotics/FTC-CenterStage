@@ -6,10 +6,10 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.CameraName;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
-import org.firstinspires.ftc.teamcode.util.vision.processors.SpikeLocationDetectionProcessor;
-import org.firstinspires.ftc.teamcode.util.auto.constants.BoardAlignmentConstants;
 import org.firstinspires.ftc.teamcode.util.auto.AutoColor;
 import org.firstinspires.ftc.teamcode.util.auto.BoardPosition;
+import org.firstinspires.ftc.teamcode.util.auto.constants.BoardAlignmentConstants;
+import org.firstinspires.ftc.teamcode.util.vision.processors.SpikeLocationDetectionProcessor;
 import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 import org.firstinspires.ftc.vision.apriltag.AprilTagPoseFtc;
@@ -187,5 +187,9 @@ public class Vision {
         if (visionPortal != null) {
             visionPortal.close();
         }
+    }
+
+    public boolean isReady() {
+        return visionPortal.getCameraState() == VisionPortal.CameraState.CAMERA_DEVICE_READY;
     }
 }

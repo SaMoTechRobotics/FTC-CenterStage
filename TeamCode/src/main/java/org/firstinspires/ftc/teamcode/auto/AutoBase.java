@@ -44,7 +44,7 @@ public abstract class AutoBase extends LinearOpMode {
 
         double startHeading = COLOR == AutoColor.BLUE ? 270 : 90;
 
-        while (!isStarted() && !isStopRequested()) {
+        while ((!isStarted() || !robot.vision.isReady()) && !isStopRequested()) {
             telemetry.addLine("Color: " + COLOR + " Side: " + SIDE);
             telemetry.addData("Status", "Initialized for " + Math.round(timer.seconds()));
             telemetry.addLine("---");
