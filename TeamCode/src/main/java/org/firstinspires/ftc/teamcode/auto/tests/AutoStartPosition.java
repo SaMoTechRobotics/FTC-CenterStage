@@ -6,15 +6,14 @@ import com.acmerobotics.roadrunner.Vector2d;
 import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import org.firstinspires.ftc.teamcode.util.robot.AutoRobot;
-import org.firstinspires.ftc.teamcode.util.auto.RobotStorage;
 import org.firstinspires.ftc.teamcode.util.auto.AutoColor;
 import org.firstinspires.ftc.teamcode.util.auto.AutoSide;
+import org.firstinspires.ftc.teamcode.util.auto.RobotStorage;
+import org.firstinspires.ftc.teamcode.util.robot.AutoRobot;
 
 @Config
 @Autonomous(name = "AutoStartPosition", group = "Tests")
 public class AutoStartPosition extends LinearOpMode {
-    private AutoRobot robot;
 
     public static AutoSide SIDE = AutoSide.FAR;
     public static AutoColor COLOR = AutoColor.RED;
@@ -23,7 +22,7 @@ public class AutoStartPosition extends LinearOpMode {
     public void runOpMode() {
         Pose2d startPose = RobotStorage.getStartPose(SIDE, COLOR);
         RobotStorage.setPose(startPose);
-        robot = new AutoRobot(hardwareMap, telemetry, RobotStorage.pose);
+        AutoRobot robot = new AutoRobot(hardwareMap, telemetry, RobotStorage.pose);
 
         int c = COLOR.value;
         double outRot = COLOR == AutoColor.BLUE ? 270 : 90;

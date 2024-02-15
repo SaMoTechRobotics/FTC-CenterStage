@@ -6,15 +6,16 @@ import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
-import org.firstinspires.ftc.teamcode.util.robot.AutoRobot;
-import org.firstinspires.ftc.teamcode.util.auto.constants.BoardAlignmentConstants;
-import org.firstinspires.ftc.teamcode.util.robot.arm.ArmRotation;
-import org.firstinspires.ftc.teamcode.util.robot.chassis.ChassisSpeed;
-import org.firstinspires.ftc.teamcode.util.robot.arm.WristRotation;
+import org.firstinspires.ftc.teamcode.roadrunner.speed.TrajectorySpeed;
 import org.firstinspires.ftc.teamcode.util.auto.BoardPosition;
-import org.firstinspires.ftc.teamcode.util.vision.VisionProcessor;
+import org.firstinspires.ftc.teamcode.util.auto.constants.BoardAlignmentConstants;
 import org.firstinspires.ftc.teamcode.util.lib.GamepadButton;
 import org.firstinspires.ftc.teamcode.util.lib.StatefulGamepad;
+import org.firstinspires.ftc.teamcode.util.robot.AutoRobot;
+import org.firstinspires.ftc.teamcode.util.robot.arm.ArmRotation;
+import org.firstinspires.ftc.teamcode.util.robot.arm.WristRotation;
+import org.firstinspires.ftc.teamcode.util.robot.chassis.ChassisSpeed;
+import org.firstinspires.ftc.teamcode.util.vision.VisionProcessor;
 import org.firstinspires.ftc.vision.apriltag.AprilTagPoseFtc;
 
 import java.lang.Math;
@@ -245,11 +246,10 @@ public class PlacePixelTest extends LinearOpMode {
 
                         Actions.runBlocking(
                                 robot.drive
-                                        .actionBuilder(robot.drive.pose)
+                                        .actionBuilder(robot.drive.pose, TrajectorySpeed.SLOW)
                                         .strafeToLinearHeading(
                                                 newPose,
-                                                heading,
-                                                robot.drive.slowVelConstraint
+                                                heading
                                         )
                                         .build()
                         );

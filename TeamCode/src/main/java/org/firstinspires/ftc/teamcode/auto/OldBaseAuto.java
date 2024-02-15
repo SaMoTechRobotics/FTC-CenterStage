@@ -5,6 +5,7 @@ import com.acmerobotics.roadrunner.*;
 import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
+import org.firstinspires.ftc.teamcode.roadrunner.speed.TrajectorySpeed;
 import org.firstinspires.ftc.teamcode.util.auto.AutoColor;
 import org.firstinspires.ftc.teamcode.util.auto.AutoSide;
 import org.firstinspires.ftc.teamcode.util.auto.BoardPosition;
@@ -75,11 +76,11 @@ public abstract class OldBaseAuto extends LinearOpMode {
         Pose2d startPose = RobotStorage.getStartPose(SIDE, COLOR);
         RobotStorage.setPose(startPose);
         robot = new AutoRobot(hardwareMap, telemetry, RobotStorage.pose);
-        if (FastAuto) {
-            robot.drive.defaultVelConstraint = robot.drive.fastVelConstraint;
-            robot.drive.defaultAccelConstraint = robot.drive.fastAccelConstraint;
-            robot.drive.defaultTurnConstraints = robot.drive.fastTurnConstraints;
-        }
+//        if (FastAuto) {
+//            robot.drive.defaultVelConstraint = robot.drive.fastVelConstraint;
+//            robot.drive.defaultAccelConstraint = robot.drive.fastAccelConstraint;
+//            robot.drive.defaultTurnConstraints = robot.drive.fastTurnConstraints;
+//        }
 
         robot.vision.startProcessor(VisionProcessor.SPIKE_LOCATION_DETECTION);
         robot.vision.setColor(COLOR);
@@ -183,12 +184,10 @@ public abstract class OldBaseAuto extends LinearOpMode {
                 );
                 Actions.runBlocking(
                         robot.drive
-                                .actionBuilder(robot.drive.pose)
+                                .actionBuilder(robot.drive.pose, TrajectorySpeed.SLOW)
                                 .strafeToLinearHeading(
                                         new Vector2d(leftX, 38 * c),
-                                        Math.toRadians(outRot + 45),
-                                        robot.drive.slowVelConstraint,
-                                        robot.drive.slowAccelConstraint
+                                        Math.toRadians(outRot + 45)
                                 )
                                 .build()
                 );
@@ -218,12 +217,10 @@ public abstract class OldBaseAuto extends LinearOpMode {
                 );
                 Actions.runBlocking(
                         robot.drive
-                                .actionBuilder(robot.drive.pose)
+                                .actionBuilder(robot.drive.pose, TrajectorySpeed.SLOW)
                                 .strafeToLinearHeading(
                                         new Vector2d(-36, 13 * c),
-                                        Math.toRadians(outRot - 180),
-                                        robot.drive.slowVelConstraint,
-                                        robot.drive.slowAccelConstraint
+                                        Math.toRadians(outRot - 180)
                                 )
                                 .build()
                 );
@@ -256,12 +253,10 @@ public abstract class OldBaseAuto extends LinearOpMode {
                 );
                 Actions.runBlocking(
                         robot.drive
-                                .actionBuilder(robot.drive.pose)
+                                .actionBuilder(robot.drive.pose, TrajectorySpeed.SLOW)
                                 .strafeToLinearHeading(
                                         new Vector2d(rightX, 38 * c),
-                                        Math.toRadians(outRot - 45),
-                                        robot.drive.slowVelConstraint,
-                                        robot.drive.slowAccelConstraint
+                                        Math.toRadians(outRot - 45)
                                 )
                                 .build()
                 );
@@ -382,12 +377,10 @@ public abstract class OldBaseAuto extends LinearOpMode {
 
         Actions.runBlocking(
                 robot.drive
-                        .actionBuilder(robot.drive.pose)
+                        .actionBuilder(robot.drive.pose, TrajectorySpeed.SLOW)
                         .strafeToLinearHeading(
                                 new Vector2d(PrepDeliverX, boardDeliverY * c),
-                                Math.toRadians(180),
-                                robot.drive.slowVelConstraint,
-                                robot.drive.slowAccelConstraint
+                                Math.toRadians(180)
                         )
                         .build()
         );
@@ -427,12 +420,10 @@ public abstract class OldBaseAuto extends LinearOpMode {
 
                     Actions.runBlocking(
                             robot.drive
-                                    .actionBuilder(robot.drive.pose)
+                                    .actionBuilder(robot.drive.pose, TrajectorySpeed.SLOW)
                                     .strafeToLinearHeading(
                                             newPose,
-                                            heading,
-                                            robot.drive.slowVelConstraint,
-                                            robot.drive.slowAccelConstraint
+                                            heading
                                     )
                                     .build()
                     );
@@ -460,14 +451,12 @@ public abstract class OldBaseAuto extends LinearOpMode {
 
         Actions.runBlocking(
                 robot.drive
-                        .actionBuilder(robot.drive.pose)
+                        .actionBuilder(robot.drive.pose, TrajectorySpeed.SLOW)
                         .strafeTo(
                                 new Vector2d(
                                         robot.drive.pose.position.x,
                                         robot.drive.pose.position.y + alignmentOffset
-                                ),
-                                robot.drive.slowVelConstraint,
-                                robot.drive.slowAccelConstraint
+                                )
                         )
                         .build()
         );
@@ -540,18 +529,14 @@ public abstract class OldBaseAuto extends LinearOpMode {
 
             Actions.runBlocking(
                     robot.drive
-                            .actionBuilder(robot.drive.pose)
+                            .actionBuilder(robot.drive.pose, TrajectorySpeed.SLOW)
                             .strafeToLinearHeading(
                                     new Vector2d(PrepStackX, StackY * c),
-                                    Math.toRadians(180),
-                                    robot.drive.slowVelConstraint,
-                                    robot.drive.slowAccelConstraint
+                                    Math.toRadians(180)
                             )
                             .strafeToLinearHeading(
                                     new Vector2d(StackX, StackY * c),
-                                    Math.toRadians(180),
-                                    robot.drive.slowVelConstraint,
-                                    robot.drive.slowAccelConstraint
+                                    Math.toRadians(180)
                             )
                             .build()
             );
