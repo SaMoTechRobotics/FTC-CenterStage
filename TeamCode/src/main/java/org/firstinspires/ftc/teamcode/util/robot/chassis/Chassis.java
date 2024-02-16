@@ -5,51 +5,26 @@ import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.PoseVelocity2d;
 import com.acmerobotics.roadrunner.Vector2d;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
-import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.IMU;
-import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.roadrunner.MecanumDrive;
 import org.firstinspires.ftc.teamcode.util.auto.RobotStorage;
 
 @Config
 public class Chassis {
+    public static boolean headingFixEnabled = false;
 
-    public static boolean headingFix = false;
+    private final MecanumDrive drive;
 
-    private final Telemetry telemetry;
-
-    MecanumDrive drive;
-
-    IMU imu;
-
-    public Wheels wheels;
+    private final IMU imu;
 
     private PoseVelocity2d speed = ChassisSpeed.Mid;
-
-    public double driveSpeed = ChassisSpeed.MidDrive;
-    public double turnSpeed = ChassisSpeed.MidTurn;
-    public double strafeSpeed = ChassisSpeed.MidStrafe;
-    public boolean brake = true;
 
     private boolean lockHeading = false;
     private double startHeading = 0;
 
-    public Chassis(HardwareMap hardwareMap, Telemetry telemetry) {
-        this.telemetry = telemetry;
-
-        this.wheels =
-                new Wheels(
-                        hardwareMap.get(DcMotor.class, "frontLeft"),
-                        hardwareMap.get(DcMotor.class, "frontRight"),
-                        hardwareMap.get(DcMotor.class, "backLeft"),
-                        hardwareMap.get(DcMotor.class, "backRight")
-                );
-
-        this.wheels.frontLeft.setDirection(DcMotor.Direction.REVERSE);
-        this.wheels.backLeft.setDirection(DcMotor.Direction.REVERSE);
-
+    public Chassis(HardwareMap hardwareMap) {
         drive = new MecanumDrive(hardwareMap, RobotStorage.pose);
 
         imu = hardwareMap.get(IMU.class, "imu");
@@ -61,87 +36,19 @@ public class Chassis {
                         )
                 )
         );
-
-        toggleBrake(true);
     }
 
     public void update() {
         drive.updatePoseEstimate();
     }
 
-    private boolean isCloseEnough(double a, double b, double margin) {
-        return Math.abs(a - b) < margin;
-    }
-
-    public void setPower(DcMotor motor, double power) {
-        motor.setPower(power);
-    }
-
-    public void toggleBrake(boolean brakeOn) {
-        this.brake = brakeOn;
-        DcMotor.ZeroPowerBehavior behavior = brakeOn
-                ? DcMotor.ZeroPowerBehavior.BRAKE
-                : DcMotor.ZeroPowerBehavior.FLOAT;
-        this.wheels.frontLeft.setZeroPowerBehavior(behavior);
-        this.wheels.frontRight.setZeroPowerBehavior(behavior);
-        this.wheels.backLeft.setZeroPowerBehavior(behavior);
-        this.wheels.backRight.setZeroPowerBehavior(behavior);
-    }
-
     public void updateSpeed(boolean high, boolean low) {
         if (high) speed = ChassisSpeed.Max;
-        else if (low) speed =
-                ChassisSpeed.Min;
+        else if (low) speed = ChassisSpeed.Min;
         else speed = ChassisSpeed.Mid;
-        //        if (high) { // Left bumper is max speeds
-        //            this.driveSpeed = ChassisSpeed.MaxDrive;
-        //            this.turnSpeed = ChassisSpeed.MaxTurn;
-        //            this.strafeSpeed = ChassisSpeed.MaxStrafe;
-        //            this.toggleBrake(true);
-        //        } else if (low) { // Right bumper is min speeds
-        //            this.driveSpeed = ChassisSpeed.MinDrive;
-        //            this.turnSpeed = ChassisSpeed.MinTurn;
-        //            this.strafeSpeed = ChassisSpeed.MinStrafe;
-        //            this.toggleBrake(true);
-        //        } else { // No bumper is mid speeds
-        //            this.driveSpeed = ChassisSpeed.MidDrive;
-        //            this.turnSpeed = ChassisSpeed.MidTurn;
-        //            this.strafeSpeed = ChassisSpeed.MidStrafe;
-        //            this.toggleBrake(true);
-        //        }
     }
 
-    //
-    //    public void updateWithControls(
-    //            GamepadEx gamepad1,
-    //            GamepadEx gamepad2,
-    //            boolean delivering
-    //    ) {
-    //        double driveStick = Math.abs(gamepad1.getLeftY()) > ChassisSpeed.JoystickYMargin ? gamepad1.getLeftY() : 0;
-    //        if (delivering) {
-    //            if (Math.abs(gamepad2.getRightX()) > 0.01) {
-    //                driveStick += gamepad2.getLeftX() * ChassisSpeed.MatchingArmSlowSpeed;
-    //            } else if (Math.abs(gamepad2.getLeftX()) > 0.01) {
-    //                driveStick += gamepad2.getLeftX() * ChassisSpeed.MatchingArmSpeed;
-    //            }
-    //        }
-    //        double strafeStick = Math.abs(gamepad1.getLeftX()) > ChassisSpeed.JoystickXMargin ? gamepad1.getLeftX() : 0;
-    //        double turnStick = gamepad1.getRightX();
-    //        if (driveStick != 0 || strafeStick != 0 || turnStick != 0) {
-    //            this.setManualPower(driveStick, strafeStick, turnStick);
-    //        } else {
-    //            this.setPower(this.wheels.frontLeft, 0);
-    //            this.setPower(this.wheels.frontRight, 0);
-    //            this.setPower(this.wheels.backLeft, 0);
-    //            this.setPower(this.wheels.backRight, 0);
-    //        }
-    //    }
-
-    public void setManualPower(
-            double drivePower,
-            double strafePower,
-            double turnPower
-    ) {
+    public void setManualPower(double drivePower, double strafePower, double turnPower) {
         if (turnPower != 0) { // If started turning
             lockHeading = false;
             startHeading = getCurrentHeadingRadians(); // Get current heading from imu, this is the heading that will be locked for strafing or driving
@@ -153,38 +60,32 @@ public class Chassis {
         }
 
         // If heading lock is enabled
-        if (headingFix && lockHeading) {
+        if (headingFixEnabled && lockHeading) {
+
             double headingError = getCurrentHeadingRadians() - startHeading; // The current heading from imu - the starting (target) heading
 
             // Which way to rotate to correct
             if (headingError > Math.PI) headingError -= Math.PI;
-            else if (
-                    headingError < -Math.PI
-            ) headingError += Math.PI;
+            else if (headingError < -Math.PI) headingError += Math.PI;
 
             // How fast to rotate to correct
-            double headingCorrectionPower =
-                    -MecanumDrive.PARAMS.headingCorrectionCoefficient * headingError;
+            double headingCorrectionPower = -MecanumDrive.PARAMS.headingCorrectionCoefficient * headingError;
 
-            drive.setDrivePowers(
-                    new PoseVelocity2d(
-                            new Vector2d(
-                                    -drivePower * speed.linearVel.x,
-                                    -strafePower * speed.linearVel.y
-                            ),
-                            headingCorrectionPower
-                    )
-            );
+            drive.setDrivePowers(new PoseVelocity2d(
+                    new Vector2d(
+                            -drivePower * speed.linearVel.x,
+                            -strafePower * speed.linearVel.y
+                    ),
+                    headingCorrectionPower
+            ));
         } else {
-            drive.setDrivePowers(
-                    new PoseVelocity2d(
-                            new Vector2d(
-                                    -drivePower * speed.linearVel.x,
-                                    -strafePower * speed.linearVel.y
-                            ),
-                            -turnPower * speed.angVel
-                    )
-            );
+            drive.setDrivePowers(new PoseVelocity2d(
+                    new Vector2d(
+                            -drivePower * speed.linearVel.x,
+                            -strafePower * speed.linearVel.y
+                    ),
+                    -turnPower * speed.angVel
+            ));
         }
     }
 
@@ -192,34 +93,11 @@ public class Chassis {
         return imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
     }
 
-    public void setPowerAllMotors(double speed) {
-        this.setPower(this.wheels.frontLeft, speed);
-        this.setPower(this.wheels.frontRight, speed);
-        this.setPower(this.wheels.backRight, speed);
-        this.setPower(this.wheels.backLeft, speed);
+    public double getCurrentHeadingDegrees() {
+        return Math.toDegrees(getCurrentHeadingRadians());
     }
 
     public Pose2d getPose() {
         return drive.pose;
-    }
-
-    private static class Wheels {
-
-        public DcMotor frontLeft;
-        public DcMotor frontRight;
-        public DcMotor backLeft;
-        public DcMotor backRight;
-
-        public Wheels(
-                DcMotor frontLeft,
-                DcMotor frontRight,
-                DcMotor backLeft,
-                DcMotor backRight
-        ) {
-            this.frontLeft = frontLeft;
-            this.frontRight = frontRight;
-            this.backLeft = backLeft;
-            this.backRight = backRight;
-        }
     }
 }

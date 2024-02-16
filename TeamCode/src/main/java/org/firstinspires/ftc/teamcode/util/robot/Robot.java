@@ -3,11 +3,11 @@ package org.firstinspires.ftc.teamcode.util.robot;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.util.robot.arm.Arm;
+import org.firstinspires.ftc.teamcode.util.robot.arm.ArmRotation;
+import org.firstinspires.ftc.teamcode.util.robot.arm.WristRotation;
 import org.firstinspires.ftc.teamcode.util.robot.chassis.Chassis;
 import org.firstinspires.ftc.teamcode.util.robot.claw.Claw;
 import org.firstinspires.ftc.teamcode.util.vision.Vision;
-import org.firstinspires.ftc.teamcode.util.robot.arm.ArmRotation;
-import org.firstinspires.ftc.teamcode.util.robot.arm.WristRotation;
 
 public class Robot {
     private final Telemetry telemetry;
@@ -23,7 +23,7 @@ public class Robot {
     public Robot(HardwareMap hardwareMap, Telemetry telemetry) {
 //        vision = new Vision(hardwareMap);
 
-        chassis = new Chassis(hardwareMap, telemetry);
+        chassis = new Chassis(hardwareMap);
         arm = new Arm(hardwareMap, telemetry);
         claw = new Claw(hardwareMap, telemetry);
 
