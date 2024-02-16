@@ -20,35 +20,13 @@ public class ChassisSpeed {
             0.25
     );
 
-    /**
-     * The max and min speeds of the chassis motors
-     */
-    //    public static final double Max = 1.0;
-    //    public static final double Min = 0.0;
-    /**
-     * The speed of the robot when it is moving forward or backward
-     */
-    public static double MaxDrive = 1.0;
-    public static double MidDrive = 0.5;
-    public static double MinDrive = 0.2;
-    /**
-     * The speed of the robot when it is turning
-     */
-    public static double MaxTurn = 1.0;
-    public static double MidTurn = 0.5;
-    public static double MinTurn = 0.2;
-    /**
-     * The speed of the robot when it is strafing
-     */
-    public static double MaxStrafe = 1.0;
-    public static double MidStrafe = 0.5;
-    public static double MinStrafe = 0.25;
+    public static double DriveDeadZone = 0.1;
+    public static double StrafeDeadZone = 0.1;
+    public static double TurnDeadZone = 0.1;
 
-    public static double MatchingArmSpeed = 0.0; // 0.3
-    public static double MatchingArmSlowSpeed = 0.0; // 0.15
-
-    public static double JoystickYMargin = 0.1;
-    public static double JoystickXMargin = 0.15;
+    public static double applyDeadZone(double val, double m) {
+        return Math.abs(val) > m ? val : 0;
+    }
 
     public static double BoardAlignmentSpeed = 0.2;
 }

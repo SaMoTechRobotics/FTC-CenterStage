@@ -71,15 +71,15 @@ public class PlacePixelTest extends LinearOpMode {
 
                 if (!CustomDrive) {
                     double drivePower = Math.abs(gamepad1.left_stick_y) >
-                            ChassisSpeed.JoystickYMargin
+                            ChassisSpeed.DriveDeadZone
                             ? gamepad1.left_stick_y
                             : 0;
                     double strafePower = Math.abs(gamepad1.left_stick_x) >
-                            ChassisSpeed.JoystickXMargin
+                            ChassisSpeed.StrafeDeadZone
                             ? gamepad1.left_stick_x
                             : 0;
                     double turnPower = Math.abs(gamepad1.right_stick_x) >
-                            ChassisSpeed.JoystickXMargin
+                            ChassisSpeed.StrafeDeadZone
                             ? gamepad1.right_stick_x
                             : 0;
 
@@ -191,15 +191,15 @@ public class PlacePixelTest extends LinearOpMode {
                     }
                     if (!gamepad1.a) {
                         double drivePower = Math.abs(gamepad1.left_stick_y) >
-                                ChassisSpeed.JoystickYMargin
+                                ChassisSpeed.DriveDeadZone
                                 ? gamepad1.left_stick_y
                                 : 0;
                         double strafePower = Math.abs(gamepad1.left_stick_x) >
-                                ChassisSpeed.JoystickXMargin
+                                ChassisSpeed.StrafeDeadZone
                                 ? gamepad1.left_stick_x
                                 : 0;
                         double turnPower = Math.abs(gamepad1.right_stick_x) >
-                                ChassisSpeed.JoystickXMargin
+                                ChassisSpeed.StrafeDeadZone
                                 ? gamepad1.right_stick_x
                                 : 0;
 

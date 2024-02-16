@@ -10,15 +10,14 @@ import org.firstinspires.ftc.teamcode.util.robot.claw.Claw;
 import org.firstinspires.ftc.teamcode.util.vision.Vision;
 
 public class Robot {
-    private final Telemetry telemetry;
-
     public Vision vision;
     public Chassis chassis;
     public Arm arm;
     public Claw claw;
 
-    public Boolean pickUp = true;
-    public Boolean droneReady = false;
+    public boolean pickUp = true;
+
+    public boolean wristLevelingEnabled = true;
 
     public Robot(HardwareMap hardwareMap, Telemetry telemetry) {
 //        vision = new Vision(hardwareMap);
@@ -26,8 +25,6 @@ public class Robot {
         chassis = new Chassis(hardwareMap);
         arm = new Arm(hardwareMap, telemetry);
         claw = new Claw(hardwareMap, telemetry);
-
-        this.telemetry = telemetry;
     }
 
     public void resetForIntake() {
@@ -35,12 +32,6 @@ public class Robot {
         arm.setRotation(ArmRotation.Down);
         arm.setWristRotation(WristRotation.Down);
         claw.open();
-    }
-
-    public void prepareDroneLaunch() {
-        arm.setRotation(ArmRotation.DroneLaunch);
-        arm.setWristRotation(WristRotation.Up);
-        droneReady = true;
     }
 
     public void update() {
