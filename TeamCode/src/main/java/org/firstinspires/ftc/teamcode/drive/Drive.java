@@ -164,11 +164,12 @@ public class Drive extends LinearOpMode {
                 robot.arm.setGlobalWristRotation(false);
                 robot.arm.setWristRotation(WristRotation.PickupBack);
                 robot.arm.setRotation(ArmRotation.BackDown, ArmSpeed.DeliverSpeed);
-            } else if (gamepad2Buttons.wasJustPressed(GamepadButton.X)) {
-                robot.wristLevelingEnabled = true;
-                robot.arm.setRotation(ArmRotation.LowDeliver);
-                robot.arm.setGlobalWristRotation(true);
             }
+//            else if (gamepad2Buttons.wasJustPressed(GamepadButton.X)) {
+//                robot.wristLevelingEnabled = true;
+//                robot.arm.setRotation(ArmRotation.LowDeliver);
+//                robot.arm.setGlobalWristRotation(true);
+//            }
 
             // Drone Launcher Controls (Gamepad 1)
 
@@ -183,7 +184,7 @@ public class Drive extends LinearOpMode {
                 robot.wristLevelingEnabled = true;
                 robot.claw.setFingerEnabled(false);
             } else {
-                robot.claw.setFingerEnabled(true);
+                robot.claw.setFingerEnabled(!robot.claw.isOpen);
             }
 
             // Telemetry

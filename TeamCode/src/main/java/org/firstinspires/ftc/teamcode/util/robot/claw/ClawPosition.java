@@ -5,7 +5,7 @@ import com.acmerobotics.dashboard.config.Config;
 @Config
 public class ClawPosition {
     public static double PrimaryOpen = 0;
-    public static double PrimaryClosed = 0.9;
+    public static double PrimaryClosed = 0.95;
     public static double SecondaryOpen = 1;
     public static double SecondaryClosed = 0;
 
