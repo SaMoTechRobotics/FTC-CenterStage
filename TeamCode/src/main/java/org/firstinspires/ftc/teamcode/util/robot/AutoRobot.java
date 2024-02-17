@@ -24,7 +24,7 @@ public class AutoRobot {
         drive = new MecanumDrive(hardwareMap, pose);
 
         arm = new Arm(hardwareMap, telemetry);
-        claw = new Claw(hardwareMap, telemetry);
+        claw = new Claw(hardwareMap);
 
         this.telemetry = telemetry;
     }

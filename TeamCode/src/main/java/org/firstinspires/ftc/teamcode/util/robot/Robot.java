@@ -24,7 +24,7 @@ public class Robot {
 
         chassis = new Chassis(hardwareMap);
         arm = new Arm(hardwareMap, telemetry);
-        claw = new Claw(hardwareMap, telemetry);
+        claw = new Claw(hardwareMap);
     }
 
     public void resetForIntake() {

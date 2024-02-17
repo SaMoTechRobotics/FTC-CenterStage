@@ -177,6 +177,10 @@ public class Arm {
         wristServo.setPosition(wristPosition);
     }
 
+    public boolean getGlobalWristRotationEnabled() {
+        return globalWristRotation;
+    }
+
     public void setWristRotation(double position) {
         wristServo.setPosition(position);
         globalWristRotation = false;

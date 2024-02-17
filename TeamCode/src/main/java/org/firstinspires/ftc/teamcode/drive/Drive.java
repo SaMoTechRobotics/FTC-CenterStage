@@ -123,10 +123,10 @@ public class Drive extends LinearOpMode {
                 }
             }
 
-
             if (gamepad2Buttons.wasJustReleased(GamepadButton.A)) {
                 robot.resetForIntake();
             }
+
 
             // Claw Controls (Gamepad 2)
 
@@ -179,7 +179,12 @@ public class Drive extends LinearOpMode {
             // Updates
 
             robot.update();
-            if (robot.pickUp) robot.wristLevelingEnabled = true;
+            if (robot.pickUp) {
+                robot.wristLevelingEnabled = true;
+                robot.claw.setFingerEnabled(false);
+            } else {
+                robot.claw.setFingerEnabled(true);
+            }
 
             // Telemetry
 

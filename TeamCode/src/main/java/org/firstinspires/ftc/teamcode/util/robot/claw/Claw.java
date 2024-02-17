@@ -2,22 +2,22 @@ package org.firstinspires.ftc.teamcode.util.robot.claw;
 
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
-import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.teamcode.util.lib.MicroServo;
 
 public class Claw {
-    private final Telemetry telemetry;
+    public final Servo primaryClawServo;
+    private final Servo secondaryClawServo;
 
-    public final MicroServo primaryClawServo;
-    private final MicroServo secondaryClawServo;
+    private final Servo fingerServo;
 
     public boolean isOpen = false;
+    private boolean fingerEnabled = false;
 
-    public Claw(HardwareMap hardwareMap, Telemetry telemetry) {
-        this.telemetry = telemetry;
+    public Claw(HardwareMap hardwareMap) {
+        primaryClawServo = hardwareMap.get(Servo.class, "claw0");
+        secondaryClawServo = hardwareMap.get(Servo.class, "claw1");
 
-        primaryClawServo = new MicroServo(hardwareMap.get(Servo.class, "claw0"));
-        secondaryClawServo = new MicroServo(hardwareMap.get(Servo.class, "claw1"));
+        fingerServo = hardwareMap.get(Servo.class, "finger");
+        fingerServo.setPosition(ClawPosition.FingerIn);
     }
 
     public void close() {
@@ -40,6 +40,12 @@ public class Claw {
             secondaryClawServo.setPosition(ClawPosition.SecondaryOpen);
             isOpen = true;
         }
+    }
+
+    public void setFingerEnabled(boolean enabled) {
+//        if (fingerEnabled == enabled) return;
+        fingerEnabled = enabled;
+        fingerServo.setPosition(enabled ? ClawPosition.FingerOut : ClawPosition.FingerIn);
     }
 
     public double getPrimaryPosition() {
