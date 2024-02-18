@@ -24,17 +24,17 @@ import java.util.List;
 public final class MecanumDrive {
     public static class Params {
         // drive model parameters
-        public double inPerTick = 0.0005836757;
+        public double inPerTick = 0.0005277604;
         public double lateralInPerTick = 0.0005758376975630854;
-        public double trackWidthTicks = 21877.222006513308;
+        public double trackWidthTicks = 18791.697458330193;
 
         //Coefficient for proportionate heading correction. This is just a guess.
         //If you see a lot of oscillation or bot spins out of control, try smaller.
         public double headingCorrectionCoefficient = 2;
 
         // feedforward parameters (in tick units)
-        public double kS = 0.7512713410616052;
-        public double kV = 0.00010269914801726239;
+        public double kS = 1.3572340058093988;
+        public double kV = 0.00007475484378017362;
         public double kA = 0.00001;
 
         // Speed constraint parameters
@@ -199,8 +199,8 @@ public final class MecanumDrive {
 
         imu = hardwareMap.get(IMU.class, "imu");
         IMU.Parameters parameters = new IMU.Parameters(new RevHubOrientationOnRobot(
-                RevHubOrientationOnRobot.LogoFacingDirection.UP,
-                RevHubOrientationOnRobot.UsbFacingDirection.FORWARD));
+                RevHubOrientationOnRobot.LogoFacingDirection.LEFT,
+                RevHubOrientationOnRobot.UsbFacingDirection.UP));
         imu.initialize(parameters);
 
 //        imu = null;

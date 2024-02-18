@@ -30,8 +30,8 @@ public class Vision {
     private boolean multiProcessor = false;
 
     public Vision(HardwareMap hardwareMap) {
-        frontCamera = hardwareMap.get(WebcamName.class, "Webcam 1");
-        backCamera = hardwareMap.get(WebcamName.class, "Webcam 2");
+        frontCamera = hardwareMap.get(WebcamName.class, "Webcam 2");
+        backCamera = hardwareMap.get(WebcamName.class, "Webcam 1");
     }
 
     public void startProcessor(VisionProcessor processingMode) {
