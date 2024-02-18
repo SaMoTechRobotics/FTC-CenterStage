@@ -27,7 +27,7 @@ public class Drive extends LinearOpMode {
     @Override
     public void runOpMode() {
         if (ResetPose) RobotStorage.reset();
-        robot = new Robot(hardwareMap, telemetry);
+        robot = new Robot(hardwareMap);
         robot.arm.lockDrone();
         robot.claw.open();
 

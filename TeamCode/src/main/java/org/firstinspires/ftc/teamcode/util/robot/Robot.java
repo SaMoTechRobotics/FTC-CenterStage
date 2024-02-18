@@ -1,7 +1,6 @@
 package org.firstinspires.ftc.teamcode.util.robot;
 
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.util.robot.arm.Arm;
 import org.firstinspires.ftc.teamcode.util.robot.arm.ArmRotation;
 import org.firstinspires.ftc.teamcode.util.robot.arm.WristRotation;
@@ -19,11 +18,11 @@ public class Robot {
 
     public boolean wristLevelingEnabled = true;
 
-    public Robot(HardwareMap hardwareMap, Telemetry telemetry) {
+    public Robot(HardwareMap hardwareMap) {
 //        vision = new Vision(hardwareMap);
 
         chassis = new Chassis(hardwareMap);
-        arm = new Arm(hardwareMap, telemetry);
+        arm = new Arm(hardwareMap);
         claw = new Claw(hardwareMap);
     }
 

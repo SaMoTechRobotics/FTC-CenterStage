@@ -75,7 +75,7 @@ public abstract class OldBaseAuto extends LinearOpMode {
 
         Pose2d startPose = RobotStorage.getStartPose(SIDE, COLOR);
         RobotStorage.setPose(startPose);
-        robot = new AutoRobot(hardwareMap, telemetry, RobotStorage.pose);
+        robot = new AutoRobot(hardwareMap, RobotStorage.pose);
 //        if (FastAuto) {
 //            robot.drive.defaultVelConstraint = robot.drive.fastVelConstraint;
 //            robot.drive.defaultAccelConstraint = robot.drive.fastAccelConstraint;

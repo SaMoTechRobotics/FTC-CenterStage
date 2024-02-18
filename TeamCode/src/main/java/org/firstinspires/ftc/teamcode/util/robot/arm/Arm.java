@@ -1,6 +1,5 @@
 package org.firstinspires.ftc.teamcode.util.robot.arm;
 
-import com.acmerobotics.dashboard.FtcDashboard;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
@@ -8,20 +7,13 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.util.robot.claw.ClawPosition;
 
 public class Arm {
-    private final Telemetry telemetry;
-
     private final DcMotor armMotor;
     private final Servo wristServo;
     private final Servo droneServo;
 
     private boolean globalWristRotation = false;
 
-    private double lastLoopTime = 0;
-    private double targetStartRotation = 0;
-
-    public Arm(HardwareMap hardwareMap, Telemetry telemetry) {
-        this.telemetry = telemetry;
-
+    public Arm(HardwareMap hardwareMap) {
         armMotor = hardwareMap.get(DcMotor.class, "arm");
         armMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         armMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -34,66 +26,6 @@ public class Arm {
 
     public void update() {
         if (globalWristRotation) updateGlobalWristRotation();
-
-//        if (armMotor.getMode() == DcMotor.RunMode.RUN_TO_POSITION) {
-//            updateSpeedRamping();
-//        }
-    }
-
-    public void updateSpeedRamping() {
-        telemetry.addData("target", armMotor.getTargetPosition());
-        telemetry.addData("start", targetStartRotation);
-        telemetry.addData("current", armMotor.getCurrentPosition());
-
-        double period = Math.abs(armMotor.getTargetPosition() - targetStartRotation);
-        double x = Math.abs(armMotor.getCurrentPosition());
-        double h = Math.abs(targetStartRotation);
-
-
-        double sin = Math.sin((Math.PI / (period / ArmRotation.PeriodDivider)) * (x - (period / ArmRotation.StartDivider) - h));
-        telemetry.addData("sin", sin);
-
-        double motorPower = ArmSpeed.Min * (
-                sin
-        ) + (1.0 - 2.0 * ArmSpeed.Min);
-
-//        armMotor.setPower(motorPower);
-
-        Telemetry dashboardTelemetry = FtcDashboard.getInstance().getTelemetry();
-        dashboardTelemetry.addData("s", sin);
-        dashboardTelemetry.addData("x", armMotor.getPower());
-        dashboardTelemetry.update();
-
-        armMotor.setPower(ArmSpeed.Max);
-
-//            double loopTime = System.currentTimeMillis();
-//            double timeDifference = loopTime - lastLoopTime;
-//            lastLoopTime = loopTime;
-//            double rampSpeed = ArmSpeed.RampSpeed * timeDifference;
-//
-//            boolean speedUp = armMotor.getCurrentPosition() > (armMotor.getTargetPosition() + targetStartRotation) / 2;
-//
-//            if(speedUp) {
-//                if (armMotor.getPower() < ArmSpeed.Max) {
-//                    if (armMotor.getPower() + rampSpeed > ArmSpeed.Max) {
-//                        armMotor.setPower(ArmSpeed.Max);
-//                    } else {
-//                        armMotor.setPower(armMotor.getPower() + rampSpeed);
-//                    }
-//                }
-//            } else {
-//                if (armMotor.getPower() > ArmSpeed.Min) {
-//                    if (armMotor.getPower() - rampSpeed > ArmSpeed.Min) {
-//                        armMotor.setPower(ArmSpeed.Min);
-//                    } else {
-//                        armMotor.setPower(armMotor.getPower() - rampSpeed);
-//                    }
-//                }
-//            }
-
-//        TelemetryPacket graphSpeedRamping =
-
-
     }
 
     public void launchDrone() {
@@ -135,7 +67,6 @@ public class Arm {
     }
 
     public void setRotation(double degrees) {
-        targetStartRotation = armMotor.getCurrentPosition();
         armMotor.setTargetPosition(degreesToArmTicks(degrees));
         armMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         double diff = Math.abs(degrees - armMotor.getCurrentPosition() * 90.0 / ArmRotation.TicksAt90Degrees);
