@@ -40,7 +40,7 @@ public final class MecanumDrive {
         // Speed constraint parameters
 
         public SpeedConstraintParams defaultSpeeds = new SpeedConstraintParams(
-                80, Math.PI, 80, 60, Math.PI, Math.PI, -30, 60
+                80, Math.PI, 80, 60, 2 * Math.PI, 2 * Math.PI, -30, 60
         );
 
         public SpeedConstraintParams slowSpeeds = new SpeedConstraintParams(
@@ -48,7 +48,7 @@ public final class MecanumDrive {
         );
 
         public SpeedConstraintParams fastSpeeds = new SpeedConstraintParams(
-                100, 2 * Math.PI, 100, 100, 2 * Math.PI, 2 * Math.PI, -30, 100
+                100, 2 * Math.PI, 100, 100, 3 * Math.PI, 2 * Math.PI, -30, 100
         );
 
 
@@ -199,7 +199,7 @@ public final class MecanumDrive {
 
         imu = hardwareMap.get(IMU.class, "imu");
         IMU.Parameters parameters = new IMU.Parameters(new RevHubOrientationOnRobot(
-                RevHubOrientationOnRobot.LogoFacingDirection.LEFT,
+                RevHubOrientationOnRobot.LogoFacingDirection.RIGHT,
                 RevHubOrientationOnRobot.UsbFacingDirection.UP));
         imu.initialize(parameters);
 
@@ -209,6 +209,7 @@ public final class MecanumDrive {
 
 //        localizer = new DriveLocalizer();
         localizer = new ThreeDeadWheelLocalizer(hardwareMap, PARAMS.inPerTick);
+//        localizer = new TwoDeadWheelLocalizer(hardwareMap, imu, PARAMS.inPerTick);
 
 //        FlightRecorder.write("MECANUM_PARAMS", PARAMS);
     }

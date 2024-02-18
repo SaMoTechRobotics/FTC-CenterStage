@@ -5,6 +5,7 @@ import com.acmerobotics.roadrunner.Pose2d;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import org.firstinspires.ftc.teamcode.roadrunner.MecanumDrive;
 import org.firstinspires.ftc.teamcode.util.robot.arm.Arm;
+import org.firstinspires.ftc.teamcode.util.robot.arm.ArmRotation;
 import org.firstinspires.ftc.teamcode.util.robot.claw.Claw;
 import org.firstinspires.ftc.teamcode.util.vision.Vision;
 
@@ -25,10 +26,23 @@ public class AutoRobot {
         claw = new Claw(hardwareMap);
     }
 
-    // roadrunner action to open claw
     public Action openNextClaw() {
         return packet -> {
             claw.openNext();
+            return false;
+        };
+    }
+
+    public Action raiseArmForStack() {
+        return packet -> {
+            arm.setRotation(ArmRotation.Stack5);
+            return false;
+        };
+    }
+
+    public Action closeClaw() {
+        return packet -> {
+            claw.close();
             return false;
         };
     }
