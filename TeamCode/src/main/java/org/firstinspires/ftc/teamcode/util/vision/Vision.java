@@ -190,6 +190,7 @@ public class Vision {
     }
 
     public boolean isReady() {
-        return visionPortal.getCameraState() == VisionPortal.CameraState.CAMERA_DEVICE_READY;
+        return true;
+//        return visionPortal.getCameraState() == VisionPortal.CameraState.CAMERA_DEVICE_READY;
     }
 }

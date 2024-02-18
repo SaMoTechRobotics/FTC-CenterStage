@@ -460,6 +460,17 @@ public final class MecanumDrive {
         );
     }
 
+    public SpeedConstraint getSpeedConstraint(TrajectorySpeed speed) {
+        switch (speed) {
+            case SLOW:
+                return slowSpeedConstraint;
+            case FAST:
+                return fastSpeedConstraint;
+            default:
+                return defaultSpeedConstraint;
+        }
+    }
+
     public void drawFieldOverlay() {
         double x = pose.position.x;
         double y = pose.position.y;

@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.util.robot;
 
+import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import org.firstinspires.ftc.teamcode.roadrunner.MecanumDrive;
@@ -22,5 +23,13 @@ public class AutoRobot {
 
         arm = new Arm(hardwareMap);
         claw = new Claw(hardwareMap);
+    }
+
+    // roadrunner action to open claw
+    public Action openNextClaw() {
+        return packet -> {
+            claw.openNext();
+            return false;
+        };
     }
 }
