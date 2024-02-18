@@ -7,10 +7,10 @@ import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
-import org.firstinspires.ftc.teamcode.util.robot.AutoRobot;
-import org.firstinspires.ftc.teamcode.util.auto.RobotStorage;
 import org.firstinspires.ftc.teamcode.util.auto.AutoColor;
 import org.firstinspires.ftc.teamcode.util.auto.AutoSide;
+import org.firstinspires.ftc.teamcode.util.auto.RobotStorage;
+import org.firstinspires.ftc.teamcode.util.robot.AutoRobot;
 
 @Config
 @Autonomous(name = "TrajectoryTesting", group = "Tests")
@@ -23,7 +23,7 @@ public class TrajectoryTesting extends LinearOpMode {
     @Override
     public void runOpMode() {
         RobotStorage.setPose(RobotStorage.getStartPose(SIDE, COLOR));
-        robot = new AutoRobot(hardwareMap, telemetry, RobotStorage.pose);
+        robot = new AutoRobot(hardwareMap, RobotStorage.pose);
 
         ElapsedTime timer = new ElapsedTime();
 

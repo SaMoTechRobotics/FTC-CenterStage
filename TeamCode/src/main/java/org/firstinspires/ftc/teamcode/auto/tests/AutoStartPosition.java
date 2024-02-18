@@ -22,7 +22,7 @@ public class AutoStartPosition extends LinearOpMode {
     public void runOpMode() {
         Pose2d startPose = RobotStorage.getStartPose(SIDE, COLOR);
         RobotStorage.setPose(startPose);
-        AutoRobot robot = new AutoRobot(hardwareMap, telemetry, RobotStorage.pose);
+        AutoRobot robot = new AutoRobot(hardwareMap, RobotStorage.pose);
 
         int c = COLOR.value;
         double outRot = COLOR == AutoColor.BLUE ? 270 : 90;

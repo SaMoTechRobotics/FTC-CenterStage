@@ -5,8 +5,8 @@ import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
-import org.firstinspires.ftc.teamcode.util.robot.AutoRobot;
 import org.firstinspires.ftc.teamcode.util.auto.RobotStorage;
+import org.firstinspires.ftc.teamcode.util.robot.AutoRobot;
 
 @Config
 @Autonomous(name = "TurnTest", group = "Tests")
@@ -17,7 +17,7 @@ public class TurnTest extends LinearOpMode {
     @Override
     public void runOpMode() {
         RobotStorage.reset();
-        AutoRobot robot = new AutoRobot(hardwareMap, telemetry, RobotStorage.pose);
+        AutoRobot robot = new AutoRobot(hardwareMap, RobotStorage.pose);
 
         ElapsedTime timer = new ElapsedTime();
 

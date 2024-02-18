@@ -49,7 +49,7 @@ public class PlacePixelTest extends LinearOpMode {
 
     @Override
     public void runOpMode() {
-        robot = new AutoRobot(hardwareMap, telemetry, new Pose2d(0, 0, 0));
+        robot = new AutoRobot(hardwareMap, new Pose2d(0, 0, 0));
         robot.vision.startProcessor(VisionProcessor.APRIL_TAG_DETECTION);
 
         waitForStart();
