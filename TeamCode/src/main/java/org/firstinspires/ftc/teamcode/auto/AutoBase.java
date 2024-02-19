@@ -1,10 +1,7 @@
 package org.firstinspires.ftc.teamcode.auto;
 
 import com.acmerobotics.dashboard.config.Config;
-import com.acmerobotics.roadrunner.Pose2d;
-import com.acmerobotics.roadrunner.SequentialAction;
-import com.acmerobotics.roadrunner.SleepAction;
-import com.acmerobotics.roadrunner.Vector2d;
+import com.acmerobotics.roadrunner.*;
 import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -13,11 +10,17 @@ import org.firstinspires.ftc.teamcode.util.auto.AutoColor;
 import org.firstinspires.ftc.teamcode.util.auto.AutoSide;
 import org.firstinspires.ftc.teamcode.util.auto.BoardPosition;
 import org.firstinspires.ftc.teamcode.util.auto.RobotStorage;
+import org.firstinspires.ftc.teamcode.util.auto.constants.BoardAlignmentConstants;
 import org.firstinspires.ftc.teamcode.util.robot.AutoRobot;
 import org.firstinspires.ftc.teamcode.util.robot.arm.ArmRotation;
+import org.firstinspires.ftc.teamcode.util.robot.arm.ArmSpeed;
 import org.firstinspires.ftc.teamcode.util.robot.arm.WristRotation;
+import org.firstinspires.ftc.teamcode.util.robot.chassis.ChassisSpeed;
 import org.firstinspires.ftc.teamcode.util.vision.VisionProcessor;
+import org.firstinspires.ftc.vision.apriltag.AprilTagPoseFtc;
 
+import java.lang.Math;
+import java.util.Optional;
 import java.util.Timer;
 
 @Config
@@ -37,7 +40,17 @@ public abstract class AutoBase extends LinearOpMode {
 
     public static double FarLaneY = 14;
 
-    public static Pose2d leaveYellowSpot = new Pose2d(-48, 36, Math.toRadians(180 - 45));
+    // Right, Center, Left on blue side
+    public static double[] AlignmentOffsetsBLUE = new double[]{-5.5, 6.0, 6.0};
+    // Left Center Right on red side
+    public static double[] AlignmentOffsetsRED = new double[]{5.5, -5.0, -5.0};
+
+    public static double AlignWithBoardTime = 3.0;
+    public static double PushBoardTime = 0.5;
+
+    public static double ParkX = 62;
+
+    public static Vector2d stack1 = new Vector2d(-50, 39);
 
     int c;
     double startHeading;
@@ -96,78 +109,180 @@ public abstract class AutoBase extends LinearOpMode {
             deliverSpikeMarkNear();
         }
 
+        // Pickup from white stack
+
+        robot.arm.setWristRotation(WristRotation.StackDown);
+
         Actions.runBlocking(
-                robot.drive.actionBuilder(robot.drive.pose)
-                        .strafeToLinearHeading(new Vector2d(34, FarLaneY * c), Math.toRadians(180))
+                robot.drive.actionBuilder(robot.drive.pose, TrajectorySpeed.SLOW)
+                        .strafeToLinearHeading(new Vector2d(-62, stack1.y * c), Math.toRadians(180))
                         .build()
         );
 
-        robot.arm.setRotation(ArmRotation.BackDown);
-        robot.arm.setWristRotation(WristRotation.PickupBack);
+        robot.arm.setRotation(ArmRotation.StackDownAuto);
+        robot.arm.setWristRotation(WristRotation.AutoPickupStack);
 
         Actions.runBlocking(
-                new SleepAction(2)
+                robot.drive.actionBuilder(robot.drive.pose, TrajectorySpeed.SLOW)
+                        .strafeToLinearHeading(new Vector2d(-64, stack1.y * c), Math.toRadians(180))
+                        .build()
+        );
+
+        Actions.runBlocking(new SleepAction(0.5));
+
+        robot.claw.close();
+
+        Actions.runBlocking(new SleepAction(0.2));
+
+        robot.arm.setRotation(ArmRotation.HoldDown);
+        robot.arm.setWristRotation(WristRotation.Down);
+
+        robot.vision.startProcessor(VisionProcessor.APRIL_TAG_DETECTION);
+
+        robot.vision.setActiveCamera(VisionProcessor.APRIL_TAG_DETECTION);
+
+        Actions.runBlocking(
+                new SequentialAction(
+                        robot.drive.actionBuilder(robot.drive.pose, TrajectorySpeed.FAST)
+                                .strafeToLinearHeading(new Vector2d(-42, 36 * c), Math.toRadians(180))
+                                .strafeToLinearHeading(new Vector2d(-38, FarLaneY * c), Math.toRadians(180))
+                                .strafeToLinearHeading(new Vector2d(30, FarLaneY * c), Math.toRadians(180))
+                                .build(),
+                        robot.prepareForDelivery(),
+                        robot.drive.actionBuilder(new Pose2d(30, FarLaneY * c, Math.toRadians(180)))
+                                .strafeToLinearHeading(new Vector2d(30, 36 * c), Math.toRadians(180))
+                                .build()
+                )
+        );
+
+        Actions.runBlocking(
+                robot.drive.actionBuilder(robot.drive.pose)
+                        .strafeToLinearHeading(new Vector2d(38, 28 * c), Math.toRadians(180))
+                        .build()
+        );
+
+        robot.claw.openNext();
+
+        Actions.runBlocking(
+                robot.drive.actionBuilder(robot.drive.pose)
+                        .strafeToLinearHeading(new Vector2d(30, 34 * c), Math.toRadians(180))
+                        .build()
+        );
+
+        // Delivery to board
+
+        BoardPosition targetTag = BoardPosition.CENTER;
+        double alignmentOffset = COLOR == AutoColor.BLUE
+                ? AlignmentOffsetsBLUE[1]
+                : AlignmentOffsetsRED[1];
+
+        if (boardPosition == BoardPosition.CENTER) {
+            if (COLOR == AutoColor.BLUE) {
+                targetTag = BoardPosition.RIGHT;
+            } else {
+                targetTag = BoardPosition.LEFT;
+            }
+        } else {
+            if (COLOR == AutoColor.BLUE) {
+                if (boardPosition == BoardPosition.LEFT) {
+                    alignmentOffset = AlignmentOffsetsBLUE[2];
+                } else {
+                    alignmentOffset = AlignmentOffsetsBLUE[0];
+                }
+            } else {
+                if (boardPosition == BoardPosition.LEFT) {
+                    alignmentOffset = AlignmentOffsetsRED[0];
+                } else {
+                    alignmentOffset = AlignmentOffsetsRED[2];
+                }
+            }
+        }
+
+        robot.arm.setRotation(ArmRotation.AutoDeliverLow, ArmSpeed.Min);
+        robot.arm.update();
+
+        ElapsedTime time = new ElapsedTime();
+
+        boolean aligned = false;
+        while (opModeIsActive()) {
+            if (time.seconds() > AlignWithBoardTime) break;
+            robot.arm.update();
+            if (robot.vision.isBoardDetected(targetTag)) {
+                Optional<AprilTagPoseFtc> tpose = robot.vision.getBoardPose(targetTag);
+                if (tpose.isPresent()) {
+                    double margin = 0.0;
+
+                    Vector2d newPose = new Vector2d(
+                            robot.drive.pose.position.x +
+                                    (tpose.get().y - (BoardAlignmentConstants.DistFromBoard + 1)),
+                            robot.drive.pose.position.y - (tpose.get().x + margin)
+                    );
+                    Rotation2d heading = robot.drive.pose.heading.plus(
+                            Math.toRadians(tpose.get().yaw)
+                    );
+
+                    aligned = true;
+
+                    Actions.runBlocking(
+                            robot.drive
+                                    .actionBuilder(robot.drive.pose, TrajectorySpeed.SLOW)
+                                    .strafeToLinearHeading(
+                                            newPose,
+                                            heading
+                                    )
+                                    .build()
+                    );
+                }
+            }
+        }
+
+        if (!aligned) {
+            telemetry.addLine("ERROR: APRIL TAG CAMERA NOT WORKING!!!");
+            telemetry.update();
+
+            robot.drive.setDrivePowers(
+                    new PoseVelocity2d(
+                            new Vector2d(-ChassisSpeed.BoardAlignmentSpeed, 0),
+                            0
+                    )
+            );
+
+            Actions.runBlocking(new SleepAction(1));
+
+            robot.drive.setDrivePowers(new PoseVelocity2d(new Vector2d(0, 0), 0));
+        }
+
+        robot.arm.update();
+
+        Actions.runBlocking(
+                robot.drive
+                        .actionBuilder(robot.drive.pose, TrajectorySpeed.SLOW)
+                        .strafeTo(
+                                new Vector2d(
+                                        robot.drive.pose.position.x,
+                                        robot.drive.pose.position.y + alignmentOffset
+                                )
+                        )
+                        .build()
         );
 
         robot.claw.open();
 
-        Actions.runBlocking(
-                new SleepAction(0.5)
-        );
+        Actions.runBlocking(new SleepAction(0.5));
+
+        robot.arm.setRotation(ArmRotation.AutoDeliver);
+
+        Actions.runBlocking(new SleepAction(0.2));
 
         robot.arm.setRotation(ArmRotation.Down);
         robot.arm.setWristRotation(WristRotation.Down);
 
         Actions.runBlocking(
-                new SleepAction(1)
-        );
-
-        Actions.runBlocking(
-                robot.drive.actionBuilder(robot.drive.pose)
-                        .strafeToLinearHeading(new Vector2d(-36, FarLaneY * c), Math.toRadians(180))
-                        .strafeToLinearHeading(new Vector2d(-36, 68), Math.toRadians(180))
-                        .strafeToLinearHeading(new Vector2d(-36, 74), Math.toRadians(180), robot.drive.getSpeedConstraint(TrajectorySpeed.SLOW).velConstraint)
-                        .strafeToLinearHeading(new Vector2d(-60, 74), Math.toRadians(180))
-//                        .splineTo(new Vector2d(
-//                                leaveYellowSpot.position.x, leaveYellowSpot.position.y), leaveYellowSpot.heading
-//                        )
-//                        .strafeToLinearHeading(new Vector2d(
-//                                        leaveYellowSpot.position.x - 5, leaveYellowSpot.position.y + 5), leaveYellowSpot.heading,
-//                                robot.drive.getSpeedConstraint(TrajectorySpeed.SLOW).velConstraint
-//                        )
+                robot.drive
+                        .actionBuilder(robot.drive.pose)
+                        .lineToX(ParkX)
                         .build()
         );
-
-        robot.drive.pose = new Pose2d(robot.drive.pose.position.x, robot.drive.pose.position.y, Math.toRadians(180));
-
-        robot.claw.close();
-
-        Actions.runBlocking(
-                new SleepAction(0.5)
-        );
-
-        robot.arm.setRotation(ArmRotation.AutoHoldDown);
-
-        Actions.runBlocking(
-                robot.drive.actionBuilder(robot.drive.pose)
-                        .strafeToLinearHeading(new Vector2d(-36, FarLaneY * c), Math.toRadians(180))
-                        .strafeToLinearHeading(new Vector2d(34, FarLaneY * c), Math.toRadians(180))
-                        .build()
-        );
-
-        robot.arm.setRotation(ArmRotation.HighDeliver);
-        robot.arm.setWristRotation(WristRotation.HoldDown);
-
-        Actions.runBlocking(
-                robot.drive.actionBuilder(robot.drive.pose, TrajectorySpeed.FAST)
-                        .turn(90)
-                        .turn(-180)
-                        .turn(90)
-                        .turn(-90)
-                        .build()
-        );
-
-        robot.claw.open();
 
         telemetry.addLine("Auto Finished in " + Math.round(elapsedTime.seconds()) + " seconds");
         telemetry.update();
@@ -195,35 +310,24 @@ public abstract class AutoBase extends LinearOpMode {
                                         .strafeToLinearHeading(
                                                 new Vector2d(leftX, 38 * c),
                                                 Math.toRadians(startHeading + 45),
-                                                robot.drive.getSpeedConstraint(TrajectorySpeed.SLOW).velConstraint,
-                                                robot.drive.getSpeedConstraint(TrajectorySpeed.SLOW).accelConstraint
+                                                robot.drive.getSpeedConstraint(TrajectorySpeed.SLOW).velConstraint
                                         ).build(),
                                 robot.openNextClaw(),
                                 robot.drive.actionBuilder(new Pose2d(leftX, 38 * c, Math.toRadians(startHeading + 45)))
                                         .strafeToLinearHeading(
-                                                new Vector2d(c == 1 ? -36 : -40, 48 * c),
+                                                new Vector2d(-36, 48 * c),
                                                 Math.toRadians(startHeading + 45)
-                                        )
-                                        .turn(Math.toRadians(-45))
-                                        .strafeToLinearHeading(new Vector2d(
-                                                -50, FarLaneY * c), Math.toRadians(180)
                                         )
                                         .build(),
                                 robot.raiseArmForStack(),
-                                robot.drive.actionBuilder(new Pose2d(-50, FarLaneY * c, Math.toRadians(180)))
-                                        .strafeToLinearHeading(new Vector2d(
-                                                        -58, FarLaneY * c), Math.toRadians(175),
-                                                robot.drive.getSpeedConstraint(TrajectorySpeed.SLOW).velConstraint
+                                robot.drive.actionBuilder(new Pose2d(-36, 48 * c, Math.toRadians(startHeading + 45)))
+                                        .splineToLinearHeading(
+                                                new Pose2d(stack1.x, stack1.y * c, Math.toRadians(180)),
+                                                Math.toRadians(0)
                                         )
-                                        .strafeToLinearHeading(new Vector2d(
-                                                        -66, FarLaneY * c), Math.toRadians(175),
-                                                robot.drive.getSpeedConstraint(TrajectorySpeed.SLOW).velConstraint
-                                        )
-                                        .build(),
-                                robot.closeClaw()
+                                        .build()
                         )
                 );
-                robot.drive.pose = new Pose2d(robot.drive.pose.position.x, robot.drive.pose.position.y, Math.toRadians(180));
                 break;
             case CENTER:
                 Actions.runBlocking(

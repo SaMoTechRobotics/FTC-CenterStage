@@ -20,4 +20,6 @@ public class WristRotation {
 
     public static double Hang = 0.7;
     public static double HangLock = 1.0;
+
+    public static double AutoPickupStack = 0.9;
 }

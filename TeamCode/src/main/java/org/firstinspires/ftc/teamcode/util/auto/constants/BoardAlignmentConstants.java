@@ -7,5 +7,5 @@ public class BoardAlignmentConstants {
 
     public static double minDistanceFromBoard = 2.0;
 
-    public static double DistFromBoard = 17.0;
+    public static double DistFromBoard = 18.8;
 }

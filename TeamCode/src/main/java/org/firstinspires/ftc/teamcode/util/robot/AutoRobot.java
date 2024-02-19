@@ -35,7 +35,16 @@ public class AutoRobot {
 
     public Action raiseArmForStack() {
         return packet -> {
-            arm.setRotation(ArmRotation.Stack5);
+            arm.setRotation(ArmRotation.StackAuto);
+            return false;
+        };
+    }
+
+    public Action prepareForDelivery() {
+        return packet -> {
+            arm.setRotation(ArmRotation.AutoDeliver);
+            arm.setGlobalWristRotation(true);
+            arm.update();
             return false;
         };
     }

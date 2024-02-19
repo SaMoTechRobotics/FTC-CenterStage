@@ -199,7 +199,6 @@ public abstract class OldBaseAuto extends LinearOpMode {
                                         new Vector2d(c == 1 ? -40 : -36, 48 * c),
                                         Math.toRadians(outRot + 45)
                                 )
-                                //                                .lineToY(48 * c)
                                 .turn(Math.toRadians(-45))
                                 //                                .strafeToLinearHeading(new Vector2d(-36, CrossFieldY * c), Math.toRadians(outRot))
                                 .build()
