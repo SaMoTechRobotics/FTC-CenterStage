@@ -42,7 +42,7 @@ public class AutoRobot {
 
     public Action prepareForDelivery() {
         return packet -> {
-            arm.setRotation(ArmRotation.AutoDeliver);
+            arm.setRotation(ArmRotation.MidDeliver);
             arm.setGlobalWristRotation(true);
             arm.update();
             return false;

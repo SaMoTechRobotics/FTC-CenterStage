@@ -13,6 +13,8 @@ public class Arm {
 
     private boolean globalWristRotation = false;
 
+    private double boardAngle = WristRotation.TeleopBoardAngle;
+
     public Arm(HardwareMap hardwareMap) {
         armMotor = hardwareMap.get(DcMotor.class, "arm");
         armMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -102,10 +104,14 @@ public class Arm {
         if (rotation < ArmRotation.MaxPickup) {
             wristRotation = WristRotation.PickupComplementAngle - rotation;
         } else {
-            wristRotation = rotation - WristRotation.ArmComplementAngle;
+            wristRotation = rotation - boardAngle;
         }
         double wristPosition = degreesToWristPosition(wristRotation);
         wristServo.setPosition(wristPosition);
+    }
+
+    public void setBoardAngle(double angle) {
+        boardAngle = angle;
     }
 
     public boolean getGlobalWristRotationEnabled() {

@@ -13,8 +13,8 @@ public class ArmRotation {
     public static int MidDeliver = 145;
     public static int LowDeliver = 160;
 
-    public static int AutoDeliver = 155;
-    public static int AutoDeliverLow = 162;
+    public static int AutoDeliver = 160;
+    public static int AutoDeliverLow = 170;
 
     public static int DroneLaunch = 136;
 
@@ -35,7 +35,7 @@ public class ArmRotation {
     public static double Stack4 = 4;
     public static double Stack3 = 2;
 
-    public static double StackAuto = 12;
+    public static double StackAuto = 14;
     public static double StackDownAuto = 4;
 }
 

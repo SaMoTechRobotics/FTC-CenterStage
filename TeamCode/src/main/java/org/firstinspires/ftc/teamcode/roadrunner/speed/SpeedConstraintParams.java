@@ -22,7 +22,7 @@ public class SpeedConstraintParams {
      * @param minProfileAccel The minimum profile acceleration of the robot
      * @param maxProfileAccel The maximum profile acceleration of the robot
      */
-    public SpeedConstraintParams(double maxWheelVel, double angVel, double maxVel, double maxAccel, double maxAngVel, double maxAngAccel, double minProfileAccel, double maxProfileAccel) {
+    public SpeedConstraintParams(double maxWheelVel, double maxAngVel, double maxAngAccel, double minProfileAccel, double maxProfileAccel) {
         this.maxWheelVel = maxWheelVel;
         this.maxAngVel = maxAngVel;
         this.maxAngAccel = maxAngAccel;

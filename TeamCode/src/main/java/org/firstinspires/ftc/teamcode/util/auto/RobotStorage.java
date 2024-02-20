@@ -19,7 +19,7 @@ public class RobotStorage {
         if (color == AutoColor.BLUE) {
             x = side == AutoSide.NEAR ? FieldStartingPosition.BlueNearX : FieldStartingPosition.BlueFarX;
         } else {
-            x = side == AutoSide.NEAR ? FieldStartingPosition.RedFarX : FieldStartingPosition.RedNearX;
+            x = side == AutoSide.NEAR ? FieldStartingPosition.RedNearX : FieldStartingPosition.RedFarX;
         }
         double y = color == AutoColor.BLUE ? FieldStartingPosition.BlueY : FieldStartingPosition.RedY;
         double rot = color == AutoColor.BLUE ? FieldStartingPosition.BlueRot : FieldStartingPosition.RedRot;

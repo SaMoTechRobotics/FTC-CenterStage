@@ -11,6 +11,7 @@ import com.acmerobotics.roadrunner.ftc.*;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.hardware.*;
+import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.roadrunner.speed.SpeedConstraint;
 import org.firstinspires.ftc.teamcode.roadrunner.speed.SpeedConstraintParams;
@@ -40,15 +41,15 @@ public final class MecanumDrive {
         // Speed constraint parameters
 
         public SpeedConstraintParams defaultSpeeds = new SpeedConstraintParams(
-                80, Math.PI, 80, 60, 2 * Math.PI, 2 * Math.PI, -30, 60
+                50, 1 * Math.PI, 0.5 * Math.PI, -30, 40
         );
 
         public SpeedConstraintParams slowSpeeds = new SpeedConstraintParams(
-                10, Math.PI, 10, 30, Math.PI, Math.PI, -20, 30
+                10, Math.PI / 4, Math.PI / 2, -20, 20
         );
 
         public SpeedConstraintParams fastSpeeds = new SpeedConstraintParams(
-                100, 2 * Math.PI, 100, 100, 4 * Math.PI, 4 * Math.PI, -30, 100
+                100, 4 * Math.PI, 4 * Math.PI, -30, 70
         );
 
 
@@ -227,6 +228,15 @@ public final class MecanumDrive {
         leftBack.setPower(wheelVels.leftBack.get(0) / maxPowerMag);
         rightBack.setPower(wheelVels.rightBack.get(0) / maxPowerMag);
         rightFront.setPower(wheelVels.rightFront.get(0) / maxPowerMag);
+    }
+
+    public void setDrivePowersForSeconds(PoseVelocity2d powers, double seconds) {
+        ElapsedTime timer = new ElapsedTime();
+        while (timer.seconds() < seconds) {
+            setDrivePowers(powers);
+            updatePoseEstimate();
+        }
+        setDrivePowers(new PoseVelocity2d(new Vector2d(0, 0), 0));
     }
 
     public final class FollowTrajectoryAction implements Action {
