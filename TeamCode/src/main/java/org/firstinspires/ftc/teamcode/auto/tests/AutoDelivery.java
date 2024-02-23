@@ -32,7 +32,7 @@ public class AutoDelivery extends LinearOpMode {
 
     public static double xCoefficient = 0.01;
     public static double yCoefficient = 0.01;
-    public static double rotCoefficient = 0.01;
+    public static double rotCoefficient = 0.001;
 
     public static double yDist = 20.0;
 
@@ -64,9 +64,9 @@ public class AutoDelivery extends LinearOpMode {
 
             if (!autoPlace) {
                 robot.drive.setDrivePowers(new PoseVelocity2d(
-                        new Vector2d(ChassisSpeed.applyDeadZone(gamepad1.left_stick_y, ChassisSpeed.DriveDeadZone),
-                                ChassisSpeed.applyDeadZone(gamepad1.left_stick_x, ChassisSpeed.StrafeDeadZone)),
-                        ChassisSpeed.applyDeadZone(gamepad1.right_stick_x, ChassisSpeed.TurnDeadZone)
+                        new Vector2d(-ChassisSpeed.applyDeadZone(gamepad1.left_stick_y, ChassisSpeed.DriveDeadZone),
+                                -ChassisSpeed.applyDeadZone(gamepad1.left_stick_x, ChassisSpeed.StrafeDeadZone)),
+                        -ChassisSpeed.applyDeadZone(gamepad1.right_stick_x, ChassisSpeed.TurnDeadZone)
                 ));
 
                 if (gamepad1Buttons.wasJustPressed(GamepadButton.RIGHT_BUMPER)) {
@@ -101,13 +101,13 @@ public class AutoDelivery extends LinearOpMode {
 
             double targetY = pose.y - yDist;
 
-            double xPower = Math.abs(pose.x) > xMargin ? Math.max(Math.min(xCoefficient * pose.x, 0.1), 0.5) : 0;
-            double yPower = Math.abs(targetY) > yMargin ? Math.max(Math.min(yCoefficient * targetY, 0.1), 0.5) : 0;
-            double rotPower = Math.abs(pose.yaw) > rotMargin ? Math.max(Math.min(rotCoefficient * pose.yaw, 0.1), 0.5) : 0;
+            double xPower = Math.abs(pose.x) > xMargin ? xCoefficient * pose.x : 0;
+            double yPower = Math.abs(targetY) > yMargin ? yCoefficient * targetY : 0;
+            double rotPower = Math.abs(pose.yaw) > rotMargin ? rotCoefficient * pose.yaw : 0;
 
             robot.drive.setDrivePowers(new PoseVelocity2d(
-                    new Vector2d(xPower, yPower),
-                    rotPower
+                    new Vector2d(-xPower, -yPower),
+                    -rotPower
             ));
             return xPower == 0 && yPower == 0 && rotPower == 0;
         } else {

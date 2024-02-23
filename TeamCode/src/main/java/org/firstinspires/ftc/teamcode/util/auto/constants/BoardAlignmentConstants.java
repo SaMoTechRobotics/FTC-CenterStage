@@ -9,5 +9,5 @@ public class BoardAlignmentConstants {
 
     public static double DistFromBoard = 18.5;
 
-    public static double XOffset = -1.0;
+    public static double XOffset = -0.5;
 }
