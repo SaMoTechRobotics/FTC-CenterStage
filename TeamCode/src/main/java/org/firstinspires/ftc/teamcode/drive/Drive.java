@@ -127,6 +127,13 @@ public class Drive extends LinearOpMode {
                 robot.resetForIntake();
             }
 
+            if (!robot.pickUp) {
+                if (robot.arm.getRotation() < ArmRotation.HighWristMode) {
+                    robot.arm.setBoardAngle(Math.max(WristRotation.MaxHighBoardAngle - (ArmRotation.HighWristMode - robot.arm.getRotation()) * WristRotation.HighCoefficient, WristRotation.MinHighBoardAngle));
+                } else {
+                    robot.arm.setBoardAngle(WristRotation.DefaultBoardAngle);
+                }
+            }
 
             // Claw Controls (Gamepad 2)
 
@@ -182,9 +189,9 @@ public class Drive extends LinearOpMode {
             robot.update();
             if (robot.pickUp) {
                 robot.wristLevelingEnabled = true;
-                robot.claw.setFingerEnabled(false);
+//                robot.claw.setFingerEnabled(false);
             } else {
-                robot.claw.setFingerEnabled(!robot.claw.isOpen);
+//                robot.claw.setFingerEnabled(!robot.claw.isOpen);
             }
 
             // Telemetry

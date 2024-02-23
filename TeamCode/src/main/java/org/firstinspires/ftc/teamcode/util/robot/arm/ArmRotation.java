@@ -9,13 +9,15 @@ public class ArmRotation {
     public static int MaxPickup = 60;
     public static int MinDeliver = 50;
 
-    public static int HighDeliver = 130;
+    public static int HighDeliver = 135;
     public static int MidDeliver = 145;
     public static int LowDeliver = 160;
 
     public static int PrepAutoDeliver = 145;
-    public static int AutoDeliver = 156;
+    public static int AutoDeliver = 158;
     public static int AutoDeliverLow = 160;
+
+    public static double HighWristMode = 140;
 
     public static int DroneLaunch = 136;
 

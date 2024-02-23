@@ -13,7 +13,7 @@ public class Arm {
 
     private boolean globalWristRotation = false;
 
-    private double boardAngle = WristRotation.TeleopBoardAngle;
+    private double boardAngle = WristRotation.DefaultBoardAngle;
 
     public Arm(HardwareMap hardwareMap) {
         armMotor = hardwareMap.get(DcMotor.class, "arm");
