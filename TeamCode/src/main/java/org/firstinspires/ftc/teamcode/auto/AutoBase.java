@@ -443,6 +443,10 @@ public abstract class AutoBase extends LinearOpMode {
                 Actions.runBlocking(
                         new SequentialAction(
                                 robot.drive.actionBuilder(robot.drive.pose)
+                                        .strafeToLinearHeading(
+                                                new Vector2d(-36, 58 * c),
+                                                Math.toRadians(startHeading)
+                                        )
                                         .splineToSplineHeading(
                                                 new Pose2d(-36, 34 * c, Math.toRadians(startHeading)),
                                                 Math.toRadians(startHeading)
