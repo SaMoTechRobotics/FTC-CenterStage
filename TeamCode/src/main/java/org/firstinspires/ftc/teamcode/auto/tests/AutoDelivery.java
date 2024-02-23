@@ -99,8 +99,10 @@ public class AutoDelivery extends LinearOpMode {
             if (tag.isPresent()) pose = tag.get();
             lastPose = pose;
 
+            double targetY = pose.y - yDist;
+
             double xPower = Math.abs(pose.x) > xMargin ? Math.max(Math.min(xCoefficient * pose.x, 0.1), 0.5) : 0;
-            double yPower = Math.abs(pose.y) > yMargin ? Math.max(Math.min(yCoefficient * pose.y, 0.1), 0.5) : 0;
+            double yPower = Math.abs(targetY) > yMargin ? Math.max(Math.min(yCoefficient * targetY, 0.1), 0.5) : 0;
             double rotPower = Math.abs(pose.yaw) > rotMargin ? Math.max(Math.min(rotCoefficient * pose.yaw, 0.1), 0.5) : 0;
 
             robot.drive.setDrivePowers(new PoseVelocity2d(

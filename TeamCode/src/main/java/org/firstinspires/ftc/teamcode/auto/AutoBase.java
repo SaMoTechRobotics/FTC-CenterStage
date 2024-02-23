@@ -13,8 +13,8 @@ import org.firstinspires.ftc.teamcode.util.auto.RobotStorage;
 import org.firstinspires.ftc.teamcode.util.auto.constants.BoardAlignmentConstants;
 import org.firstinspires.ftc.teamcode.util.robot.AutoRobot;
 import org.firstinspires.ftc.teamcode.util.robot.arm.ArmRotation;
+import org.firstinspires.ftc.teamcode.util.robot.arm.ArmSpeed;
 import org.firstinspires.ftc.teamcode.util.robot.arm.WristRotation;
-import org.firstinspires.ftc.teamcode.util.robot.chassis.ChassisSpeed;
 import org.firstinspires.ftc.teamcode.util.vision.VisionProcessor;
 import org.firstinspires.ftc.vision.apriltag.AprilTagPoseFtc;
 
@@ -40,12 +40,12 @@ public abstract class AutoBase extends LinearOpMode {
     public static double FarLaneY = 14;
 
     // Right, Center, Left on blue side
-    public static double[] AlignmentOffsetsBLUE = new double[]{-5.5, 6.0, 6.0};
+    public static double[] AlignmentOffsetsBLUE = new double[]{-5.5, 6.0, 6.7};
     // Left Center Right on red side
     public static double[] AlignmentOffsetsRED = new double[]{5.5, -5.0, -4.5};
 
-    public static double WhiteAlignWithBoardTime = 2;
-    public static double AlignWithBoardTime = 2.0;
+    public static double WhiteAlignWithBoardTime = 1.5;
+    public static double AlignWithBoardTime = 2.5;
     public static double PushBoardTime = 0.5;
 
     public static double ParkX = 58;
@@ -125,7 +125,7 @@ public abstract class AutoBase extends LinearOpMode {
 
         robot.drive.setDrivePowersForSeconds(new PoseVelocity2d(
                 new Vector2d(0.35, 0), 0
-        ), 1.5);
+        ), 1);
 
         robot.drive.pose = new Pose2d(-65, robot.drive.pose.position.y, Math.toRadians(180));
 
@@ -224,10 +224,40 @@ public abstract class AutoBase extends LinearOpMode {
             }
         }
 
-        robot.arm.setRotation(ArmRotation.AutoDeliver);
+        robot.claw.setFingerEnabled(true);
+
+        robot.arm.setRotation(ArmRotation.PrepAutoDeliver);
         robot.arm.update();
 
-        boolean whiteAligned = alignWithAprilTag(BoardPosition.LEFT, WhiteAlignWithBoardTime);
+        BoardPosition whiteTag = COLOR == AutoColor.BLUE ? BoardPosition.RIGHT : BoardPosition.LEFT;
+
+        if (COLOR == AutoColor.BLUE) {
+            if (boardPosition == BoardPosition.RIGHT) {
+                whiteTag = BoardPosition.LEFT;
+            }
+        } else {
+            if (boardPosition == BoardPosition.LEFT) {
+                whiteTag = BoardPosition.RIGHT;
+            }
+        }
+
+        boolean whiteAligned = alignWithAprilTag(whiteTag, WhiteAlignWithBoardTime);
+
+
+        robot.arm.setRotation(ArmRotation.AutoDeliver, ArmSpeed.Mid);
+        robot.arm.update();
+
+        Actions.runBlocking(
+                robot.drive
+                        .actionBuilder(robot.drive.pose, TrajectorySpeed.SLOW)
+                        .strafeTo(
+                                new Vector2d(
+                                        robot.drive.pose.position.x + 2,
+                                        robot.drive.pose.position.y
+                                )
+                        )
+                        .build()
+        );
 
         robot.claw.openNext();
 
@@ -238,45 +268,46 @@ public abstract class AutoBase extends LinearOpMode {
                         .actionBuilder(robot.drive.pose, TrajectorySpeed.SLOW)
                         .strafeTo(
                                 new Vector2d(
-                                        robot.drive.pose.position.x - 4,
-                                        robot.drive.pose.position.y + (4 * c)
+                                        32,
+                                        robot.drive.pose.position.y + (8 * c)
                                 )
                         )
                         .build()
         );
 
-        robot.arm.setRotation(ArmRotation.AutoDeliverLow);
+        robot.arm.setRotation(ArmRotation.AutoDeliver);
         robot.arm.setBoardAngle(WristRotation.AutoBoardAngle);
+//        robot.arm.setBoardAngle(WristRotation.AutoBoardAngle);
         robot.arm.update();
 
-        boolean aligned = alignWithAprilTag(targetTag, AlignWithBoardTime);
-
-        if (!aligned) {
-            telemetry.addLine("ERROR: APRIL TAG CAMERA NOT WORKING!!!");
-            telemetry.update();
-
-            Actions.runBlocking(
-                    robot.drive.actionBuilder(robot.drive.pose)
-                            .strafeToLinearHeading(new Vector2d(38, 28 * c), Math.toRadians(180))
-                            .build()
-            );
-
-            robot.claw.openNext();
-
-            Actions.runBlocking(
-                    robot.drive.actionBuilder(robot.drive.pose)
-                            .strafeToLinearHeading(new Vector2d(30, 34 * c), Math.toRadians(180))
-                            .build()
-            );
-
-            robot.drive.setDrivePowersForSeconds(
-                    new PoseVelocity2d(
-                            new Vector2d(-ChassisSpeed.BoardAlignmentSpeed, 0),
-                            0
-                    ),
-                    1
-            );
-        }
+        boolean aligned = alignWithAprilTag(boardPosition, AlignWithBoardTime);
+//
+//        if (!aligned) {
+//            telemetry.addLine("ERROR: APRIL TAG CAMERA NOT WORKING!!!");
+//            telemetry.update();
+//
+//            Actions.runBlocking(
+//                    robot.drive.actionBuilder(robot.drive.pose)
+//                            .strafeToLinearHeading(new Vector2d(38, 28 * c), Math.toRadians(180))
+//                            .build()
+//            );
+//
+//            robot.claw.openNext();
+//
+//            Actions.runBlocking(
+//                    robot.drive.actionBuilder(robot.drive.pose)
+//                            .strafeToLinearHeading(new Vector2d(30, 34 * c), Math.toRadians(180))
+//                            .build()
+//            );
+//
+//            robot.drive.setDrivePowersForSeconds(
+//                    new PoseVelocity2d(
+//                            new Vector2d(-ChassisSpeed.BoardAlignmentSpeed, 0),
+//                            0
+//                    ),
+//                    1
+//            );
+//        }
 
         robot.arm.update();
 
@@ -287,12 +318,24 @@ public abstract class AutoBase extends LinearOpMode {
                         .actionBuilder(robot.drive.pose, TrajectorySpeed.SLOW)
                         .strafeTo(
                                 new Vector2d(
-                                        robot.drive.pose.position.x + 0.5,
-                                        alignedY + alignmentOffset
+                                        robot.drive.pose.position.x + 1,
+                                        alignedY
                                 )
                         )
                         .build()
         );
+
+//        Actions.runBlocking(
+//                robot.drive
+//                        .actionBuilder(robot.drive.pose, TrajectorySpeed.SLOW)
+//                        .strafeTo(
+//                                new Vector2d(
+//                                        robot.drive.pose.position.x + 0.5,
+//                                        alignedY + alignmentOffset
+//                                )
+//                        )
+//                        .build()
+//        );
 
         robot.claw.open();
 
@@ -302,6 +345,7 @@ public abstract class AutoBase extends LinearOpMode {
 
         Actions.runBlocking(new SleepAction(0.2));
 
+        robot.claw.setFingerEnabled(false);
         robot.arm.setRotation(ArmRotation.Down);
         robot.arm.setWristRotation(WristRotation.Down);
 
@@ -338,7 +382,7 @@ public abstract class AutoBase extends LinearOpMode {
     private void deliverSpikeMarkFar() {
         switch (boardPosition) {
             case LEFT:
-                double leftX = -36 + (COLOR == AutoColor.BLUE ? 7.5 : -6);
+                double leftX = -36 + (COLOR == AutoColor.BLUE ? 7 : -6);
                 Actions.runBlocking(
                         new SequentialAction(
                                 robot.drive.actionBuilder(robot.drive.pose)
@@ -355,7 +399,9 @@ public abstract class AutoBase extends LinearOpMode {
                                                 Math.toRadians(startHeading + 45),
                                                 robot.drive.getSpeedConstraint(TrajectorySpeed.SLOW).velConstraint
                                         ).build(),
+                                new SleepAction(0.2),
                                 robot.openNextClaw(),
+                                new SleepAction(0.2),
                                 robot.drive.actionBuilder(new Pose2d(leftX, 38 * c, Math.toRadians(startHeading + 45)))
                                         .strafeToLinearHeading(
                                                 new Vector2d(-36, 48 * c),
@@ -387,9 +433,12 @@ public abstract class AutoBase extends LinearOpMode {
                                         .strafeToLinearHeading(
                                                 new Vector2d(33, 32 * c),
                                                 Math.toRadians(startHeading + 45),
-                                                robot.drive.getSpeedConstraint(TrajectorySpeed.SLOW).velConstraint
+                                                robot.drive.getSpeedConstraint(TrajectorySpeed.SLOW).velConstraint,
+                                                robot.drive.getSpeedConstraint(TrajectorySpeed.SLOW).accelConstraint
                                         ).build(),
+                                new SleepAction(0.2),
                                 robot.openNextClaw(),
+                                new SleepAction(0.2),
                                 robot.drive.actionBuilder(new Pose2d(33, 32 * c, Math.toRadians(startHeading)))
                                         .strafeToLinearHeading(
                                                 new Vector2d(-34, 48 * c),
@@ -470,7 +519,7 @@ public abstract class AutoBase extends LinearOpMode {
                     Vector2d newPose = new Vector2d(
                             robot.drive.pose.position.x +
                                     (tpose.get().y - (BoardAlignmentConstants.DistFromBoard + 1)),
-                            robot.drive.pose.position.y - (tpose.get().x + margin)
+                            robot.drive.pose.position.y - (tpose.get().x + BoardAlignmentConstants.XOffset)
                     );
                     Rotation2d heading = robot.drive.pose.heading.plus(
                             Math.toRadians(tpose.get().yaw)
