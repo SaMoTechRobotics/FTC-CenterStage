@@ -45,7 +45,11 @@ public final class MecanumDrive {
         );
 
         public SpeedConstraintParams slowSpeeds = new SpeedConstraintParams(
-                8, Math.PI / 4, Math.PI / 2, -20, 10
+                15, Math.PI / 4, Math.PI / 2, -20, 20
+        );
+
+        public SpeedConstraintParams alignSpeeds = new SpeedConstraintParams(
+                15, Math.PI / 4, Math.PI / 2, -20, 15
         );
 
         public SpeedConstraintParams fastSpeeds = new SpeedConstraintParams(
@@ -99,6 +103,8 @@ public final class MecanumDrive {
     public final SpeedConstraint slowSpeedConstraint = PARAMS.slowSpeeds.getSpeedConstraint(kinematics);
 
     public final SpeedConstraint fastSpeedConstraint = PARAMS.fastSpeeds.getSpeedConstraint(kinematics);
+
+    public final SpeedConstraint alignSpeedConstraint = PARAMS.alignSpeeds.getSpeedConstraint(kinematics);
 
     private final TrajectorySpeed defaultTrajectorySpeed = TrajectorySpeed.NORMAL;
 
@@ -459,6 +465,9 @@ public final class MecanumDrive {
                 break;
             case FAST:
                 speedConstraint = fastSpeedConstraint;
+                break;
+            case ALIGN:
+                speedConstraint = alignSpeedConstraint;
                 break;
         }
         return new TrajectoryActionBuilder(

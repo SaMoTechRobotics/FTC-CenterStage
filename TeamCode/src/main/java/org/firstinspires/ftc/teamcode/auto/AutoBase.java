@@ -50,9 +50,9 @@ public abstract class AutoBase extends LinearOpMode {
 
     public static double ParkX = 58;
 
-    public static Vector2d stack1 = new Vector2d(-50, 39);
-    public static Vector2d blueStack = new Vector2d(-50, 38.6);
-    public static Vector2d redStack = new Vector2d(-50, 36);
+    public static double stackY = 38;
+    public static double blueStackY = 38.6;
+    public static double redStackY = 38;
 
     int c;
     double startHeading;
@@ -74,7 +74,7 @@ public abstract class AutoBase extends LinearOpMode {
 
         c = COLOR.value;
         startHeading = COLOR == AutoColor.BLUE ? 270 : 90;
-        stack1 = COLOR == AutoColor.BLUE ? blueStack : redStack;
+        stackY = COLOR == AutoColor.BLUE ? blueStackY : redStackY;
 
         while ((!isStarted() || !robot.vision.isReady()) && !isStopRequested()) {
             telemetry.addLine("Color: " + COLOR + " Side: " + SIDE);
@@ -119,19 +119,19 @@ public abstract class AutoBase extends LinearOpMode {
 
         Actions.runBlocking(
                 robot.drive.actionBuilder(robot.drive.pose, TrajectorySpeed.SLOW)
-                        .strafeToLinearHeading(new Vector2d(-62, stack1.y * c), Math.toRadians(180))
+                        .strafeToLinearHeading(new Vector2d(-62, stackY * c), Math.toRadians(180))
                         .build()
         );
 
         robot.drive.setDrivePowersForSeconds(new PoseVelocity2d(
                 new Vector2d(0.35, 0), 0
-        ), 1);
+        ), 0.6);
 
         robot.drive.pose = new Pose2d(-65, robot.drive.pose.position.y, Math.toRadians(180));
 
         Actions.runBlocking(
                 robot.drive.actionBuilder(robot.drive.pose, TrajectorySpeed.SLOW)
-                        .strafeToLinearHeading(new Vector2d(-63.5, stack1.y * c), Math.toRadians(180))
+                        .strafeToLinearHeading(new Vector2d(-63.5, stackY * c), Math.toRadians(180))
                         .build()
         );
 
@@ -140,7 +140,7 @@ public abstract class AutoBase extends LinearOpMode {
 
         Actions.runBlocking(
                 robot.drive.actionBuilder(robot.drive.pose, TrajectorySpeed.SLOW)
-                        .strafeToLinearHeading(new Vector2d(-65, stack1.y * c), Math.toRadians(180))
+                        .strafeToLinearHeading(new Vector2d(-65, stackY * c), Math.toRadians(180))
                         .build()
         );
 
@@ -255,13 +255,25 @@ public abstract class AutoBase extends LinearOpMode {
 
         Rotation2d goodHeading = robot.drive.pose.heading;
 
+        double yOffset = 0;
+
+        if (whiteTag == BoardPosition.LEFT) {
+            yOffset -= 2 * c;
+        } else if (whiteTag == BoardPosition.RIGHT) {
+            yOffset += 2 * c;
+        }
+
+        if (weirdPos) {
+            yOffset += 4 * c;
+        }
+
         Actions.runBlocking(
                 robot.drive
                         .actionBuilder(robot.drive.pose, TrajectorySpeed.SLOW)
                         .strafeToLinearHeading(
                                 new Vector2d(
                                         robot.drive.pose.position.x + 2,
-                                        robot.drive.pose.position.y - (boardPosition == BoardPosition.CENTER ? 0 * c : 0) + (weirdPos ? 4 * c : 0)
+                                        robot.drive.pose.position.y + yOffset
                                 ),
                                 goodHeading
                         )
@@ -435,7 +447,7 @@ public abstract class AutoBase extends LinearOpMode {
                                 robot.raiseArmForStack(),
                                 robot.drive.actionBuilder(new Pose2d(-36, 48 * c, Math.toRadians(startHeading + 45)))
                                         .splineToLinearHeading(
-                                                new Pose2d(stack1.x, stack1.y * c, Math.toRadians(180)),
+                                                new Pose2d(-50, stackY * c, Math.toRadians(180)),
                                                 Math.toRadians(0)
                                         )
                                         .build()
@@ -471,7 +483,7 @@ public abstract class AutoBase extends LinearOpMode {
                                 robot.raiseArmForStack(),
                                 robot.drive.actionBuilder(new Pose2d(-36, 48 * c, Math.toRadians(startHeading)))
                                         .splineToLinearHeading(
-                                                new Pose2d(stack1.x, stack1.y * c, Math.toRadians(180)),
+                                                new Pose2d(-50, stackY * c, Math.toRadians(180)),
                                                 Math.toRadians(0)
                                         )
                                         .build()
@@ -479,7 +491,7 @@ public abstract class AutoBase extends LinearOpMode {
                 );
                 break;
             case RIGHT:
-                double rightX = -36 - (COLOR == AutoColor.BLUE ? 6 : -7);
+                double rightX = -36 - (COLOR == AutoColor.BLUE ? 6 : -6);
                 double rightY = COLOR == AutoColor.BLUE ? 32 : 38;
                 Actions.runBlocking(
                         new SequentialAction(
@@ -509,13 +521,13 @@ public abstract class AutoBase extends LinearOpMode {
                                 robot.raiseArmForStack(),
                                 robot.drive.actionBuilder(new Pose2d(-36, 48 * c, Math.toRadians(startHeading - 45)))
                                         .splineToLinearHeading(
-                                                new Pose2d(stack1.x + 2, stack1.y * c, Math.toRadians(180)),
+                                                new Pose2d(-50 + 2, stackY * c, Math.toRadians(180)),
                                                 Math.toRadians(0)
                                         )
                                         .build(),
-                                robot.drive.actionBuilder(new Pose2d(stack1.x + 2, stack1.y * c, Math.toRadians(180)), TrajectorySpeed.SLOW)
+                                robot.drive.actionBuilder(new Pose2d(-50 + 2, stackY * c, Math.toRadians(180)), TrajectorySpeed.SLOW)
                                         .strafeToLinearHeading(
-                                                new Vector2d(stack1.x, stack1.y * c),
+                                                new Vector2d(-50, stackY * c),
                                                 Math.toRadians(180)
                                         )
                                         .build()
