@@ -37,6 +37,8 @@ public abstract class AutoBase extends LinearOpMode {
 
     BoardPosition boardPosition = BoardPosition.CENTER;
 
+    public static double Delay = 0.5;
+
     public static double FarLaneY = 14;
 
     // Right, Center, Left on blue side
@@ -44,7 +46,7 @@ public abstract class AutoBase extends LinearOpMode {
     // Left Center Right on red side
     public static double[] AlignmentOffsetsRED = new double[]{5.5, -5.0, -4.5};
 
-    public static double WhiteAlignWithBoardTime = 2;
+    public static double WhiteAlignWithBoardTime = 1.5;
     public static double AlignWithBoardTime = 2.5;
     public static double PushBoardTime = 0.5;
 
@@ -182,6 +184,7 @@ public abstract class AutoBase extends LinearOpMode {
                                 .strafeToLinearHeading(new Vector2d(strafeToFarLaneX, 36 * c), Math.toRadians(180))
                                 .strafeToLinearHeading(new Vector2d(strafeToFarLaneX, FarLaneY * c), Math.toRadians(180))
                                 .build(),
+                        new SleepAction(Delay),
                         robot.drive.actionBuilder(new Pose2d(strafeToFarLaneX, FarLaneY * c, Math.toRadians(180)), TrajectorySpeed.FAST)
                                 .strafeToLinearHeading(new Vector2d(30, FarLaneY * c), Math.toRadians(180))
                                 .build(),
