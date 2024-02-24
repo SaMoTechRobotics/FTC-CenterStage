@@ -10,4 +10,6 @@ public class BoardAlignmentConstants {
     public static double DistFromBoard = 18;
 
     public static double XOffset = 0;
+
+    public static double FindSpeed = 0.2;
 }

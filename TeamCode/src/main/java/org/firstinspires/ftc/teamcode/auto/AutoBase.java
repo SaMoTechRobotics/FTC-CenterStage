@@ -417,7 +417,7 @@ public abstract class AutoBase extends LinearOpMode {
 
         switch (boardPosition) {
             case LEFT:
-                double leftX = -36 + (COLOR == AutoColor.BLUE ? 7 : -6);
+                double leftX = -36 + (COLOR == AutoColor.BLUE ? 7 : -7);
                 double leftY = COLOR == AutoColor.BLUE ? 38 : 32;
                 Actions.runBlocking(
                         new SequentialAction(
@@ -574,6 +574,8 @@ public abstract class AutoBase extends LinearOpMode {
                                     .build()
                     );
                 }
+            } else {
+                robot.drive.setDrivePowers(new PoseVelocity2d(new Vector2d(0, -BoardAlignmentConstants.FindSpeed * c), 0));
             }
         }
         return aligned;
