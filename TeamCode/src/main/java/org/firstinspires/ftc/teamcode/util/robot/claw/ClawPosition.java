@@ -13,6 +13,6 @@ public class ClawPosition {
     public static double FingerIn = 1;
 
 
-    public static double DroneLock = 0.0;
-    public static double DroneRelease = 0.5;
+    public static double DroneLock = 1;
+    public static double DroneRelease = 0.6;
 }

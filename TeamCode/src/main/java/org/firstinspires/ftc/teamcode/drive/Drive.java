@@ -182,7 +182,7 @@ public class Drive extends LinearOpMode {
 
             // Drone Launcher Controls (Gamepad 1)
 
-            if (gamepad1.right_trigger > 0.1 && gamepad1.left_trigger > 0.1 && gamepad1Buttons.getButton(GamepadButton.RIGHT_BUMPER)) {
+            if (gamepad1.right_trigger > 0.1 && gamepad1.left_trigger > 0.1 && gamepad1Buttons.getButton(GamepadButton.RIGHT_BUMPER) && !robot.pickUp) {
                 robot.arm.launchDrone();
             }
 
