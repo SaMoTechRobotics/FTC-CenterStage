@@ -54,6 +54,8 @@ public class Drive extends LinearOpMode {
 
             // Drive Controls (Gamepad 1)
 
+            robot.chassis.enableHeading = !robot.pickUp;
+
             robot.chassis.setManualPower(
                     ChassisSpeed.applyDeadZone(gamepad1.left_stick_y, ChassisSpeed.DriveDeadZone),
                     ChassisSpeed.applyDeadZone(gamepad1.left_stick_x, ChassisSpeed.StrafeDeadZone),

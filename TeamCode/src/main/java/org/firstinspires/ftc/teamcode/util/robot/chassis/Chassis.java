@@ -15,6 +15,8 @@ import org.firstinspires.ftc.teamcode.util.auto.RobotStorage;
 public class Chassis {
     public static boolean headingFixEnabled = true;
 
+    public boolean enableHeading = false;
+
     private final MecanumDrive drive;
 
     private final IMU imu;
@@ -60,7 +62,7 @@ public class Chassis {
         }
 
         // If heading lock is enabled
-        if (headingFixEnabled && speed == ChassisSpeed.Min && lockHeading) {
+        if (headingFixEnabled && (speed == ChassisSpeed.Min || enableHeading) && lockHeading) {
 
             double headingError = getCurrentHeadingRadians() - startHeading; // The current heading from imu - the starting (target) heading
 
