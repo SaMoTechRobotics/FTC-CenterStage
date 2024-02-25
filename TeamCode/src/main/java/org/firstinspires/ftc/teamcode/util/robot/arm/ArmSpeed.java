@@ -9,6 +9,8 @@ public class ArmSpeed {
     public static double Mid = 0.6;
     public static double Min = 0.3;
 
+    public static double MinSlowingDown = 0.1;
+
     public static double RampSpeed = 0.01;
 
     public static double HoldSpeed = 0.5;

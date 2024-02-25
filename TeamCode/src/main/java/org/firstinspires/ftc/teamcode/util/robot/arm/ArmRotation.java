@@ -24,6 +24,8 @@ public class ArmRotation {
     public static int HoldDown = 10;
     public static int AutoHoldDown = 5;
 
+    public static double RampUpAngle = 90;
+
     public static int Down = 0;
 
     public static int BackDown = 170;

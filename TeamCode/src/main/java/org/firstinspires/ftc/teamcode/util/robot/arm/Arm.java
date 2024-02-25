@@ -14,6 +14,8 @@ public class Arm {
 
     private boolean globalWristRotation = false;
 
+    private int startingRotation = 0;
+
     private double boardAngle = WristRotation.DefaultBoardAngle;
 
     public Arm(HardwareMap hardwareMap) {
@@ -32,6 +34,8 @@ public class Arm {
 
     public void update() {
         if (globalWristRotation) updateGlobalWristRotation();
+
+        updateSpeed();
     }
 
     public void launchDrone() {
@@ -72,8 +76,26 @@ public class Arm {
         }
     }
 
+    public void updateSpeed() {
+        if (armMotors.getMode() != DcMotor.RunMode.RUN_TO_POSITION) return;
+        double conversion = (90.0 / ArmRotation.TicksAt90Degrees);
+        double current = armMotors.getCurrentPosition() * conversion;
+        double target = armMotors.getTargetPosition() * conversion;
+        // make it get to max speed in ArmRotation.RampUpAngle degrees and then go down when at target - ArmRotation.RampUpAngle
+        double diffToTarget = Math.abs(target - current);
+        double diffToStart = Math.abs(current - startingRotation);
+//        if (diffToStart < ArmRotation.RampUpAngle) {
+//            armMotors.setPower((ArmSpeed.Max - ArmSpeed.Min) * (diffToStart / ArmRotation.RampUpAngle) + ArmSpeed.Min);
+        if (diffToTarget < ArmRotation.RampUpAngle) {
+            armMotors.setPower((ArmSpeed.Max - ArmSpeed.MinSlowingDown) * (diffToTarget / ArmRotation.RampUpAngle) + ArmSpeed.MinSlowingDown);
+        } else {
+            armMotors.setPower(ArmSpeed.Max);
+        }
+    }
+
     public void setRotation(double degrees) {
         armMotors.setTargetPosition(degreesToArmTicks(degrees));
+        startingRotation = armMotors.getCurrentPosition();
         armMotors.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         double diff = Math.abs(degrees - armMotors.getCurrentPosition() * 90.0 / ArmRotation.TicksAt90Degrees);
         if (diff < 15) {
