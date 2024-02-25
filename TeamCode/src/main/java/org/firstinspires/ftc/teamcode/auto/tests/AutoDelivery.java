@@ -9,6 +9,7 @@ import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import org.firstinspires.ftc.teamcode.util.auto.BoardPosition;
+import org.firstinspires.ftc.teamcode.util.auto.constants.BoardAlignmentConstants;
 import org.firstinspires.ftc.teamcode.util.lib.GamepadButton;
 import org.firstinspires.ftc.teamcode.util.lib.StatefulGamepad;
 import org.firstinspires.ftc.teamcode.util.robot.AutoRobot;
@@ -112,7 +113,7 @@ public class AutoDelivery extends LinearOpMode {
             return xPower == 0 && yPower == 0 && rotPower == 0;
         } else {
             robot.drive.setDrivePowers(new PoseVelocity2d(
-                    new Vector2d(0, 0.5),
+                    new Vector2d(0, BoardAlignmentConstants.FindSpeed),
                     0
             ));
         }

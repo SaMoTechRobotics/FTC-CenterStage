@@ -22,6 +22,9 @@ public class Vision {
     private final WebcamName frontCamera;
     private final WebcamName backCamera;
 
+    public static int AprilTagCameraWidth = 640;
+    public static int AprilTagCameraHeight = 480;
+
     public VisionPortal visionPortal = null;
     public VisionPortal visionPortal2 = null;
     SpikeLocationDetectionProcessor spikeMarkDetectionProcessor = null;
@@ -37,6 +40,12 @@ public class Vision {
     public void startProcessor(VisionProcessor processingMode) {
         VisionPortal.Builder builder = new VisionPortal.Builder();
         builder.setCameraResolution(new Size(1280, 720));
+//        if (processingMode == VisionProcessor.APRIL_TAG_DETECTION) {
+//            builder.setStreamFormat(VisionPortal.StreamFormat.MJPEG);
+//            builder.setCameraResolution(new Size(AprilTagCameraWidth, AprilTagCameraHeight));
+//        }
+//        builder.setAutoStopLiveView(true);
+//        builder.enableLiveView(false);
         switch (processingMode) {
             case SPIKE_LOCATION_DETECTION:
                 builder.setCamera(frontCamera);
