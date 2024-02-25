@@ -10,8 +10,8 @@ public class ArmRotation {
     public static int MinDeliver = 50;
 
     public static int HighDeliver = 135;
-    public static int MidDeliver = 145;
-    public static int LowDeliver = 160;
+    public static int MidDeliver = 140;
+    public static int LowDeliver = 155;
 
     public static int PrepAutoDeliver = 145;
     public static int AutoDeliver = 155;

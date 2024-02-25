@@ -15,8 +15,8 @@ public class ArmSpeed {
 
     public static double HoldSpeed = 0.5;
 
-    public static double DeliverSpeed = 0.8;
-    public static double SlowDeliverSpeed = 0.15;
+    public static double DeliverSpeed = 0.3;
+    public static double SlowDeliverSpeed = 0.08;
 
     public static double PickupSpeed = 0.3;
     public static double SlowPickupSpeed = 0.05;
