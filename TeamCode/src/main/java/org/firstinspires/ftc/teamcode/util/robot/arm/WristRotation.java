@@ -24,7 +24,7 @@ public class WristRotation {
     public static double PickupBack = 0.3;
 
     public static double Hang = 0.7;
-    public static double HangLock = 1.0;
+    public static double HangLock = 0.95;
 
     public static double AutoPickupStack = 0.9;
 }

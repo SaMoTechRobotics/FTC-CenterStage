@@ -4,10 +4,11 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.teamcode.util.lib.MotorsSyncManager;
 import org.firstinspires.ftc.teamcode.util.robot.claw.ClawPosition;
 
 public class Arm {
-    private final DcMotor armMotor;
+    private final MotorsSyncManager armMotors;
     private final Servo wristServo;
     private final Servo droneServo;
 
@@ -16,14 +17,17 @@ public class Arm {
     private double boardAngle = WristRotation.DefaultBoardAngle;
 
     public Arm(HardwareMap hardwareMap) {
-        armMotor = hardwareMap.get(DcMotor.class, "arm");
-        armMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        armMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        DcMotor motor = hardwareMap.get(DcMotor.class, "arm0");
+        DcMotor motor2 = hardwareMap.get(DcMotor.class, "arm1");
+        armMotors = new MotorsSyncManager(motor, motor2);
+        armMotors.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        armMotors.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
         wristServo = hardwareMap.get(Servo.class, "wrist");
         droneServo = hardwareMap.get(Servo.class, "drone");
+
         setWristRotation(WristRotation.Down);
         droneServo.setPosition(ClawPosition.DroneLock);
-
     }
 
     public void update() {
@@ -39,11 +43,11 @@ public class Arm {
     }
 
     public double getRotation() {
-        return armMotor.getCurrentPosition() * (90.0 / ArmRotation.TicksAt90Degrees);
+        return armMotors.getCurrentPosition() * (90.0 / ArmRotation.TicksAt90Degrees);
     }
 
     public double getArmTicks() {
-        return armMotor.getCurrentPosition();
+        return armMotors.getCurrentPosition();
     }
 
     public double getWristRotation() {
@@ -61,35 +65,35 @@ public class Arm {
     }
 
     public void holdRotation() {
-        if (armMotor.getMode() == DcMotor.RunMode.RUN_USING_ENCODER) {
-            armMotor.setTargetPosition(armMotor.getCurrentPosition());
-            armMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            armMotor.setPower(ArmSpeed.HoldSpeed);
+        if (armMotors.getMode() == DcMotor.RunMode.RUN_USING_ENCODER) {
+            armMotors.setTargetPosition(armMotors.getCurrentPosition());
+            armMotors.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            armMotors.setPower(ArmSpeed.HoldSpeed);
         }
     }
 
     public void setRotation(double degrees) {
-        armMotor.setTargetPosition(degreesToArmTicks(degrees));
-        armMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        double diff = Math.abs(degrees - armMotor.getCurrentPosition() * 90.0 / ArmRotation.TicksAt90Degrees);
+        armMotors.setTargetPosition(degreesToArmTicks(degrees));
+        armMotors.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        double diff = Math.abs(degrees - armMotors.getCurrentPosition() * 90.0 / ArmRotation.TicksAt90Degrees);
         if (diff < 15) {
-            armMotor.setPower(ArmSpeed.Min);
+            armMotors.setPower(ArmSpeed.Min);
         } else if (diff < 45) {
-            armMotor.setPower(ArmSpeed.Mid);
+            armMotors.setPower(ArmSpeed.Mid);
         } else {
-            armMotor.setPower(ArmSpeed.Max);
+            armMotors.setPower(ArmSpeed.Max);
         }
     }
 
     public void setRotation(double degrees, double speed) {
-        armMotor.setTargetPosition(degreesToArmTicks(degrees));
-        armMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        armMotor.setPower(speed);
+        armMotors.setTargetPosition(degreesToArmTicks(degrees));
+        armMotors.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        armMotors.setPower(speed);
     }
 
     public void manualRotation(double power) {
-        armMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        armMotor.setPower(power);
+        armMotors.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        armMotors.setPower(power);
     }
 
     public void setGlobalWristRotation(boolean value) {
@@ -97,8 +101,8 @@ public class Arm {
     }
 
     public void updateGlobalWristRotation() {
-        int ticks = armMotor.getCurrentPosition();
-        if (armMotor.getMode() == DcMotor.RunMode.RUN_TO_POSITION) ticks = armMotor.getTargetPosition();
+        int ticks = armMotors.getCurrentPosition();
+        if (armMotors.getMode() == DcMotor.RunMode.RUN_TO_POSITION) ticks = armMotors.getTargetPosition();
         double rotation = ticks * (90.0 / ArmRotation.TicksAt90Degrees);
         double wristRotation;
         if (rotation < ArmRotation.MaxPickup) {
@@ -125,13 +129,13 @@ public class Arm {
 
     public void setHangingLock(boolean lock) {
         if (lock) {
-            armMotor.setTargetPosition(degreesToArmTicks(ArmRotation.HangingLock));
-            armMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            armMotors.setTargetPosition(degreesToArmTicks(ArmRotation.HangingLock));
+            armMotors.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             wristServo.setPosition(WristRotation.HangLock);
-            armMotor.setPower(ArmSpeed.Max);
+            armMotors.setPower(ArmSpeed.Max);
         } else {
-            armMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            armMotor.setPower(0);
+            armMotors.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            armMotors.setPower(0);
         }
     }
 
