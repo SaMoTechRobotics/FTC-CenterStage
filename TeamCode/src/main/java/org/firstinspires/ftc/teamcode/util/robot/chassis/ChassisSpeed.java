@@ -16,7 +16,7 @@ public class ChassisSpeed {
             0.5
     );
     public static PoseVelocity2d Min = new PoseVelocity2d(
-            new Vector2d(0.2, 0.2),
+            new Vector2d(0.3, 0.3),
             0.25
     );
 
