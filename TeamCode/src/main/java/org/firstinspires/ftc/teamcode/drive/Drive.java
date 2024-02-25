@@ -163,6 +163,7 @@ public class Drive extends LinearOpMode {
                     robot.claw.open();
                 } else {
                     robot.claw.openNext();
+                    robot.arm.setRotation(robot.arm.getRotation() - ArmRotation.UpAfterDrop);
                 }
             }
 
@@ -182,7 +183,7 @@ public class Drive extends LinearOpMode {
                 robot.arm.setWristRotation(WristRotation.PickupBack);
                 robot.arm.setRotation(ArmRotation.BackDown, ArmSpeed.DeliverSpeed);
             }
-            
+
 //            else if (gamepad2Buttons.wasJustPressed(GamepadButton.X)) {
 //                robot.wristLevelingEnabled = true;
 //                robot.arm.setRotation(ArmRotation.LowDeliver);

@@ -6,6 +6,8 @@ import com.acmerobotics.dashboard.config.Config;
 public class ArmRotation {
     public static int TicksAt90Degrees = -740;
 
+    public static int UpAfterDrop = 6;
+
     public static int MaxPickup = 60;
     public static int MinDeliver = 50;
 
