@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.auto;
+package org.firstinspires.ftc.teamcode.auto.old;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.*;
