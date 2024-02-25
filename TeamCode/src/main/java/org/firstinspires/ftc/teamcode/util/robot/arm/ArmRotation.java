@@ -13,7 +13,7 @@ public class ArmRotation {
 
     public static int HighDeliver = 135;
     public static int MidDeliver = 140;
-    public static int LowDeliver = 155;
+    public static int LowDeliver = 150;
 
     public static int PrepAutoDeliver = 145;
     public static int AutoDeliver = 155;
@@ -30,7 +30,7 @@ public class ArmRotation {
 
     public static int Down = 0;
 
-    public static int BackDown = 170;
+    public static int BackDown = 165;
 
     public static int Hang = 90;
     public static int HangingLock = 10;

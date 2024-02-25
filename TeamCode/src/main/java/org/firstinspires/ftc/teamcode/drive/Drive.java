@@ -54,7 +54,7 @@ public class Drive extends LinearOpMode {
 
             // Drive Controls (Gamepad 1)
 
-            robot.chassis.enableHeading = !robot.pickUp;
+            robot.chassis.enableHeading = robot.arm.getRotation() > ArmRotation.Hang + 1;
 
             robot.chassis.setManualPower(
                     ChassisSpeed.applyDeadZone(gamepad1.left_stick_y, ChassisSpeed.DriveDeadZone),
@@ -163,7 +163,9 @@ public class Drive extends LinearOpMode {
                     robot.claw.open();
                 } else {
                     robot.claw.openNext();
-                    robot.arm.setRotation(robot.arm.getRotation() - ArmRotation.UpAfterDrop);
+                    if (gamepad2.right_trigger < 0.1) {
+                        robot.arm.setRotation(robot.arm.getRotation() - ArmRotation.UpAfterDrop);
+                    }
                 }
             }
 
