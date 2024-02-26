@@ -27,13 +27,17 @@ public class AutoDelivery extends LinearOpMode {
 
     public static BoardPosition Side = BoardPosition.CENTER;
 
-    public static double xMargin = 1.0;
-    public static double yMargin = 1.0;
-    public static double rotMargin = 1.0;
+    public static double xMargin = 0.5;
+    public static double yMargin = 0.5;
+    public static double rotMargin = 0.5;
 
-    public static double xCoefficient = 0.01;
-    public static double yCoefficient = 0.01;
-    public static double rotCoefficient = 0.001;
+    public static double xMax = 0.2;
+    public static double yMax = 0.2;
+    public static double rotMax = 0.2;
+
+    public static double xCoefficient = 0.05;
+    public static double yCoefficient = -0.05;
+    public static double rotCoefficient = 0.01;
 
     public static double yDist = 20.0;
 
@@ -107,8 +111,8 @@ public class AutoDelivery extends LinearOpMode {
             double rotPower = Math.abs(pose.yaw) > rotMargin ? rotCoefficient * pose.yaw : 0;
 
             robot.drive.setDrivePowers(new PoseVelocity2d(
-                    new Vector2d(-xPower, -yPower),
-                    -rotPower
+                    new Vector2d(clamp(yPower, yMax), clamp(xPower, xMax)),
+                    clamp(rotPower, xMax)
             ));
             return xPower == 0 && yPower == 0 && rotPower == 0;
         } else {
@@ -118,5 +122,9 @@ public class AutoDelivery extends LinearOpMode {
             ));
         }
         return false;
+    }
+
+    private double clamp(double n, double m) {
+        return (Math.abs(n) / n) * Math.min(Math.abs(n), m);
     }
 }
