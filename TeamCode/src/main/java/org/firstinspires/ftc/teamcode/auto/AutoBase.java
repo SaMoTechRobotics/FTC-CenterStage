@@ -36,6 +36,26 @@ public abstract class AutoBase extends LinearOpMode {
 
     BoardPosition boardPosition = BoardPosition.CENTER;
 
+    private static class Timings {
+        public static double Delay = 0.5;
+
+        public static double WhiteAlignWithBoardTime = 1.5;
+        public static double AlignWithBoardTime = 2.5;
+
+        public static double PushBoardParked = 2;
+    }
+
+    public static Timings TRAJECTORY_SPEEDS = new Timings();
+
+    public static class Locations {
+        public static double FarLaneY = 14;
+
+        public static double blueStackY = 38.6;
+        public static double redStackY = 38;
+    }
+
+//    public static Locations LOCATIONS = new Locations();
+
     public static double Delay = 0.5;
 
     public static double FarLaneY = 14;
@@ -51,12 +71,26 @@ public abstract class AutoBase extends LinearOpMode {
 
     public static double ParkX = 58;
 
-    public static double stackY = 38;
-    public static double blueStackY = 38.6;
-    public static double redStackY = 38;
 
+    /**
+     * This is to flip the sign of the y coordinate based on the color
+     * Can be used like this:
+     *
+     * @implNote new Vector2d(30, 36 * c)
+     */
     int c;
+
+    /**
+     * This is to use for the starting heading, facing away from the wall but flipped based on the color
+     *
+     * @implNote Math.toRadians(startHeading)
+     */
     double startHeading;
+
+    /**
+     * Pretty self-explanatory, is blue?
+     */
+    boolean isBlue;
 
     @Override
     public void runOpMode() {
@@ -72,7 +106,7 @@ public abstract class AutoBase extends LinearOpMode {
 
         c = COLOR.value;
         startHeading = COLOR == AutoColor.BLUE ? 270 : 90;
-        stackY = COLOR == AutoColor.BLUE ? blueStackY : redStackY;
+        isBlue = COLOR == AutoColor.BLUE;
 
         while ((!isStarted() || !robot.vision.isReady()) && !isStopRequested()) {
             telemetry.addLine("Color: " + COLOR + " Side: " + SIDE);
@@ -111,14 +145,289 @@ public abstract class AutoBase extends LinearOpMode {
 
         if (SIDE == AutoSide.FAR) {
             deliverSpikeMarkFar();
+
+            pickUpFromWhiteStack();
+
+            // Switch to April Tag detection
+            robot.vision.startProcessor(VisionProcessor.APRIL_TAG_DETECTION);
+            robot.vision.setActiveCamera(VisionProcessor.APRIL_TAG_DETECTION);
+
+            deliverToBoardFromFar();
         } else {
             deliverSpikeMarkNear();
         }
 
-        // Pickup from white stack
+        String log = "Auto Finished in " + Math.round(elapsedTime.seconds() * 1000) / 1000 + " seconds";
+        telemetry.addLine(log);
+        telemetry.update();
 
+        saveToLog(log);
+        saveToLog("Color: " + COLOR + " Side: " + SIDE);
+        saveToLog("Board Position: " + boardPosition.toString());
+        saveToLog("End Pose: " + robot.drive.pose.toString());
+
+        if (SIDE == AutoSide.FAR) {
+            pushBoardWhileParked();
+        }
+
+        while (opModeIsActive() && !isStopRequested()) {
+            idle();
+        }
+    }
+
+    private void deliverSpikeMarkFar() {
+        double stackY = isBlue ? Locations.blueStackY : Locations.redStackY;
+
+        switch (boardPosition) {
+            case INNER:
+                double leftX = -36 + (COLOR == AutoColor.BLUE ? 7 : -7);
+                double leftY = COLOR == AutoColor.BLUE ? 38 : 32;
+                Actions.runBlocking(
+                        new SequentialAction(
+                                robot.drive.actionBuilder(robot.drive.pose)
+                                        .strafeToLinearHeading(
+                                                new Vector2d(-36, 54 * c),
+                                                Math.toRadians(startHeading)
+                                        )
+                                        .splineToSplineHeading(
+                                                new Pose2d(leftX, (leftY + 2) * c, Math.toRadians(startHeading + 45)),
+                                                Math.toRadians(startHeading + 45)
+                                        )
+                                        .strafeToLinearHeading(
+                                                new Vector2d(leftX, leftY * c),
+                                                Math.toRadians(startHeading + 45),
+                                                robot.drive.getSpeedConstraint(TrajectorySpeed.SLOW).velConstraint
+                                        ).build(),
+                                new SleepAction(0.2),
+                                robot.openNextClaw(),
+                                new SleepAction(0.2),
+                                robot.drive.actionBuilder(new Pose2d(leftX, leftY * c, Math.toRadians(startHeading + 45)))
+                                        .strafeToLinearHeading(
+                                                new Vector2d(-36, 48 * c),
+                                                Math.toRadians(startHeading + 45)
+                                        )
+                                        .build(),
+                                robot.raiseArmForStack(),
+                                robot.drive.actionBuilder(new Pose2d(-36, 48 * c, Math.toRadians(startHeading + 45)))
+                                        .splineToLinearHeading(
+                                                new Pose2d(-50, stackY * c, Math.toRadians(180)),
+                                                Math.toRadians(0)
+                                        )
+                                        .build()
+                        )
+                );
+                break;
+            case CENTER:
+                Actions.runBlocking(
+                        new SequentialAction(
+                                robot.drive.actionBuilder(robot.drive.pose)
+                                        .strafeToLinearHeading(
+                                                new Vector2d(-36, 58 * c),
+                                                Math.toRadians(startHeading)
+                                        )
+                                        .splineToSplineHeading(
+                                                new Pose2d(-36, 34 * c, Math.toRadians(startHeading)),
+                                                Math.toRadians(startHeading)
+                                        )
+                                        .strafeToLinearHeading(
+                                                new Vector2d(-36, 32 * c),
+                                                Math.toRadians(startHeading),
+                                                robot.drive.getSpeedConstraint(TrajectorySpeed.SLOW).velConstraint
+                                        ).build(),
+                                new SleepAction(0.2),
+                                robot.openNextClaw(),
+                                new SleepAction(0.2),
+                                robot.drive.actionBuilder(new Pose2d(-36, 32 * c, Math.toRadians(startHeading)))
+                                        .strafeToLinearHeading(
+                                                new Vector2d(-36, 48 * c),
+                                                Math.toRadians(startHeading)
+                                        )
+                                        .build(),
+                                robot.raiseArmForStack(),
+                                robot.drive.actionBuilder(new Pose2d(-36, 48 * c, Math.toRadians(startHeading)))
+                                        .splineToLinearHeading(
+                                                new Pose2d(-50, stackY * c, Math.toRadians(180)),
+                                                Math.toRadians(0)
+                                        )
+                                        .build()
+                        )
+                );
+                break;
+            case OUTER:
+                double rightX = -36 - (COLOR == AutoColor.BLUE ? 6 : -6);
+                double rightY = COLOR == AutoColor.BLUE ? 32 : 38;
+                Actions.runBlocking(
+                        new SequentialAction(
+                                robot.drive.actionBuilder(robot.drive.pose)
+                                        .strafeToLinearHeading(
+                                                new Vector2d(c == 1 ? -36 : -38, 54 * c),
+                                                Math.toRadians(startHeading)
+                                        )
+                                        .splineToSplineHeading(
+                                                new Pose2d(rightX, (rightY + 2) * c, Math.toRadians(startHeading - 45)),
+                                                Math.toRadians(startHeading - 45)
+                                        )
+                                        .strafeToLinearHeading(
+                                                new Vector2d(rightX, rightY * c),
+                                                Math.toRadians(startHeading - 45),
+                                                robot.drive.getSpeedConstraint(TrajectorySpeed.SLOW).velConstraint
+                                        ).build(),
+                                new SleepAction(0.2),
+                                robot.openNextClaw(),
+                                new SleepAction(0.2),
+                                robot.drive.actionBuilder(new Pose2d(rightX, rightY * c, Math.toRadians(startHeading - 45)))
+                                        .strafeToLinearHeading(
+                                                new Vector2d(-36, 48 * c),
+                                                Math.toRadians(startHeading - 45)
+                                        )
+                                        .build(),
+                                robot.raiseArmForStack(),
+                                robot.drive.actionBuilder(new Pose2d(-36, 48 * c, Math.toRadians(startHeading - 45)))
+                                        .splineToLinearHeading(
+                                                new Pose2d(-50 + 2, stackY * c, Math.toRadians(180)),
+                                                Math.toRadians(0)
+                                        )
+                                        .build(),
+                                robot.drive.actionBuilder(new Pose2d(-50 + 2, stackY * c, Math.toRadians(180)), TrajectorySpeed.SLOW)
+                                        .strafeToLinearHeading(
+                                                new Vector2d(-50, stackY * c),
+                                                Math.toRadians(180)
+                                        )
+                                        .build()
+                        )
+                );
+                break;
+        }
+    }
+
+    private void deliverSpikeMarkNear() {
+        switch (boardPosition) {
+            case INNER:
+                double leftX = -36 + (COLOR == AutoColor.BLUE ? 7 : -7);
+                double leftY = COLOR == AutoColor.BLUE ? 38 : 32;
+                Actions.runBlocking(
+                        new SequentialAction(
+                                robot.drive.actionBuilder(robot.drive.pose)
+                                        .strafeToLinearHeading(
+                                                new Vector2d(-36, 54 * c),
+                                                Math.toRadians(startHeading)
+                                        )
+                                        .splineToSplineHeading(
+                                                new Pose2d(leftX, (leftY + 2) * c, Math.toRadians(startHeading + 45)),
+                                                Math.toRadians(startHeading + 45)
+                                        )
+                                        .strafeToLinearHeading(
+                                                new Vector2d(leftX, leftY * c),
+                                                Math.toRadians(startHeading + 45),
+                                                robot.drive.getSpeedConstraint(TrajectorySpeed.SLOW).velConstraint
+                                        ).build(),
+                                new SleepAction(0.2),
+                                robot.openNextClaw(),
+                                new SleepAction(0.2),
+                                robot.drive.actionBuilder(new Pose2d(leftX, leftY * c, Math.toRadians(startHeading + 45)))
+                                        .strafeToLinearHeading(
+                                                new Vector2d(-36, 48 * c),
+                                                Math.toRadians(startHeading + 45)
+                                        )
+                                        .build(),
+                                robot.raiseArmForStack(),
+                                robot.drive.actionBuilder(new Pose2d(-36, 48 * c, Math.toRadians(startHeading + 45)))
+                                        .splineToLinearHeading(
+                                                new Pose2d(-50, 36 * c, Math.toRadians(180)),
+                                                Math.toRadians(0)
+                                        )
+                                        .build()
+                        )
+                );
+                break;
+            case CENTER:
+                Actions.runBlocking(
+                        new SequentialAction(
+                                robot.drive.actionBuilder(robot.drive.pose)
+                                        .strafeToLinearHeading(
+                                                new Vector2d(-36, 58 * c),
+                                                Math.toRadians(startHeading)
+                                        )
+                                        .splineToSplineHeading(
+                                                new Pose2d(-36, 34 * c, Math.toRadians(startHeading)),
+                                                Math.toRadians(startHeading)
+                                        )
+                                        .strafeToLinearHeading(
+                                                new Vector2d(-36, 32 * c),
+                                                Math.toRadians(startHeading),
+                                                robot.drive.getSpeedConstraint(TrajectorySpeed.SLOW).velConstraint
+                                        ).build(),
+                                new SleepAction(0.2),
+                                robot.openNextClaw(),
+                                new SleepAction(0.2),
+                                robot.drive.actionBuilder(new Pose2d(-36, 32 * c, Math.toRadians(startHeading)))
+                                        .strafeToLinearHeading(
+                                                new Vector2d(-36, 48 * c),
+                                                Math.toRadians(startHeading)
+                                        )
+                                        .build(),
+                                robot.raiseArmForStack(),
+                                robot.drive.actionBuilder(new Pose2d(-36, 48 * c, Math.toRadians(startHeading)))
+                                        .splineToLinearHeading(
+                                                new Pose2d(-50, 36 * c, Math.toRadians(180)),
+                                                Math.toRadians(0)
+                                        )
+                                        .build()
+                        )
+                );
+                break;
+            case OUTER:
+                double rightX = -36 - (COLOR == AutoColor.BLUE ? 6 : -6);
+                double rightY = COLOR == AutoColor.BLUE ? 32 : 38;
+                Actions.runBlocking(
+                        new SequentialAction(
+                                robot.drive.actionBuilder(robot.drive.pose)
+                                        .strafeToLinearHeading(
+                                                new Vector2d(c == 1 ? -36 : -38, 54 * c),
+                                                Math.toRadians(startHeading)
+                                        )
+                                        .splineToSplineHeading(
+                                                new Pose2d(rightX, (rightY + 2) * c, Math.toRadians(startHeading - 45)),
+                                                Math.toRadians(startHeading - 45)
+                                        )
+                                        .strafeToLinearHeading(
+                                                new Vector2d(rightX, rightY * c),
+                                                Math.toRadians(startHeading - 45),
+                                                robot.drive.getSpeedConstraint(TrajectorySpeed.SLOW).velConstraint
+                                        ).build(),
+                                new SleepAction(0.2),
+                                robot.openNextClaw(),
+                                new SleepAction(0.2),
+                                robot.drive.actionBuilder(new Pose2d(rightX, rightY * c, Math.toRadians(startHeading - 45)))
+                                        .strafeToLinearHeading(
+                                                new Vector2d(-36, 48 * c),
+                                                Math.toRadians(startHeading - 45)
+                                        )
+                                        .build(),
+                                robot.raiseArmForStack(),
+                                robot.drive.actionBuilder(new Pose2d(-36, 48 * c, Math.toRadians(startHeading - 45)))
+                                        .splineToLinearHeading(
+                                                new Pose2d(-50 + 2, 36 * c, Math.toRadians(180)),
+                                                Math.toRadians(0)
+                                        )
+                                        .build(),
+                                robot.drive.actionBuilder(new Pose2d(-50 + 2, 36 * c, Math.toRadians(180)), TrajectorySpeed.SLOW)
+                                        .strafeToLinearHeading(
+                                                new Vector2d(-50, 36 * c),
+                                                Math.toRadians(180)
+                                        )
+                                        .build()
+                        )
+                );
+                break;
+        }
+    }
+
+    private void pickUpFromWhiteStack() {
         robot.arm.setRotation(ArmRotation.StackAuto);
         robot.arm.setWristRotation(WristRotation.StackDown);
+
+        double stackY = isBlue ? Locations.blueStackY : Locations.redStackY;
 
         Actions.runBlocking(
                 robot.drive.actionBuilder(robot.drive.pose, TrajectorySpeed.SLOW)
@@ -155,13 +464,9 @@ public abstract class AutoBase extends LinearOpMode {
 
         robot.arm.setRotation(ArmRotation.HoldDown);
         robot.arm.setWristRotation(WristRotation.Down);
+    }
 
-        // Switch to April Tag detection
-
-        robot.vision.startProcessor(VisionProcessor.APRIL_TAG_DETECTION);
-
-        robot.vision.setActiveCamera(VisionProcessor.APRIL_TAG_DETECTION);
-
+    private void deliverToBoardFromFar() {
         // Drive across field
 
         double strafeToFarLaneX = -50;
@@ -397,152 +702,18 @@ public abstract class AutoBase extends LinearOpMode {
                         )
                         .build()
         );
+    }
 
+    private void pushBoardWhileParked() {
         robot.drive.setDrivePowers(new PoseVelocity2d(new Vector2d(-0.3, 0), 0));
-
-        telemetry.addLine("Auto Finished in " + Math.round(elapsedTime.seconds()) + " seconds");
-        telemetry.update();
 
         ElapsedTime driveIntoBoardTimer = new ElapsedTime();
 
-        while (driveIntoBoardTimer.seconds() < 2 && !isStopRequested()) {
+        while (driveIntoBoardTimer.seconds() < Timings.PushBoardParked && !isStopRequested()) {
             idle();
         }
 
         robot.drive.setDrivePowers(new PoseVelocity2d(new Vector2d(0, 0), 0));
-
-        while (opModeIsActive() && !isStopRequested()) {
-            idle();
-        }
-    }
-
-    private void deliverSpikeMarkFar() {
-
-
-        switch (boardPosition) {
-            case INNER:
-                double leftX = -36 + (COLOR == AutoColor.BLUE ? 7 : -7);
-                double leftY = COLOR == AutoColor.BLUE ? 38 : 32;
-                Actions.runBlocking(
-                        new SequentialAction(
-                                robot.drive.actionBuilder(robot.drive.pose)
-                                        .strafeToLinearHeading(
-                                                new Vector2d(-36, 54 * c),
-                                                Math.toRadians(startHeading)
-                                        )
-                                        .splineToSplineHeading(
-                                                new Pose2d(leftX, (leftY + 2) * c, Math.toRadians(startHeading + 45)),
-                                                Math.toRadians(startHeading + 45)
-                                        )
-                                        .strafeToLinearHeading(
-                                                new Vector2d(leftX, leftY * c),
-                                                Math.toRadians(startHeading + 45),
-                                                robot.drive.getSpeedConstraint(TrajectorySpeed.SLOW).velConstraint
-                                        ).build(),
-                                new SleepAction(0.2),
-                                robot.openNextClaw(),
-                                new SleepAction(0.2),
-                                robot.drive.actionBuilder(new Pose2d(leftX, leftY * c, Math.toRadians(startHeading + 45)))
-                                        .strafeToLinearHeading(
-                                                new Vector2d(-36, 48 * c),
-                                                Math.toRadians(startHeading + 45)
-                                        )
-                                        .build(),
-                                robot.raiseArmForStack(),
-                                robot.drive.actionBuilder(new Pose2d(-36, 48 * c, Math.toRadians(startHeading + 45)))
-                                        .splineToLinearHeading(
-                                                new Pose2d(-50, stackY * c, Math.toRadians(180)),
-                                                Math.toRadians(0)
-                                        )
-                                        .build()
-                        )
-                );
-                break;
-            case CENTER:
-                Actions.runBlocking(
-                        new SequentialAction(
-                                robot.drive.actionBuilder(robot.drive.pose)
-                                        .strafeToLinearHeading(
-                                                new Vector2d(-36, 58 * c),
-                                                Math.toRadians(startHeading)
-                                        )
-                                        .splineToSplineHeading(
-                                                new Pose2d(-36, 34 * c, Math.toRadians(startHeading)),
-                                                Math.toRadians(startHeading)
-                                        )
-                                        .strafeToLinearHeading(
-                                                new Vector2d(-36, 32 * c),
-                                                Math.toRadians(startHeading),
-                                                robot.drive.getSpeedConstraint(TrajectorySpeed.SLOW).velConstraint
-                                        ).build(),
-                                new SleepAction(0.2),
-                                robot.openNextClaw(),
-                                new SleepAction(0.2),
-                                robot.drive.actionBuilder(new Pose2d(-36, 32 * c, Math.toRadians(startHeading)))
-                                        .strafeToLinearHeading(
-                                                new Vector2d(-36, 48 * c),
-                                                Math.toRadians(startHeading)
-                                        )
-                                        .build(),
-                                robot.raiseArmForStack(),
-                                robot.drive.actionBuilder(new Pose2d(-36, 48 * c, Math.toRadians(startHeading)))
-                                        .splineToLinearHeading(
-                                                new Pose2d(-50, stackY * c, Math.toRadians(180)),
-                                                Math.toRadians(0)
-                                        )
-                                        .build()
-                        )
-                );
-                break;
-            case OUTER:
-                double rightX = -36 - (COLOR == AutoColor.BLUE ? 6 : -6);
-                double rightY = COLOR == AutoColor.BLUE ? 32 : 38;
-                Actions.runBlocking(
-                        new SequentialAction(
-                                robot.drive.actionBuilder(robot.drive.pose)
-                                        .strafeToLinearHeading(
-                                                new Vector2d(c == 1 ? -36 : -38, 54 * c),
-                                                Math.toRadians(startHeading)
-                                        )
-                                        .splineToSplineHeading(
-                                                new Pose2d(rightX, (rightY + 2) * c, Math.toRadians(startHeading - 45)),
-                                                Math.toRadians(startHeading - 45)
-                                        )
-                                        .strafeToLinearHeading(
-                                                new Vector2d(rightX, rightY * c),
-                                                Math.toRadians(startHeading - 45),
-                                                robot.drive.getSpeedConstraint(TrajectorySpeed.SLOW).velConstraint
-                                        ).build(),
-                                new SleepAction(0.2),
-                                robot.openNextClaw(),
-                                new SleepAction(0.2),
-                                robot.drive.actionBuilder(new Pose2d(rightX, rightY * c, Math.toRadians(startHeading - 45)))
-                                        .strafeToLinearHeading(
-                                                new Vector2d(-36, 48 * c),
-                                                Math.toRadians(startHeading - 45)
-                                        )
-                                        .build(),
-                                robot.raiseArmForStack(),
-                                robot.drive.actionBuilder(new Pose2d(-36, 48 * c, Math.toRadians(startHeading - 45)))
-                                        .splineToLinearHeading(
-                                                new Pose2d(-50 + 2, stackY * c, Math.toRadians(180)),
-                                                Math.toRadians(0)
-                                        )
-                                        .build(),
-                                robot.drive.actionBuilder(new Pose2d(-50 + 2, stackY * c, Math.toRadians(180)), TrajectorySpeed.SLOW)
-                                        .strafeToLinearHeading(
-                                                new Vector2d(-50, stackY * c),
-                                                Math.toRadians(180)
-                                        )
-                                        .build()
-                        )
-                );
-                break;
-        }
-    }
-
-    private void deliverSpikeMarkNear() {
-
     }
 
     public boolean alignWithAprilTag(BoardPosition targetTag, double timeout) {
@@ -583,6 +754,10 @@ public abstract class AutoBase extends LinearOpMode {
             }
         }
         return aligned;
+    }
+
+    private void saveToLog(String message) {
+        telemetry.log().add(message);
     }
 }
 
