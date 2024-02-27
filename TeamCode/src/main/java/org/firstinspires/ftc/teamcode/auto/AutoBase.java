@@ -147,7 +147,11 @@ public abstract class AutoBase extends LinearOpMode {
             deliverBothNear();
 
             for (int i = 0; i < Cycles; i++) {
+                ElapsedTime cycleTime = new ElapsedTime();
                 cycleWhiteStack();
+                telemetry.addData("Cycle Time", cycleTime.seconds());
+                telemetry.update();
+                saveToLog("Cycle " + i + 1 + " Time: " + Math.round(cycleTime.seconds() * 1000) / 1000);
             }
         }
 
