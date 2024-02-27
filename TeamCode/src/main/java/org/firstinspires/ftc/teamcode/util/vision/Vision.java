@@ -127,7 +127,7 @@ public class Vision {
 
     public BoardPosition getSpikeLocation() {
         if (spikeMarkDetectionProcessor != null) return spikeMarkDetectionProcessor.location;
-        return BoardPosition.CENTER;
+        return null;
     }
 
     public boolean isBoardDetected() {

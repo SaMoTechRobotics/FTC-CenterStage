@@ -24,16 +24,15 @@ import java.util.Timer;
 
 @Config
 public abstract class AutoBase extends LinearOpMode {
-    private final static Boolean Debug = true;
-
     private AutoRobot robot;
 
-    protected AutoSide SIDE = AutoSide.FAR;
-    protected AutoColor COLOR = AutoColor.RED;
+    protected AutoColor COLOR;
+    protected AutoSide SIDE;
 
-    protected abstract AutoSide getSide();
-
-    protected abstract AutoColor getColor();
+    public AutoBase(AutoColor color, AutoSide side) {
+        COLOR = color;
+        SIDE = side;
+    }
 
     BoardPosition boardPosition = BoardPosition.CENTER;
 
@@ -61,9 +60,6 @@ public abstract class AutoBase extends LinearOpMode {
 
     @Override
     public void runOpMode() {
-        SIDE = getSide();
-        COLOR = getColor();
-
         Pose2d startPose = RobotStorage.getStartPose(SIDE, COLOR);
         RobotStorage.setPose(startPose);
         robot = new AutoRobot(hardwareMap, startPose);
@@ -83,8 +79,13 @@ public abstract class AutoBase extends LinearOpMode {
             telemetry.addData("Status", "Initialized for " + Math.round(elapsedTime.seconds()));
             telemetry.addLine("---");
 
-            boardPosition = robot.vision.getSpikeLocation();
-            telemetry.addData("Spike Location", boardPosition.toString());
+            BoardPosition spikeLocation = robot.vision.getSpikeLocation();
+            if (spikeLocation != null) {
+                boardPosition = spikeLocation;
+                telemetry.addData("Spike Location", boardPosition.toString());
+            } else {
+                telemetry.addData("Spike Location", "LOADING...");
+            }
             telemetry.update();
         }
 
@@ -165,15 +166,15 @@ public abstract class AutoBase extends LinearOpMode {
 
         double strafeToFarLaneX = -50;
         if (COLOR == AutoColor.BLUE) {
-            if (boardPosition == BoardPosition.LEFT) {
+            if (boardPosition == BoardPosition.INNER) {
                 strafeToFarLaneX = -42;
-            } else if (boardPosition == BoardPosition.RIGHT) {
+            } else if (boardPosition == BoardPosition.OUTER) {
                 strafeToFarLaneX = -36;
             }
         } else {
-            if (boardPosition == BoardPosition.LEFT) {
+            if (boardPosition == BoardPosition.INNER) {
                 strafeToFarLaneX = -34;
-            } else if (boardPosition == BoardPosition.RIGHT) {
+            } else if (boardPosition == BoardPosition.OUTER) {
                 strafeToFarLaneX = -42;
             }
         }
@@ -209,19 +210,19 @@ public abstract class AutoBase extends LinearOpMode {
 
         if (boardPosition == BoardPosition.CENTER) {
             if (COLOR == AutoColor.BLUE) {
-                targetTag = BoardPosition.RIGHT;
+                targetTag = BoardPosition.OUTER;
             } else {
-                targetTag = BoardPosition.LEFT;
+                targetTag = BoardPosition.INNER;
             }
         } else {
             if (COLOR == AutoColor.BLUE) {
-                if (boardPosition == BoardPosition.LEFT) {
+                if (boardPosition == BoardPosition.INNER) {
                     alignmentOffset = AlignmentOffsetsBLUE[2];
                 } else {
                     alignmentOffset = AlignmentOffsetsBLUE[0];
                 }
             } else {
-                if (boardPosition == BoardPosition.LEFT) {
+                if (boardPosition == BoardPosition.INNER) {
                     alignmentOffset = AlignmentOffsetsRED[0];
                 } else {
                     alignmentOffset = AlignmentOffsetsRED[2];
@@ -234,10 +235,10 @@ public abstract class AutoBase extends LinearOpMode {
         robot.arm.setRotation(ArmRotation.PrepAutoDeliver);
         robot.arm.update();
 
-        BoardPosition whiteTag = COLOR == AutoColor.BLUE ? BoardPosition.RIGHT : BoardPosition.LEFT;
+        BoardPosition whiteTag = COLOR == AutoColor.BLUE ? BoardPosition.OUTER : BoardPosition.INNER;
 
-        boolean weirdPos = ((COLOR == AutoColor.BLUE && boardPosition == BoardPosition.RIGHT) ||
-                (COLOR == AutoColor.RED && boardPosition == BoardPosition.LEFT));
+        boolean weirdPos = ((COLOR == AutoColor.BLUE && boardPosition == BoardPosition.OUTER) ||
+                (COLOR == AutoColor.RED && boardPosition == BoardPosition.INNER));
 
         if (weirdPos) {
             whiteTag = BoardPosition.CENTER;
@@ -260,9 +261,9 @@ public abstract class AutoBase extends LinearOpMode {
 
         double yOffset = 0;
 
-        if (whiteTag == BoardPosition.LEFT) {
+        if (whiteTag == BoardPosition.INNER) {
             yOffset -= 2 * c;
-        } else if (whiteTag == BoardPosition.RIGHT) {
+        } else if (whiteTag == BoardPosition.OUTER) {
             yOffset += 2 * c;
         }
 
@@ -419,7 +420,7 @@ public abstract class AutoBase extends LinearOpMode {
 
 
         switch (boardPosition) {
-            case LEFT:
+            case INNER:
                 double leftX = -36 + (COLOR == AutoColor.BLUE ? 7 : -7);
                 double leftY = COLOR == AutoColor.BLUE ? 38 : 32;
                 Actions.runBlocking(
@@ -493,7 +494,7 @@ public abstract class AutoBase extends LinearOpMode {
                         )
                 );
                 break;
-            case RIGHT:
+            case OUTER:
                 double rightX = -36 - (COLOR == AutoColor.BLUE ? 6 : -6);
                 double rightY = COLOR == AutoColor.BLUE ? 32 : 38;
                 Actions.runBlocking(

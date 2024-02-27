@@ -6,13 +6,7 @@ import org.firstinspires.ftc.teamcode.util.auto.AutoSide;
 
 @Autonomous(name = "Auto: Blue Far", group = "Autonomous")
 public class AutoBlueFar extends AutoBase {
-    @Override
-    protected AutoSide getSide() {
-        return AutoSide.FAR;
-    }
-
-    @Override
-    protected AutoColor getColor() {
-        return AutoColor.BLUE;
+    public AutoBlueFar() {
+        super(AutoColor.BLUE, AutoSide.FAR);
     }
 }

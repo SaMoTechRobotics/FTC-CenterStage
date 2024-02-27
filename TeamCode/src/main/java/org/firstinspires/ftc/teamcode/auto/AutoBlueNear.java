@@ -8,13 +8,7 @@ import org.firstinspires.ftc.teamcode.util.auto.AutoSide;
 @Autonomous(name = "Auto: Blue Near", group = "Autonomous")
 @Disabled
 public class AutoBlueNear extends AutoBase {
-    @Override
-    protected AutoSide getSide() {
-        return AutoSide.NEAR;
-    }
-
-    @Override
-    protected AutoColor getColor() {
-        return AutoColor.BLUE;
+    public AutoBlueNear() {
+        super(AutoColor.BLUE, AutoSide.NEAR);
     }
 }
