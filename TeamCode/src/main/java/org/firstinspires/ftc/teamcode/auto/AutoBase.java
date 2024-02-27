@@ -36,17 +36,17 @@ public abstract class AutoBase extends LinearOpMode {
 
     BoardPosition boardPosition = BoardPosition.CENTER;
 
-    private static class Timings {
+    @Config
+    public static class Timings {
         public static double Delay = 0.5;
 
         public static double WhiteAlignWithBoardTime = 1.5;
-        public static double AlignWithBoardTime = 2.5;
+        public static double FarAlignWithBoardTime = 2.5;
 
         public static double PushBoardParked = 2;
     }
 
-    public static Timings TRAJECTORY_SPEEDS = new Timings();
-
+    @Config
     public static class Locations {
         public static double FarLaneY = 14;
 
@@ -54,23 +54,11 @@ public abstract class AutoBase extends LinearOpMode {
         public static double redStackY = 38;
     }
 
-//    public static Locations LOCATIONS = new Locations();
-
-    public static double Delay = 0.5;
-
-    public static double FarLaneY = 14;
-
-    // Right, Center, Left on blue side
-    public static double[] AlignmentOffsetsBLUE = new double[]{-5.5, 6.0, 6.7};
-    // Left Center Right on red side
-    public static double[] AlignmentOffsetsRED = new double[]{5.5, -5.0, -4.5};
-
-    public static double WhiteAlignWithBoardTime = 1.5;
-    public static double AlignWithBoardTime = 2.5;
-    public static double PushBoardTime = 0.5;
-
-    public static double ParkX = 58;
-
+    @Config
+    public static class AlignmentOffsets {
+        public static double[] BlueOffsets = new double[]{-5.5, 6.0, 6.7};
+        public static double[] RedOffsets = new double[]{5.5, -5.0, -4.5};
+    }
 
     /**
      * This is to flip the sign of the y coordinate based on the color
@@ -488,13 +476,13 @@ public abstract class AutoBase extends LinearOpMode {
                 new SequentialAction(
                         robot.drive.actionBuilder(robot.drive.pose)
                                 .strafeToLinearHeading(new Vector2d(strafeToFarLaneX, 36 * c), Math.toRadians(180))
-                                .strafeToLinearHeading(new Vector2d(strafeToFarLaneX, FarLaneY * c), Math.toRadians(180))
+                                .strafeToLinearHeading(new Vector2d(strafeToFarLaneX, Locations.FarLaneY * c), Math.toRadians(180))
                                 .build(),
-                        new SleepAction(Delay),
-                        robot.drive.actionBuilder(new Pose2d(strafeToFarLaneX, FarLaneY * c, Math.toRadians(180)), TrajectorySpeed.FAST)
-                                .strafeToLinearHeading(new Vector2d(30, FarLaneY * c), Math.toRadians(180))
+                        new SleepAction(Timings.Delay),
+                        robot.drive.actionBuilder(new Pose2d(strafeToFarLaneX, Locations.FarLaneY * c, Math.toRadians(180)), TrajectorySpeed.FAST)
+                                .strafeToLinearHeading(new Vector2d(30, Locations.FarLaneY * c), Math.toRadians(180))
                                 .build(),
-                        robot.drive.actionBuilder(new Pose2d(30, FarLaneY * c, Math.toRadians(180)))
+                        robot.drive.actionBuilder(new Pose2d(30, Locations.FarLaneY * c, Math.toRadians(180)))
                                 .strafeToLinearHeading(new Vector2d(30, 32 * c), Math.toRadians(180))
                                 .build()
                 )
@@ -510,8 +498,8 @@ public abstract class AutoBase extends LinearOpMode {
         BoardPosition targetTag = BoardPosition.CENTER;
 
         double alignmentOffset = COLOR == AutoColor.BLUE
-                ? AlignmentOffsetsBLUE[1]
-                : AlignmentOffsetsRED[1];
+                ? AlignmentOffsets.BlueOffsets[1]
+                : AlignmentOffsets.RedOffsets[1];
 
         if (boardPosition == BoardPosition.CENTER) {
             if (COLOR == AutoColor.BLUE) {
@@ -522,15 +510,15 @@ public abstract class AutoBase extends LinearOpMode {
         } else {
             if (COLOR == AutoColor.BLUE) {
                 if (boardPosition == BoardPosition.INNER) {
-                    alignmentOffset = AlignmentOffsetsBLUE[2];
+                    alignmentOffset = AlignmentOffsets.BlueOffsets[2];
                 } else {
-                    alignmentOffset = AlignmentOffsetsBLUE[0];
+                    alignmentOffset = AlignmentOffsets.BlueOffsets[0];
                 }
             } else {
                 if (boardPosition == BoardPosition.INNER) {
-                    alignmentOffset = AlignmentOffsetsRED[0];
+                    alignmentOffset = AlignmentOffsets.RedOffsets[0];
                 } else {
-                    alignmentOffset = AlignmentOffsetsRED[2];
+                    alignmentOffset = AlignmentOffsets.RedOffsets[2];
                 }
             }
         }
@@ -556,7 +544,7 @@ public abstract class AutoBase extends LinearOpMode {
         }
 
 
-        boolean whiteAligned = alignWithAprilTag(whiteTag, WhiteAlignWithBoardTime);
+        boolean whiteAligned = alignWithAprilTag(whiteTag, Timings.WhiteAlignWithBoardTime);
 
 
         robot.arm.setRotation(ArmRotation.AutoDeliver, ArmSpeed.Mid);
@@ -620,7 +608,7 @@ public abstract class AutoBase extends LinearOpMode {
 //        robot.arm.setBoardAngle(WristRotation.AutoBoardAngle);
         robot.arm.update();
 
-        boolean aligned = alignWithAprilTag(boardPosition, AlignWithBoardTime);
+        boolean aligned = alignWithAprilTag(boardPosition, Timings.FarAlignWithBoardTime);
 //
 //        if (!aligned) {
 //            telemetry.addLine("ERROR: APRIL TAG CAMERA NOT WORKING!!!");
