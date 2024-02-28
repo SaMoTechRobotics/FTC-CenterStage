@@ -55,12 +55,25 @@ public abstract class AutoBase extends LinearOpMode {
         public static double FarAlignWithBoardTime = 2.5;
 
         public static double PushBoardParked = 2;
+
+        public static double StrafeAlignWithWall = 1;
     }
 
     @Config
-    public static class LocationConstants {
+    public static class FarLocationConstants {
         public static double FarLaneY = 14;
 
+        public static double blueStackY = 38.6;
+        public static double redStackY = 38;
+    }
+
+    @Config
+    public static class NearLocationConstants {
+        public static double CloseLaneY = 60;
+
+        public static double WallY = 62;
+
+        public static double stackX = -50;
         public static double blueStackY = 38.6;
         public static double redStackY = 38;
     }
@@ -186,7 +199,7 @@ public abstract class AutoBase extends LinearOpMode {
     }
 
     private void deliverSpikeMarkFar() {
-        double stackY = isBlue ? LocationConstants.blueStackY : LocationConstants.redStackY;
+        double stackY = isBlue ? FarLocationConstants.blueStackY : FarLocationConstants.redStackY;
 
         switch (boardPosition) {
             case INNER:
@@ -314,7 +327,7 @@ public abstract class AutoBase extends LinearOpMode {
         robot.arm.setRotation(ArmRotation.StackAuto);
         robot.arm.setWristRotation(WristRotation.StackDown);
 
-        double stackY = isBlue ? LocationConstants.blueStackY : LocationConstants.redStackY;
+        double stackY = isBlue ? FarLocationConstants.blueStackY : FarLocationConstants.redStackY;
 
         Actions.runBlocking(
                 robot.drive.actionBuilder(robot.drive.pose, TrajectorySpeed.SLOW)
@@ -375,13 +388,13 @@ public abstract class AutoBase extends LinearOpMode {
                 new SequentialAction(
                         robot.drive.actionBuilder(robot.drive.pose)
                                 .strafeToLinearHeading(new Vector2d(strafeToFarLaneX, 36 * c), Math.toRadians(180))
-                                .strafeToLinearHeading(new Vector2d(strafeToFarLaneX, LocationConstants.FarLaneY * c), Math.toRadians(180))
+                                .strafeToLinearHeading(new Vector2d(strafeToFarLaneX, FarLocationConstants.FarLaneY * c), Math.toRadians(180))
                                 .build(),
                         new SleepAction(TimingConstants.Delay),
-                        robot.drive.actionBuilder(new Pose2d(strafeToFarLaneX, LocationConstants.FarLaneY * c, Math.toRadians(180)), TrajectorySpeed.FAST)
-                                .strafeToLinearHeading(new Vector2d(30, LocationConstants.FarLaneY * c), Math.toRadians(180))
+                        robot.drive.actionBuilder(new Pose2d(strafeToFarLaneX, FarLocationConstants.FarLaneY * c, Math.toRadians(180)), TrajectorySpeed.FAST)
+                                .strafeToLinearHeading(new Vector2d(30, FarLocationConstants.FarLaneY * c), Math.toRadians(180))
                                 .build(),
-                        robot.drive.actionBuilder(new Pose2d(30, LocationConstants.FarLaneY * c, Math.toRadians(180)))
+                        robot.drive.actionBuilder(new Pose2d(30, FarLocationConstants.FarLaneY * c, Math.toRadians(180)))
                                 .strafeToLinearHeading(new Vector2d(30, 32 * c), Math.toRadians(180))
                                 .build()
                 )
@@ -715,6 +728,55 @@ public abstract class AutoBase extends LinearOpMode {
     }
 
     public void cycleWhiteStack(StrategyConstants.CycleType cycleType) {
+        robot.resetForIntake();
+
+        Actions.runBlocking(
+                robot.drive.actionBuilder(robot.drive.pose)
+                        .splineToConstantHeading(new Vector2d(20, NearLocationConstants.CloseLaneY * c), Math.toRadians(180))
+                        .splineTo(new Vector2d(-34, NearLocationConstants.CloseLaneY * c), Math.toRadians(180))
+                        .build()
+        );
+
+        robot.drive.setDrivePowersForSeconds(new PoseVelocity2d(new Vector2d(0, 0.2 * c), 0), TimingConstants.StrafeAlignWithWall);
+
+        robot.drive.pose = new Pose2d(robot.drive.pose.position.x, NearLocationConstants.WallY * c, Math.toRadians(180));
+
+        double stackY = isBlue ? NearLocationConstants.blueStackY : NearLocationConstants.redStackY;
+
+        Actions.runBlocking(
+                robot.drive.actionBuilder(robot.drive.pose)
+                        .strafeToLinearHeading(new Vector2d(NearLocationConstants.stackX, stackY * c), Math.toRadians(180))
+                        .build()
+        );
+
+        pickUpFromWhiteStack();
+
+        Actions.runBlocking(
+                robot.drive.actionBuilder(robot.drive.pose)
+                        .setReversed(true)
+                        .splineTo(new Vector2d(-52, 36), Math.toRadians(180))
+                        .splineTo(new Vector2d(-34, 60), Math.toRadians(180))
+                        .splineToConstantHeading(new Vector2d(20, 60), Math.toRadians(180))
+                        .build()
+        );
+
+        switch (cycleType) {
+            case BACKSTAGE:
+                robot.arm.setRotation(ArmRotation.BackDown);
+                robot.arm.setWristRotation(WristRotation.PickupBack);
+
+                Actions.runBlocking(
+                        robot.drive.actionBuilder(robot.drive.pose)
+                                .strafeToLinearHeading(new Vector2d(50, 60 * c), Math.toRadians(180))
+                                .build()
+                );
+
+                robot.claw.open();
+                break;
+            case BACKDROP:
+
+                break;
+        }
     }
 
     public boolean alignWithAprilTag(BoardPosition targetTag, double timeout) {

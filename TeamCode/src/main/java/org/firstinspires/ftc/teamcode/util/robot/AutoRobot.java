@@ -6,6 +6,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import org.firstinspires.ftc.teamcode.roadrunner.MecanumDrive;
 import org.firstinspires.ftc.teamcode.util.robot.arm.Arm;
 import org.firstinspires.ftc.teamcode.util.robot.arm.ArmRotation;
+import org.firstinspires.ftc.teamcode.util.robot.arm.WristRotation;
 import org.firstinspires.ftc.teamcode.util.robot.claw.Claw;
 import org.firstinspires.ftc.teamcode.util.vision.Vision;
 
@@ -24,6 +25,13 @@ public class AutoRobot {
 
         arm = new Arm(hardwareMap);
         claw = new Claw(hardwareMap);
+    }
+
+    public void resetForIntake() {
+        arm.setHangingLock(false);
+        arm.setRotation(ArmRotation.Down);
+        arm.setWristRotation(WristRotation.Down);
+        claw.open();
     }
 
     public Action openNextClaw() {
