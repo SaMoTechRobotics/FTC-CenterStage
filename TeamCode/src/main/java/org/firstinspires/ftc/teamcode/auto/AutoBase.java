@@ -22,6 +22,25 @@ import java.lang.Math;
 import java.util.Optional;
 import java.util.Timer;
 
+/*
+ * The base class for all autonomous programs
+ * This is extended by all autonomous programs with only color and side as needed parameters
+ * The field coordinate system is as follows:
+ *                          RED
+ *             ------------------------------
+ *             |    |       | |              |
+ *             |[[| |       | |             o|
+ *             |[[| |       -y              o|
+ *             |   /        |               o|
+ *  Backstage  | /     +x   |     -x         | Audience
+ *             | \          |                |
+ *             |   \        |_              o|
+ *             |[[| |       +y              o|
+ *             |[[| |       | |             o|
+ *             |    |       | |              |
+ *             ------------------------------
+ *                         BLUE
+ */
 @Config
 public abstract class AutoBase extends LinearOpMode {
     private AutoRobot robot;
@@ -67,15 +86,13 @@ public abstract class AutoBase extends LinearOpMode {
         public static double redStackY = 38;
 
         /**
-         * The X coordinate of where the robot should be to deliver the spike mark
+         * The locations of where the robot should be to deliver the spike mark
          * Order: Inner X, Center Y, Outer X
          */
         public static double[] blueSpikeMarks = new double[]{-39, 32, -42};
         public static double[] redSpikeMarks = new double[]{-39, 32, -42};
 
-        public static double leftX = -32;
-        public static double centerY = -36;
-        public static double rightX = -40;
+        public static double boardX = 30;
     }
 
     @Config
@@ -87,6 +104,22 @@ public abstract class AutoBase extends LinearOpMode {
         public static double stackX = -50;
         public static double blueStackY = 38.6;
         public static double redStackY = 38;
+
+        /**
+         * The locations of where the robot should be to deliver the spike mark
+         * Order: Inner X, Center Y, Outer X
+         */
+        public static double[] blueSpikeMarks = new double[]{18, 32, 6};
+        public static double[] redSpikeMarks = new double[]{18, 32,};
+
+        /**
+         * The Y coordinate of where the robot should be to deliver the spike mark
+         * Order: Inner Y, Center Y, Outer Y
+         */
+        public static double[] blueBoardY = new double[]{44, 36, 28};
+        public static double[] redBoardY = new double[]{44, 36, 28};
+
+        public static double boardX = 30;
     }
 
     @Config
@@ -214,7 +247,7 @@ public abstract class AutoBase extends LinearOpMode {
 
         switch (boardPosition) {
             case INNER:
-                double innerX = COLOR == AutoColor.BLUE ? FarLocationConstants.blueSpikeMarks[0] : FarLocationConstants.redSpikeMarks[0];
+                double innerX = isBlue ? FarLocationConstants.blueSpikeMarks[0] : FarLocationConstants.redSpikeMarks[0];
                 Actions.runBlocking(
                         new SequentialAction(
                                 robot.drive.actionBuilder(robot.drive.pose)
@@ -251,7 +284,7 @@ public abstract class AutoBase extends LinearOpMode {
                 );
                 break;
             case CENTER:
-                double centerY = COLOR == AutoColor.BLUE ? FarLocationConstants.blueSpikeMarks[1] : FarLocationConstants.redSpikeMarks[1];
+                double centerY = isBlue ? FarLocationConstants.blueSpikeMarks[1] : FarLocationConstants.redSpikeMarks[1];
                 Actions.runBlocking(
                         new SequentialAction(
                                 robot.drive.actionBuilder(robot.drive.pose)
@@ -288,7 +321,7 @@ public abstract class AutoBase extends LinearOpMode {
                 );
                 break;
             case OUTER:
-                double outerX = COLOR == AutoColor.BLUE ? FarLocationConstants.blueSpikeMarks[2] : FarLocationConstants.redSpikeMarks[2];
+                double outerX = isBlue ? FarLocationConstants.blueSpikeMarks[2] : FarLocationConstants.redSpikeMarks[2];
                 Actions.runBlocking(
                         new SequentialAction(
                                 robot.drive.actionBuilder(robot.drive.pose)
@@ -402,10 +435,10 @@ public abstract class AutoBase extends LinearOpMode {
                                 .build(),
                         new SleepAction(TimingConstants.Delay),
                         robot.drive.actionBuilder(new Pose2d(strafeToFarLaneX, FarLocationConstants.FarLaneY * c, Math.toRadians(180)), TrajectorySpeed.FAST)
-                                .strafeToLinearHeading(new Vector2d(30, FarLocationConstants.FarLaneY * c), Math.toRadians(180))
+                                .strafeToLinearHeading(new Vector2d(FarLocationConstants.boardX, FarLocationConstants.FarLaneY * c), Math.toRadians(180))
                                 .build(),
-                        robot.drive.actionBuilder(new Pose2d(30, FarLocationConstants.FarLaneY * c, Math.toRadians(180)))
-                                .strafeToLinearHeading(new Vector2d(30, 32 * c), Math.toRadians(180))
+                        robot.drive.actionBuilder(new Pose2d(FarLocationConstants.boardX, FarLocationConstants.FarLaneY * c, Math.toRadians(180)))
+                                .strafeToLinearHeading(new Vector2d(FarLocationConstants.boardX, 32 * c), Math.toRadians(180))
                                 .build()
                 )
         );
