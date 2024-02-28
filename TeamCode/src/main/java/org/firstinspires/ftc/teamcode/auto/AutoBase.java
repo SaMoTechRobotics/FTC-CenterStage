@@ -36,7 +36,16 @@ public abstract class AutoBase extends LinearOpMode {
 
     BoardPosition boardPosition = BoardPosition.CENTER;
 
-    public static int Cycles = 1;
+    @Config
+    public static class Strategy {
+        public static int Cycles = 2;
+        public static CycleType[] CycleTypes = {CycleType.BACKSTAGE, CycleType.BACKDROP};
+
+        public enum CycleType {
+            BACKSTAGE,
+            BACKDROP
+        }
+    }
 
     @Config
     public static class Timings {
@@ -146,9 +155,12 @@ public abstract class AutoBase extends LinearOpMode {
         } else {
             deliverBothNear();
 
-            for (int i = 0; i < Cycles; i++) {
+            for (int i = 0; i < Strategy.Cycles; i++) {
                 ElapsedTime cycleTime = new ElapsedTime();
-                cycleWhiteStack();
+
+                Strategy.CycleType cycleType = Strategy.CycleTypes.length > i ? Strategy.CycleTypes[i] : Strategy.CycleType.BACKSTAGE;
+                cycleWhiteStack(cycleType);
+                
                 telemetry.addData("Cycle Time", cycleTime.seconds());
                 telemetry.update();
                 saveToLog("Cycle " + i + 1 + " Time: " + Math.round(cycleTime.seconds() * 1000) / 1000);
@@ -702,7 +714,7 @@ public abstract class AutoBase extends LinearOpMode {
         }
     }
 
-    public void cycleWhiteStack() {
+    public void cycleWhiteStack(Strategy.CycleType cycleType) {
     }
 
     public boolean alignWithAprilTag(BoardPosition targetTag, double timeout) {
