@@ -4,10 +4,10 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import org.firstinspires.ftc.robotcore.internal.camera.calibration.CameraCalibration;
-import org.firstinspires.ftc.teamcode.util.auto.constants.SpikeLocationDetectionConstants;
 import org.firstinspires.ftc.teamcode.util.auto.AutoColor;
 import org.firstinspires.ftc.teamcode.util.auto.AutoSide;
 import org.firstinspires.ftc.teamcode.util.auto.BoardPosition;
+import org.firstinspires.ftc.teamcode.util.auto.constants.SpikeLocationDetectionConstants;
 import org.firstinspires.ftc.vision.VisionProcessor;
 import org.opencv.core.*;
 import org.opencv.imgproc.Imgproc;
@@ -76,7 +76,7 @@ public class SpikeLocationDetectionProcessor implements VisionProcessor {
 //                location = BoardPosition.CENTER;
 //            else if (side == AutoSide.LEFT)
 //                location = BoardPosition.LEFT;
-            location = BoardPosition.LEFT;
+            location = color == AutoColor.BLUE ? BoardPosition.INNER : BoardPosition.OUTER;
         } else if (maxMean == mean2.val[0]) {
 //            if (side == AutoSide.RIGHT)
 //                location = BoardPosition.RIGHT;
@@ -84,7 +84,7 @@ public class SpikeLocationDetectionProcessor implements VisionProcessor {
 //                location = BoardPosition.CENTER;
             location = BoardPosition.CENTER;
         } else if (maxMean == mean3.val[0]) {
-            location = BoardPosition.RIGHT;
+            location = color == AutoColor.BLUE ? BoardPosition.OUTER : BoardPosition.INNER;
         }
 
         if (streamingOverlayMode) {
