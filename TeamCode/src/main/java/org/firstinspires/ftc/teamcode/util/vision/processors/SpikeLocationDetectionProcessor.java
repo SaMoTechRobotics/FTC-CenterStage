@@ -111,10 +111,10 @@ public class SpikeLocationDetectionProcessor implements VisionProcessor {
 
         int x = onscreenWidth / 2;
 
-        if (location == BoardPosition.LEFT) {
-            x = onscreenWidth / 6;
-        } else if (location == BoardPosition.RIGHT) {
-            x = 5 * onscreenWidth / 6;
+        if (location == BoardPosition.INNER) {
+            x = color == AutoColor.BLUE ? onscreenWidth / 6 : 5 * onscreenWidth / 6;
+        } else if (location == BoardPosition.OUTER) {
+            x = color == AutoColor.BLUE ? 5 * onscreenWidth / 6 : onscreenWidth / 6;
         }
 
         canvas.drawRect(x - width / 2, onscreenHeight / 2 - height / 2, x + width / 2, onscreenHeight / 2 + height / 2, paint);
