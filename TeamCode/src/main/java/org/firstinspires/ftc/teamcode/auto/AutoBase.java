@@ -37,7 +37,7 @@ public abstract class AutoBase extends LinearOpMode {
     BoardPosition boardPosition = BoardPosition.CENTER;
 
     @Config
-    public static class Strategy {
+    public static class StrategyConstants {
         public static int Cycles = 2;
         public static CycleType[] CycleTypes = {CycleType.BACKSTAGE, CycleType.BACKDROP};
 
@@ -48,7 +48,7 @@ public abstract class AutoBase extends LinearOpMode {
     }
 
     @Config
-    public static class Timings {
+    public static class TimingConstants {
         public static double Delay = 0.5;
 
         public static double WhiteAlignWithBoardTime = 1.5;
@@ -58,7 +58,7 @@ public abstract class AutoBase extends LinearOpMode {
     }
 
     @Config
-    public static class Locations {
+    public static class LocationConstants {
         public static double FarLaneY = 14;
 
         public static double blueStackY = 38.6;
@@ -66,7 +66,7 @@ public abstract class AutoBase extends LinearOpMode {
     }
 
     @Config
-    public static class AlignmentOffsets {
+    public static class AlignmentConstants {
         public static double[] BlueOffsets = new double[]{-5.5, 6.0, 6.7};
         public static double[] RedOffsets = new double[]{5.5, -5.0, -4.5};
     }
@@ -155,12 +155,12 @@ public abstract class AutoBase extends LinearOpMode {
         } else {
             deliverBothNear();
 
-            for (int i = 0; i < Strategy.Cycles; i++) {
+            for (int i = 0; i < StrategyConstants.Cycles; i++) {
                 ElapsedTime cycleTime = new ElapsedTime();
 
-                Strategy.CycleType cycleType = Strategy.CycleTypes.length > i ? Strategy.CycleTypes[i] : Strategy.CycleType.BACKSTAGE;
+                StrategyConstants.CycleType cycleType = StrategyConstants.CycleTypes.length > i ? StrategyConstants.CycleTypes[i] : StrategyConstants.CycleType.BACKSTAGE;
                 cycleWhiteStack(cycleType);
-                
+
                 telemetry.addData("Cycle Time", cycleTime.seconds());
                 telemetry.update();
                 saveToLog("Cycle " + i + 1 + " Time: " + Math.round(cycleTime.seconds() * 1000) / 1000);
@@ -186,7 +186,7 @@ public abstract class AutoBase extends LinearOpMode {
     }
 
     private void deliverSpikeMarkFar() {
-        double stackY = isBlue ? Locations.blueStackY : Locations.redStackY;
+        double stackY = isBlue ? LocationConstants.blueStackY : LocationConstants.redStackY;
 
         switch (boardPosition) {
             case INNER:
@@ -314,7 +314,7 @@ public abstract class AutoBase extends LinearOpMode {
         robot.arm.setRotation(ArmRotation.StackAuto);
         robot.arm.setWristRotation(WristRotation.StackDown);
 
-        double stackY = isBlue ? Locations.blueStackY : Locations.redStackY;
+        double stackY = isBlue ? LocationConstants.blueStackY : LocationConstants.redStackY;
 
         Actions.runBlocking(
                 robot.drive.actionBuilder(robot.drive.pose, TrajectorySpeed.SLOW)
@@ -375,13 +375,13 @@ public abstract class AutoBase extends LinearOpMode {
                 new SequentialAction(
                         robot.drive.actionBuilder(robot.drive.pose)
                                 .strafeToLinearHeading(new Vector2d(strafeToFarLaneX, 36 * c), Math.toRadians(180))
-                                .strafeToLinearHeading(new Vector2d(strafeToFarLaneX, Locations.FarLaneY * c), Math.toRadians(180))
+                                .strafeToLinearHeading(new Vector2d(strafeToFarLaneX, LocationConstants.FarLaneY * c), Math.toRadians(180))
                                 .build(),
-                        new SleepAction(Timings.Delay),
-                        robot.drive.actionBuilder(new Pose2d(strafeToFarLaneX, Locations.FarLaneY * c, Math.toRadians(180)), TrajectorySpeed.FAST)
-                                .strafeToLinearHeading(new Vector2d(30, Locations.FarLaneY * c), Math.toRadians(180))
+                        new SleepAction(TimingConstants.Delay),
+                        robot.drive.actionBuilder(new Pose2d(strafeToFarLaneX, LocationConstants.FarLaneY * c, Math.toRadians(180)), TrajectorySpeed.FAST)
+                                .strafeToLinearHeading(new Vector2d(30, LocationConstants.FarLaneY * c), Math.toRadians(180))
                                 .build(),
-                        robot.drive.actionBuilder(new Pose2d(30, Locations.FarLaneY * c, Math.toRadians(180)))
+                        robot.drive.actionBuilder(new Pose2d(30, LocationConstants.FarLaneY * c, Math.toRadians(180)))
                                 .strafeToLinearHeading(new Vector2d(30, 32 * c), Math.toRadians(180))
                                 .build()
                 )
@@ -397,8 +397,8 @@ public abstract class AutoBase extends LinearOpMode {
         BoardPosition targetTag = BoardPosition.CENTER;
 
         double alignmentOffset = COLOR == AutoColor.BLUE
-                ? AlignmentOffsets.BlueOffsets[1]
-                : AlignmentOffsets.RedOffsets[1];
+                ? AlignmentConstants.BlueOffsets[1]
+                : AlignmentConstants.RedOffsets[1];
 
         if (boardPosition == BoardPosition.CENTER) {
             if (COLOR == AutoColor.BLUE) {
@@ -409,15 +409,15 @@ public abstract class AutoBase extends LinearOpMode {
         } else {
             if (COLOR == AutoColor.BLUE) {
                 if (boardPosition == BoardPosition.INNER) {
-                    alignmentOffset = AlignmentOffsets.BlueOffsets[2];
+                    alignmentOffset = AlignmentConstants.BlueOffsets[2];
                 } else {
-                    alignmentOffset = AlignmentOffsets.BlueOffsets[0];
+                    alignmentOffset = AlignmentConstants.BlueOffsets[0];
                 }
             } else {
                 if (boardPosition == BoardPosition.INNER) {
-                    alignmentOffset = AlignmentOffsets.RedOffsets[0];
+                    alignmentOffset = AlignmentConstants.RedOffsets[0];
                 } else {
-                    alignmentOffset = AlignmentOffsets.RedOffsets[2];
+                    alignmentOffset = AlignmentConstants.RedOffsets[2];
                 }
             }
         }
@@ -443,7 +443,7 @@ public abstract class AutoBase extends LinearOpMode {
         }
 
 
-        boolean whiteAligned = alignWithAprilTag(whiteTag, Timings.WhiteAlignWithBoardTime);
+        boolean whiteAligned = alignWithAprilTag(whiteTag, TimingConstants.WhiteAlignWithBoardTime);
 
 
         robot.arm.setRotation(ArmRotation.AutoDeliver, ArmSpeed.Mid);
@@ -507,7 +507,7 @@ public abstract class AutoBase extends LinearOpMode {
 //        robot.arm.setBoardAngle(WristRotation.AutoBoardAngle);
         robot.arm.update();
 
-        boolean aligned = alignWithAprilTag(boardPosition, Timings.FarAlignWithBoardTime);
+        boolean aligned = alignWithAprilTag(boardPosition, TimingConstants.FarAlignWithBoardTime);
 //
 //        if (!aligned) {
 //            telemetry.addLine("ERROR: APRIL TAG CAMERA NOT WORKING!!!");
@@ -714,7 +714,7 @@ public abstract class AutoBase extends LinearOpMode {
         }
     }
 
-    public void cycleWhiteStack(Strategy.CycleType cycleType) {
+    public void cycleWhiteStack(StrategyConstants.CycleType cycleType) {
     }
 
     public boolean alignWithAprilTag(BoardPosition targetTag, double timeout) {
@@ -762,7 +762,7 @@ public abstract class AutoBase extends LinearOpMode {
 
         ElapsedTime driveIntoBoardTimer = new ElapsedTime();
 
-        while (driveIntoBoardTimer.seconds() < Timings.PushBoardParked && !isStopRequested()) {
+        while (driveIntoBoardTimer.seconds() < TimingConstants.PushBoardParked && !isStopRequested()) {
             idle();
         }
 
