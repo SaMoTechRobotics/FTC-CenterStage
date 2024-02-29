@@ -54,7 +54,7 @@ public abstract class AutoBase extends LinearOpMode {
     }
 
     BoardPosition boardPosition = BoardPosition.CENTER;
-
+    
     @Config
     public static class StrategyConstants {
         public static int Cycles = 2;
@@ -243,6 +243,9 @@ public abstract class AutoBase extends LinearOpMode {
         }
     }
 
+    /**
+     * Delivers the purple pixel to the spike mark and then drives to be ready for stack pickup
+     */
     private void deliverSpikeMarkFar() {
         double stackY = isBlue ? FarLocationConstants.blueStackY : FarLocationConstants.redStackY;
 
@@ -367,6 +370,9 @@ public abstract class AutoBase extends LinearOpMode {
         }
     }
 
+    /**
+     * Picks up the white pixel from the stack, will drive into the wall to realign for accurate pickup
+     */
     private void pickUpFromWhiteStack() {
         robot.arm.setRotation(ArmRotation.StackAuto);
         robot.arm.setWristRotation(WristRotation.StackDown);
@@ -410,6 +416,9 @@ public abstract class AutoBase extends LinearOpMode {
         robot.arm.setWristRotation(WristRotation.Down);
     }
 
+    /**
+     * Drives across the field after picking up from stack and then delivers white and yellow pixels to the board using apriltag detection
+     */
     private void deliverToBoardFromFar() {
         // Drive across field
 
@@ -648,6 +657,9 @@ public abstract class AutoBase extends LinearOpMode {
         );
     }
 
+    /**
+     * Delivers the purple pixel to the spike mark and then delivers the yellow pixel to the board without apriltag detection
+     */
     private void deliverBothNear() {
         switch (boardPosition) {
             case INNER:
@@ -769,6 +781,11 @@ public abstract class AutoBase extends LinearOpMode {
         robot.claw.open();
     }
 
+    /**
+     * Starts from the board and then drives across the field to pick up from the white stack and then delivers the 2 white pixels to the board or backstage based on the cycle type
+     *
+     * @param cycleType Where to deliver the 2 white pixels
+     */
     public void cycleWhiteStack(StrategyConstants.CycleType cycleType) {
         robot.resetForIntake();
 
@@ -821,6 +838,13 @@ public abstract class AutoBase extends LinearOpMode {
         }
     }
 
+    /**
+     * Aligns the robot with the board using the April Tag detection
+     *
+     * @param targetTag The tag to align with
+     * @param timeout   The maximum time to align
+     * @return Whether the robot was aligned with the board, basically always true unless the camera is not working
+     */
     public boolean alignWithAprilTag(BoardPosition targetTag, double timeout) {
         ElapsedTime time = new ElapsedTime();
 
@@ -861,6 +885,9 @@ public abstract class AutoBase extends LinearOpMode {
         return aligned;
     }
 
+    /**
+     * Pushes the board while parked to make pixels settle in the right place
+     */
     private void pushBoardWhileParked() {
         robot.drive.setDrivePowers(new PoseVelocity2d(new Vector2d(-0.3, 0), 0));
 
