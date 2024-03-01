@@ -54,7 +54,7 @@ public abstract class AutoBase extends LinearOpMode {
     }
 
     BoardPosition boardPosition = BoardPosition.CENTER;
-    
+
     @Config
     public static class StrategyConstants {
         public static int Cycles = 2;
@@ -92,6 +92,10 @@ public abstract class AutoBase extends LinearOpMode {
         public static double[] blueSpikeMarks = new double[]{-39, 32, -42};
         public static double[] redSpikeMarks = new double[]{-39, 32, -42};
 
+        // Order: Inner Y, Center Y, Outer Y
+        public static double[] blueBoardY = new double[]{44, 36, 28};
+        public static double[] redBoardY = new double[]{44, 36, 28};
+
         public static double boardX = 30;
     }
 
@@ -125,8 +129,9 @@ public abstract class AutoBase extends LinearOpMode {
 
     @Config
     public static class AlignmentConstants {
-        public static double[] BlueOffsets = new double[]{-5.5, 6.0, 6.7};
-        public static double[] RedOffsets = new double[]{5.5, -5.0, -4.5};
+        // Order: Inner, Center, Outer
+        public static double[] BlueOffsets = new double[]{5.5, 6.0, -6.7};
+        public static double[] RedOffsets = new double[]{-5.5, -5.0, 4.5};
     }
 
     /**
@@ -173,7 +178,7 @@ public abstract class AutoBase extends LinearOpMode {
             BoardPosition spikeLocation = robot.vision.getSpikeLocation();
             if (spikeLocation != null) {
                 boardPosition = spikeLocation;
-                telemetry.addData("Spike Location", boardPosition.toString());
+                telemetry.addData("Spike Location", boardPosition.getPlace(COLOR));
             } else {
                 telemetry.addData("Spike Location", "LOADING...");
             }
@@ -420,8 +425,6 @@ public abstract class AutoBase extends LinearOpMode {
      * Drives across the field after picking up from stack and then delivers white and yellow pixels to the board using apriltag detection
      */
     private void deliverToBoardFromFar() {
-        // Drive across field
-
         double strafeToFarLaneX = -50;
         if (COLOR == AutoColor.BLUE) {
             if (boardPosition == BoardPosition.INNER) {
@@ -437,6 +440,36 @@ public abstract class AutoBase extends LinearOpMode {
             }
         }
 
+
+        // Plan target tags for delivery
+
+        BoardPosition targetTagForSwoop = BoardPosition.CENTER;
+        if (boardPosition == BoardPosition.CENTER) {
+            targetTagForSwoop = BoardPosition.OUTER;
+        }
+
+        BoardPosition whiteTag = BoardPosition.CENTER;
+
+        double[] alignmentOffsets = isBlue ? AlignmentConstants.BlueOffsets : AlignmentConstants.RedOffsets;
+
+        double[] boardYLocations = isBlue ? FarLocationConstants.blueBoardY : FarLocationConstants.redBoardY;
+
+        double swoopOffset = alignmentOffsets[boardPosition.getIndex()];
+
+        switch (boardPosition) {
+            case INNER:
+                whiteTag = BoardPosition.OUTER;
+                break;
+            case CENTER:
+                whiteTag = BoardPosition.OUTER;
+                break;
+            case OUTER:
+                whiteTag = BoardPosition.INNER;
+                break;
+        }
+
+        double boardY = boardYLocations[whiteTag.getIndex()];
+
         Actions.runBlocking(
                 new SequentialAction(
                         robot.drive.actionBuilder(robot.drive.pose)
@@ -448,7 +481,7 @@ public abstract class AutoBase extends LinearOpMode {
                                 .strafeToLinearHeading(new Vector2d(FarLocationConstants.boardX, FarLocationConstants.FarLaneY * c), Math.toRadians(180))
                                 .build(),
                         robot.drive.actionBuilder(new Pose2d(FarLocationConstants.boardX, FarLocationConstants.FarLaneY * c, Math.toRadians(180)))
-                                .strafeToLinearHeading(new Vector2d(FarLocationConstants.boardX, 32 * c), Math.toRadians(180))
+                                .strafeToLinearHeading(new Vector2d(FarLocationConstants.boardX, boardY * c), Math.toRadians(180))
                                 .build()
                 )
         );
@@ -457,77 +490,26 @@ public abstract class AutoBase extends LinearOpMode {
         robot.arm.setGlobalWristRotation(true);
         robot.arm.update();
 
-
         // Delivery to board
-
-        BoardPosition targetTag = BoardPosition.CENTER;
-
-        double alignmentOffset = COLOR == AutoColor.BLUE
-                ? AlignmentConstants.BlueOffsets[1]
-                : AlignmentConstants.RedOffsets[1];
-
-        if (boardPosition == BoardPosition.CENTER) {
-            if (COLOR == AutoColor.BLUE) {
-                targetTag = BoardPosition.OUTER;
-            } else {
-                targetTag = BoardPosition.INNER;
-            }
-        } else {
-            if (COLOR == AutoColor.BLUE) {
-                if (boardPosition == BoardPosition.INNER) {
-                    alignmentOffset = AlignmentConstants.BlueOffsets[2];
-                } else {
-                    alignmentOffset = AlignmentConstants.BlueOffsets[0];
-                }
-            } else {
-                if (boardPosition == BoardPosition.INNER) {
-                    alignmentOffset = AlignmentConstants.RedOffsets[0];
-                } else {
-                    alignmentOffset = AlignmentConstants.RedOffsets[2];
-                }
-            }
-        }
-
-        robot.claw.setFingerEnabled(true);
 
         robot.arm.setRotation(ArmRotation.PrepAutoDeliver);
         robot.arm.update();
 
-        BoardPosition whiteTag = COLOR == AutoColor.BLUE ? BoardPosition.OUTER : BoardPosition.INNER;
-
-        boolean weirdPos = ((COLOR == AutoColor.BLUE && boardPosition == BoardPosition.OUTER) ||
-                (COLOR == AutoColor.RED && boardPosition == BoardPosition.INNER));
-
-        if (weirdPos) {
-            whiteTag = BoardPosition.CENTER;
-            Actions.runBlocking(
-                    robot.drive
-                            .actionBuilder(robot.drive.pose, TrajectorySpeed.SLOW)
-                            .strafeToLinearHeading(new Vector2d(30, 36 * c), Math.toRadians(180))
-                            .build()
-            );
-        }
-
-
         boolean whiteAligned = alignWithAprilTag(whiteTag, TimingConstants.WhiteAlignWithBoardTime);
-
 
         robot.arm.setRotation(ArmRotation.AutoDeliver, ArmSpeed.Mid);
         robot.arm.update();
 
         Rotation2d goodHeading = robot.drive.pose.heading;
 
-        double yOffset = 0;
+        double placeOffset = 0;
 
         if (whiteTag == BoardPosition.INNER) {
-            yOffset -= 2 * c;
+            placeOffset -= 2 * c;
         } else if (whiteTag == BoardPosition.OUTER) {
-            yOffset += 2 * c;
+            placeOffset += 2 * c;
         }
 
-        if (weirdPos) {
-            yOffset += 4 * c;
-        }
 
         Actions.runBlocking(
                 robot.drive
@@ -535,7 +517,7 @@ public abstract class AutoBase extends LinearOpMode {
                         .strafeToLinearHeading(
                                 new Vector2d(
                                         robot.drive.pose.position.x + 2,
-                                        robot.drive.pose.position.y + yOffset
+                                        robot.drive.pose.position.y + placeOffset
                                 ),
                                 goodHeading
                         )
@@ -559,8 +541,8 @@ public abstract class AutoBase extends LinearOpMode {
                                 .actionBuilder(robot.drive.pose, TrajectorySpeed.SLOW)
                                 .strafeToLinearHeading(
                                         new Vector2d(
-                                                32,
-                                                robot.drive.pose.position.y + ((weirdPos ? -6 : 4) * c) + (boardPosition == BoardPosition.CENTER ? 6 * c : 0)
+                                                FarLocationConstants.boardX,
+                                                boardY * c
                                         ),
                                         goodHeading
                                 )
@@ -603,6 +585,18 @@ public abstract class AutoBase extends LinearOpMode {
 //        }
 
         robot.arm.update();
+
+        Actions.runBlocking(
+                robot.drive
+                        .actionBuilder(robot.drive.pose, TrajectorySpeed.SLOW)
+                        .strafeTo(
+                                new Vector2d(
+                                        robot.drive.pose.position.x + 0.5,
+                                        robot.drive.pose.position.y + swoopOffset
+                                )
+                        )
+                        .build()
+        );
 
         final double alignedY = robot.drive.pose.position.y;
 
@@ -833,7 +827,6 @@ public abstract class AutoBase extends LinearOpMode {
                 robot.claw.open();
                 break;
             case BACKDROP:
-
                 break;
         }
     }
