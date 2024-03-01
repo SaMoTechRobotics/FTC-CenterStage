@@ -49,7 +49,7 @@ public final class MecanumDrive {
         );
 
         public SpeedConstraintParams alignSpeeds = new SpeedConstraintParams(
-                15, Math.PI / 4, Math.PI / 2, -20, 15
+                20, Math.PI / 4, Math.PI / 4, -20, 20
         );
 
         public SpeedConstraintParams fastSpeeds = new SpeedConstraintParams(

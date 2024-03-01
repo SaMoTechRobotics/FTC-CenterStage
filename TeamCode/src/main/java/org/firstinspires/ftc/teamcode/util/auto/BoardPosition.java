@@ -8,11 +8,11 @@ public enum BoardPosition {
     public int[] getTagNumbers() {
         switch (this) {
             case INNER:
-                return new int[]{1, 4};
+                return new int[]{1, 6};
             case CENTER:
                 return new int[]{2, 5};
             case OUTER:
-                return new int[]{3, 6};
+                return new int[]{3, 4};
             default:
                 return new int[]{-1};
         }

@@ -55,7 +55,6 @@ public abstract class AutoBase extends LinearOpMode {
 
     BoardPosition boardPosition = BoardPosition.CENTER;
 
-    @Config
     public static class StrategyConstants {
         public static int Cycles = 2;
         public static CycleType[] CycleTypes = {CycleType.BACKSTAGE, CycleType.BACKDROP};
@@ -66,40 +65,45 @@ public abstract class AutoBase extends LinearOpMode {
         }
     }
 
-    @Config
+    public static StrategyConstants STRATEGY = new StrategyConstants();
+
     public static class TimingConstants {
         public static double Delay = 0.5;
 
-        public static double WhiteAlignWithBoardTime = 1.5;
+        public static double WhiteAlignWithBoardTime = 1;
         public static double FarAlignWithBoardTime = 2.5;
 
         public static double PushBoardParked = 2;
 
+        public static double DriveIntoWhiteStack = 1.2;
+
         public static double StrafeAlignWithWall = 1;
     }
 
-    @Config
+    public static TimingConstants TIMING = new TimingConstants();
+
     public static class FarLocationConstants {
         public static double FarLaneY = 14;
 
         public static double blueStackY = 38.6;
-        public static double redStackY = 38;
+        public static double redStackY = 39;
 
         /**
          * The locations of where the robot should be to deliver the spike mark
          * Order: Inner X, Center Y, Outer X
          */
-        public static double[] blueSpikeMarks = new double[]{-39, 32, -42};
-        public static double[] redSpikeMarks = new double[]{-39, 32, -42};
+        public static double[] blueSpikeMarks = new double[]{-29, 32, -42};
+        public static double[] redSpikeMarks = new double[]{-30, 32, -44};
 
         // Order: Inner Y, Center Y, Outer Y
         public static double[] blueBoardY = new double[]{44, 36, 28};
-        public static double[] redBoardY = new double[]{44, 36, 28};
+        public static double[] redBoardY = new double[]{44, 36, 30};
 
         public static double boardX = 30;
     }
 
-    @Config
+    public static FarLocationConstants FAR_LOCATION = new FarLocationConstants();
+
     public static class NearLocationConstants {
         public static double CloseLaneY = 60;
 
@@ -121,18 +125,21 @@ public abstract class AutoBase extends LinearOpMode {
          * Order: Inner Y, Center Y, Outer Y
          */
         public static double[] blueBoardY = new double[]{44, 36, 28};
-        public static double[] redBoardY = new double[]{44, 36, 28};
+        public static double[] redBoardY = new double[]{46, 36, 28};
 
         public static double boardX = 30;
         public static double pushBoardX = 31;
     }
 
-    @Config
+    public static NearLocationConstants NEAR_LOCATION = new NearLocationConstants();
+
     public static class AlignmentConstants {
         // Order: Inner, Center, Outer
         public static double[] BlueOffsets = new double[]{5.5, 6.0, -6.7};
-        public static double[] RedOffsets = new double[]{-5.5, -5.0, 4.5};
+        public static double[] RedOffsets = new double[]{-5.5, -5.0, 5};
     }
+
+    public static AlignmentConstants ALIGNMENT = new AlignmentConstants();
 
     /**
      * This is to flip the sign of the y coordinate based on the color
@@ -179,6 +186,7 @@ public abstract class AutoBase extends LinearOpMode {
             if (spikeLocation != null) {
                 boardPosition = spikeLocation;
                 telemetry.addData("Spike Location", boardPosition.getPlace(COLOR));
+                telemetry.addData("Spike Location (RAW)", boardPosition.toString());
             } else {
                 telemetry.addData("Spike Location", "LOADING...");
             }
@@ -265,25 +273,25 @@ public abstract class AutoBase extends LinearOpMode {
                                                 Math.toRadians(startHeading)
                                         )
                                         .splineToSplineHeading(
-                                                new Pose2d(innerX, (38 + 2) * c, Math.toRadians(startHeading + 45)),
-                                                Math.toRadians(startHeading + 45)
+                                                new Pose2d(innerX, (38 + 2) * c, Math.toRadians(startHeading + 45 * c)),
+                                                Math.toRadians(startHeading + 45 * c)
                                         )
                                         .strafeToLinearHeading(
                                                 new Vector2d(innerX, 38 * c),
-                                                Math.toRadians(startHeading + 45),
+                                                Math.toRadians(startHeading + 45 * c),
                                                 robot.drive.getSpeedConstraint(TrajectorySpeed.SLOW).velConstraint
                                         ).build(),
                                 new SleepAction(0.2),
                                 robot.openNextClaw(),
                                 new SleepAction(0.2),
-                                robot.drive.actionBuilder(new Pose2d(innerX, 38 * c, Math.toRadians(startHeading + 45)))
+                                robot.drive.actionBuilder(new Pose2d(innerX, 38 * c, Math.toRadians(startHeading + 45 * c)))
                                         .strafeToLinearHeading(
                                                 new Vector2d(-36, 48 * c),
-                                                Math.toRadians(startHeading + 45)
+                                                Math.toRadians(startHeading + 45 * c)
                                         )
                                         .build(),
                                 robot.raiseArmForStack(),
-                                robot.drive.actionBuilder(new Pose2d(-36, 48 * c, Math.toRadians(startHeading + 45)))
+                                robot.drive.actionBuilder(new Pose2d(-36, 48 * c, Math.toRadians(startHeading + 45 * c)))
                                         .splineToLinearHeading(
                                                 new Pose2d(-50, stackY * c, Math.toRadians(180)),
                                                 Math.toRadians(0)
@@ -339,25 +347,25 @@ public abstract class AutoBase extends LinearOpMode {
                                                 Math.toRadians(startHeading)
                                         )
                                         .splineToSplineHeading(
-                                                new Pose2d(outerX, (32 + 2) * c, Math.toRadians(startHeading - 45)),
-                                                Math.toRadians(startHeading - 45)
+                                                new Pose2d(outerX, (32 + 2) * c, Math.toRadians(startHeading - 45 * c)),
+                                                Math.toRadians(startHeading - 45 * c)
                                         )
                                         .strafeToLinearHeading(
                                                 new Vector2d(outerX, 32 * c),
-                                                Math.toRadians(startHeading - 45),
+                                                Math.toRadians(startHeading - 45 * c),
                                                 robot.drive.getSpeedConstraint(TrajectorySpeed.SLOW).velConstraint
                                         ).build(),
                                 new SleepAction(0.2),
                                 robot.openNextClaw(),
                                 new SleepAction(0.2),
-                                robot.drive.actionBuilder(new Pose2d(outerX, 32 * c, Math.toRadians(startHeading - 45)))
+                                robot.drive.actionBuilder(new Pose2d(outerX, 32 * c, Math.toRadians(startHeading - 45 * c)))
                                         .strafeToLinearHeading(
                                                 new Vector2d(-36, 48 * c),
-                                                Math.toRadians(startHeading - 45)
+                                                Math.toRadians(startHeading - 45 * c)
                                         )
                                         .build(),
                                 robot.raiseArmForStack(),
-                                robot.drive.actionBuilder(new Pose2d(-36, 48 * c, Math.toRadians(startHeading - 45)))
+                                robot.drive.actionBuilder(new Pose2d(-36, 48 * c, Math.toRadians(startHeading - 45 * c)))
                                         .splineToLinearHeading(
                                                 new Pose2d(-50 + 2, stackY * c, Math.toRadians(180)),
                                                 Math.toRadians(0)
@@ -391,9 +399,10 @@ public abstract class AutoBase extends LinearOpMode {
         );
 
         robot.drive.setDrivePowersForSeconds(new PoseVelocity2d(
-                new Vector2d(0.35, 0), 0
-        ), 0.6);
+                new Vector2d(0.3, 0), 0
+        ), TimingConstants.DriveIntoWhiteStack);
 
+//        robot.drive.pose = new Pose2d(-65, robot.drive.pose.position.y, Math.toRadians(180));
         robot.drive.pose = new Pose2d(-65, robot.drive.pose.position.y, Math.toRadians(180));
 
         Actions.runBlocking(
@@ -426,20 +435,11 @@ public abstract class AutoBase extends LinearOpMode {
      */
     private void deliverToBoardFromFar() {
         double strafeToFarLaneX = -50;
-        if (COLOR == AutoColor.BLUE) {
-            if (boardPosition == BoardPosition.INNER) {
-                strafeToFarLaneX = -42;
-            } else if (boardPosition == BoardPosition.OUTER) {
-                strafeToFarLaneX = -36;
-            }
-        } else {
-            if (boardPosition == BoardPosition.INNER) {
-                strafeToFarLaneX = -34;
-            } else if (boardPosition == BoardPosition.OUTER) {
-                strafeToFarLaneX = -42;
-            }
+        if (boardPosition == BoardPosition.INNER) {
+            strafeToFarLaneX = -42;
+        } else if (boardPosition == BoardPosition.OUTER) {
+            strafeToFarLaneX = -36;
         }
-
 
         // Plan target tags for delivery
 
@@ -461,7 +461,7 @@ public abstract class AutoBase extends LinearOpMode {
                 whiteTag = BoardPosition.OUTER;
                 break;
             case CENTER:
-                whiteTag = BoardPosition.OUTER;
+                whiteTag = BoardPosition.INNER;
                 break;
             case OUTER:
                 whiteTag = BoardPosition.INNER;
@@ -486,13 +486,13 @@ public abstract class AutoBase extends LinearOpMode {
                 )
         );
 
-        robot.arm.setRotation(ArmRotation.MidDeliver);
-        robot.arm.setGlobalWristRotation(true);
-        robot.arm.update();
+//        robot.arm.setRotation(ArmRotation.MidDeliver);
+//        robot.arm.update();
 
         // Delivery to board
 
-        robot.arm.setRotation(ArmRotation.PrepAutoDeliver);
+        robot.arm.setRotation(ArmRotation.PrepAutoDeliver, ArmSpeed.Mid);
+        robot.arm.setGlobalWristRotation(true);
         robot.arm.update();
 
         boolean whiteAligned = alignWithAprilTag(whiteTag, TimingConstants.WhiteAlignWithBoardTime);
@@ -555,7 +555,7 @@ public abstract class AutoBase extends LinearOpMode {
 //        robot.arm.setBoardAngle(WristRotation.AutoBoardAngle);
         robot.arm.update();
 
-        boolean aligned = alignWithAprilTag(boardPosition, TimingConstants.FarAlignWithBoardTime);
+        boolean aligned = alignWithAprilTag(targetTagForSwoop, TimingConstants.FarAlignWithBoardTime);
 //
 //        if (!aligned) {
 //            telemetry.addLine("ERROR: APRIL TAG CAMERA NOT WORKING!!!");
@@ -662,25 +662,25 @@ public abstract class AutoBase extends LinearOpMode {
                         new SequentialAction(
                                 robot.drive.actionBuilder(robot.drive.pose)
                                         .strafeToLinearHeading(
-                                                new Vector2d(-36, 54 * c),
+                                                new Vector2d(12, 54 * c),
                                                 Math.toRadians(startHeading)
                                         )
                                         .splineToSplineHeading(
-                                                new Pose2d(innerX, (38 + 2) * c, Math.toRadians(startHeading + 45)),
-                                                Math.toRadians(startHeading + 45)
+                                                new Pose2d(innerX, (38 + 2) * c, Math.toRadians(startHeading + 45 * c)),
+                                                Math.toRadians(startHeading + 45 * c)
                                         )
                                         .strafeToLinearHeading(
                                                 new Vector2d(innerX, 38 * c),
-                                                Math.toRadians(startHeading + 45),
+                                                Math.toRadians(startHeading + 45 * c),
                                                 robot.drive.getSpeedConstraint(TrajectorySpeed.SLOW).velConstraint
                                         ).build(),
                                 new SleepAction(0.2),
                                 robot.openNextClaw(),
                                 new SleepAction(0.2),
-                                robot.drive.actionBuilder(new Pose2d(innerX, 38 * c, Math.toRadians(startHeading + 45)))
+                                robot.drive.actionBuilder(new Pose2d(innerX, 38 * c, Math.toRadians(startHeading + 45 * c)))
                                         .strafeToLinearHeading(
-                                                new Vector2d(-36, 48 * c),
-                                                Math.toRadians(startHeading + 45)
+                                                new Vector2d(12, 48 * c),
+                                                Math.toRadians(startHeading + 45 * c)
                                         )
                                         .build()
                         )
@@ -692,24 +692,24 @@ public abstract class AutoBase extends LinearOpMode {
                         new SequentialAction(
                                 robot.drive.actionBuilder(robot.drive.pose)
                                         .strafeToLinearHeading(
-                                                new Vector2d(-36, 58 * c),
+                                                new Vector2d(12, 58 * c),
                                                 Math.toRadians(startHeading)
                                         )
                                         .splineToSplineHeading(
-                                                new Pose2d(-36, (centerY + 2) * c, Math.toRadians(startHeading)),
+                                                new Pose2d(12, (centerY + 2) * c, Math.toRadians(startHeading)),
                                                 Math.toRadians(startHeading)
                                         )
                                         .strafeToLinearHeading(
-                                                new Vector2d(-36, centerY * c),
+                                                new Vector2d(12, centerY * c),
                                                 Math.toRadians(startHeading),
                                                 robot.drive.getSpeedConstraint(TrajectorySpeed.SLOW).velConstraint
                                         ).build(),
                                 new SleepAction(0.2),
                                 robot.openNextClaw(),
                                 new SleepAction(0.2),
-                                robot.drive.actionBuilder(new Pose2d(-36, centerY * c, Math.toRadians(startHeading)))
+                                robot.drive.actionBuilder(new Pose2d(12, centerY * c, Math.toRadians(startHeading)))
                                         .strafeToLinearHeading(
-                                                new Vector2d(-36, 48 * c),
+                                                new Vector2d(12, 48 * c),
                                                 Math.toRadians(startHeading)
                                         )
                                         .build()
@@ -722,25 +722,25 @@ public abstract class AutoBase extends LinearOpMode {
                         new SequentialAction(
                                 robot.drive.actionBuilder(robot.drive.pose)
                                         .strafeToLinearHeading(
-                                                new Vector2d(c == 1 ? -36 : -38, 54 * c),
+                                                new Vector2d(12, 54 * c),
                                                 Math.toRadians(startHeading)
                                         )
                                         .splineToSplineHeading(
-                                                new Pose2d(outerX, (32 + 2) * c, Math.toRadians(startHeading - 45)),
-                                                Math.toRadians(startHeading - 45)
+                                                new Pose2d(outerX, (32 + 2) * c, Math.toRadians(startHeading - 45 * c)),
+                                                Math.toRadians(startHeading - 45 * c)
                                         )
                                         .strafeToLinearHeading(
                                                 new Vector2d(outerX, 32 * c),
-                                                Math.toRadians(startHeading - 45),
+                                                Math.toRadians(startHeading - 45 * c),
                                                 robot.drive.getSpeedConstraint(TrajectorySpeed.SLOW).velConstraint
                                         ).build(),
                                 new SleepAction(0.2),
                                 robot.openNextClaw(),
                                 new SleepAction(0.2),
-                                robot.drive.actionBuilder(new Pose2d(outerX, 32 * c, Math.toRadians(startHeading - 45)))
+                                robot.drive.actionBuilder(new Pose2d(outerX, 32 * c, Math.toRadians(startHeading - 45 * c)))
                                         .strafeToLinearHeading(
-                                                new Vector2d(-36, 48 * c),
-                                                Math.toRadians(startHeading - 45)
+                                                new Vector2d(12, 48 * c),
+                                                Math.toRadians(startHeading - 45 * c)
                                         )
                                         .build()
                         )

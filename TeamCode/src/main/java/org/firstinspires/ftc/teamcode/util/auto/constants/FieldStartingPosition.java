@@ -5,7 +5,7 @@ import com.acmerobotics.dashboard.config.Config;
 @Config
 public class FieldStartingPosition {
     public static double RedFarX = -(24 + 7);
-    public static double RedNearX = -48.0 + 6.5;
+    public static double RedNearX = 24 - 7;
 
     public static double BlueNearX = 12.0;
     public static double BlueFarX = -(48 - 7);
