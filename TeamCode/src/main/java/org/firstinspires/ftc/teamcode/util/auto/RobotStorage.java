@@ -6,6 +6,8 @@ import org.firstinspires.ftc.teamcode.util.auto.constants.FieldStartingPosition;
 public class RobotStorage {
     public static Pose2d pose = new Pose2d(0, 0, 0);
 
+    public static boolean armUp = false;
+
     public static void reset() {
         pose = new Pose2d(0, 0, 0);
     }

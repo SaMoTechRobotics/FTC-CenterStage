@@ -31,6 +31,8 @@ public class Drive extends LinearOpMode {
         robot.arm.lockDrone();
         robot.claw.open();
 
+        RobotStorage.armUp = false;
+
         StatefulGamepad gamepad1Buttons = new StatefulGamepad(gamepad1);
         StatefulGamepad gamepad2Buttons = new StatefulGamepad(gamepad2);
 

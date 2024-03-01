@@ -4,6 +4,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.teamcode.util.auto.RobotStorage;
 import org.firstinspires.ftc.teamcode.util.lib.MotorsSyncManager;
 import org.firstinspires.ftc.teamcode.util.robot.claw.ClawPosition;
 
@@ -22,7 +23,7 @@ public class Arm {
         DcMotor motor = hardwareMap.get(DcMotor.class, "arm0");
         DcMotor motor2 = hardwareMap.get(DcMotor.class, "arm1");
         armMotors = new MotorsSyncManager(motor, motor2);
-        armMotors.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        if (!RobotStorage.armUp) armMotors.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         armMotors.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         wristServo = hardwareMap.get(Servo.class, "wrist");
@@ -48,6 +49,10 @@ public class Arm {
 
     public double getRotation() {
         return armMotors.getCurrentPosition() * (90.0 / ArmRotation.TicksAt90Degrees);
+    }
+
+    public boolean isDown() {
+        return armMotors.getCurrentPosition() <= degreesToArmTicks(ArmRotation.Down) + 1;
     }
 
     public double getArmTicks() {

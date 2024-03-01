@@ -165,6 +165,7 @@ public abstract class AutoBase extends LinearOpMode {
     public void runOpMode() {
         Pose2d startPose = RobotStorage.getStartPose(SIDE, COLOR);
         RobotStorage.setPose(startPose);
+        RobotStorage.armUp = false;
         robot = new AutoRobot(hardwareMap, startPose);
 
         robot.vision.startProcessor(VisionProcessor.SPIKE_LOCATION_DETECTION);
@@ -213,6 +214,8 @@ public abstract class AutoBase extends LinearOpMode {
                 200
         );
 
+        RobotStorage.armUp = true;
+
         if (SIDE == AutoSide.FAR) {
             deliverSpikeMarkFar();
 
@@ -250,6 +253,8 @@ public abstract class AutoBase extends LinearOpMode {
         if (SIDE == AutoSide.FAR) {
             pushBoardWhileParked();
         }
+
+        RobotStorage.armUp = false;
 
         while (opModeIsActive() && !isStopRequested()) {
             idle();
@@ -902,6 +907,7 @@ public abstract class AutoBase extends LinearOpMode {
 
         while (driveIntoBoardTimer.seconds() < TimingConstants.PushBoardParked && !isStopRequested()) {
             idle();
+            if (robot.arm.isDown() && RobotStorage.armUp) RobotStorage.armUp = false;
         }
 
         robot.drive.setDrivePowers(new PoseVelocity2d(new Vector2d(0, 0), 0));
