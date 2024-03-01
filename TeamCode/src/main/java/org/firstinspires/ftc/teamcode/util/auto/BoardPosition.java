@@ -32,7 +32,7 @@ public enum BoardPosition {
     }
 
     public String getPlace(AutoColor color) {
-        if (color == AutoColor.RED) {
+        if (color == AutoColor.BLUE) {
             switch (this) {
                 case INNER:
                     return "LEFT";
