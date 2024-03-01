@@ -496,7 +496,7 @@ public abstract class AutoBase extends LinearOpMode {
 
         // Delivery to board
 
-        robot.arm.setRotation(ArmRotation.PrepAutoDeliver, ArmSpeed.Mid);
+        robot.arm.setRotation(ArmRotation.MidDeliver);
         robot.arm.setGlobalWristRotation(true);
         robot.arm.update();
 
