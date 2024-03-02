@@ -41,11 +41,11 @@ public final class MecanumDrive {
         // Speed constraint parameters
 
         public SpeedConstraintParams defaultSpeeds = new SpeedConstraintParams(
-                50, 1 * Math.PI, 0.5 * Math.PI, -30, 40
+                70, 1 * Math.PI, 0.5 * Math.PI, -40, 60
         );
 
         public SpeedConstraintParams slowSpeeds = new SpeedConstraintParams(
-                15, Math.PI / 4, Math.PI / 2, -20, 20
+                20, Math.PI / 4, Math.PI / 2, -20, 20
         );
 
         public SpeedConstraintParams alignSpeeds = new SpeedConstraintParams(
@@ -53,7 +53,7 @@ public final class MecanumDrive {
         );
 
         public SpeedConstraintParams fastSpeeds = new SpeedConstraintParams(
-                100, 4 * Math.PI, 4 * Math.PI, -30, 70
+                100, 3 * Math.PI, 3 * Math.PI, -50, 80
         );
 
 

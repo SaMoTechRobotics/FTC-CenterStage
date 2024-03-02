@@ -69,7 +69,7 @@ public abstract class AutoBase extends LinearOpMode {
     public static StrategyConstants STRATEGY = new StrategyConstants();
 
     public static class TimingConstants {
-        public static double Delay = 0.5;
+        public static double Delay = 0;
 
         public static double WhiteAlignWithBoardTime = 1;
         public static double FarAlignWithBoardTime = 2.5;
@@ -97,8 +97,8 @@ public abstract class AutoBase extends LinearOpMode {
         public static double[] redSpikeMarks = new double[]{-30, 32, -44};
 
         // Order: Inner Y, Center Y, Outer Y
-        public static double[] blueBoardY = new double[]{44, 36, 28};
-        public static double[] redBoardY = new double[]{44, 36, 30};
+        public static double[] blueBoardY = new double[]{46, 38, 32};
+        public static double[] redBoardY = new double[]{46, 38, 32};
 
         public static double boardX = 30;
     }
@@ -137,7 +137,7 @@ public abstract class AutoBase extends LinearOpMode {
     public static class AlignmentConstants {
         // Order: Inner, Center, Outer
         public static double[] BlueOffsets = new double[]{5.5, 6.0, -6.7};
-        public static double[] RedOffsets = new double[]{-5.5, -5.0, 5};
+        public static double[] RedOffsets = new double[]{-5.5, -5.0, 6};
     }
 
     public static AlignmentConstants ALIGNMENT = new AlignmentConstants();
@@ -479,23 +479,25 @@ public abstract class AutoBase extends LinearOpMode {
 
         Actions.runBlocking(
                 new SequentialAction(
-                        robot.drive.actionBuilder(robot.drive.pose)
+                        robot.drive.actionBuilder(robot.drive.pose, TrajectorySpeed.FAST)
                                 .strafeToLinearHeading(new Vector2d(strafeToFarLaneX, 36 * c), Math.toRadians(180))
-                                .strafeToLinearHeading(new Vector2d(strafeToFarLaneX, FarLocationConstants.FarLaneY * c), Math.toRadians(180))
                                 .build(),
-                        new SleepAction(TimingConstants.Delay),
-                        robot.drive.actionBuilder(new Pose2d(strafeToFarLaneX, FarLocationConstants.FarLaneY * c, Math.toRadians(180)), TrajectorySpeed.FAST)
-                                .strafeToLinearHeading(new Vector2d(FarLocationConstants.boardX, FarLocationConstants.FarLaneY * c), Math.toRadians(180))
+                        robot.drive.actionBuilder(new Pose2d(strafeToFarLaneX, 36 * c, Math.toRadians(180)), TrajectorySpeed.SLOW)
+                                .strafeToLinearHeading(new Vector2d(strafeToFarLaneX, FarLocationConstants.FarLaneY * c), Math.toRadians(180))
                                 .build()
                 )
         );
 
+        if (TimingConstants.Delay > 0) Actions.runBlocking(new SleepAction(TimingConstants.Delay));
+
         double newHeading = robot.drive.imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES) + 90;
         robot.drive.pose = new Pose2d(robot.drive.pose.position.x, robot.drive.pose.position.y, Math.toRadians(newHeading));
 
-
         Actions.runBlocking(
-                robot.drive.actionBuilder(new Pose2d(FarLocationConstants.boardX, FarLocationConstants.FarLaneY * c, Math.toRadians(180)))
+                robot.drive.actionBuilder(robot.drive.pose, TrajectorySpeed.FAST)
+                        .turnTo(Math.toRadians(180))
+                        .strafeToLinearHeading(new Vector2d(FarLocationConstants.boardX, FarLocationConstants.FarLaneY * c), Math.toRadians(180))
+                        .splineToConstantHeading(new Vector2d(36, 20 * c), Math.toRadians(180))
                         .strafeToLinearHeading(new Vector2d(FarLocationConstants.boardX, boardY * c), Math.toRadians(180))
                         .build()
         );
@@ -569,6 +571,9 @@ public abstract class AutoBase extends LinearOpMode {
 //        robot.arm.setBoardAngle(WristRotation.AutoBoardAngle);
         robot.arm.update();
 
+        robot.arm.setRotation(ArmRotation.AutoDeliverLow, ArmSpeed.Min);
+        robot.arm.update();
+
         boolean aligned = alignWithAprilTag(targetTagForSwoop, TimingConstants.FarAlignWithBoardTime);
 //
 //        if (!aligned) {
@@ -598,19 +603,36 @@ public abstract class AutoBase extends LinearOpMode {
 //            );
 //        }
 
+        robot.arm.setRotation(ArmRotation.AutoDeliverLow, ArmSpeed.Mid);
         robot.arm.update();
 
-        Actions.runBlocking(
-                robot.drive
-                        .actionBuilder(robot.drive.pose, TrajectorySpeed.SLOW)
-                        .strafeTo(
-                                new Vector2d(
-                                        robot.drive.pose.position.x + 0.5,
-                                        robot.drive.pose.position.y + swoopOffset
-                                )
-                        )
-                        .build()
-        );
+        if (!aligned) {
+            robot.arm.setRotation(ArmRotation.MidDeliver);
+
+            Actions.runBlocking(
+                    robot.drive
+                            .actionBuilder(robot.drive.pose, TrajectorySpeed.SLOW)
+                            .strafeTo(
+                                    new Vector2d(
+                                            33,
+                                            boardYLocations[boardPosition.getIndex()] * c
+                                    )
+                            )
+                            .build()
+            );
+        } else {
+            Actions.runBlocking(
+                    robot.drive
+                            .actionBuilder(robot.drive.pose, TrajectorySpeed.SLOW)
+                            .strafeTo(
+                                    new Vector2d(
+                                            robot.drive.pose.position.x + 0.5,
+                                            robot.drive.pose.position.y + swoopOffset
+                                    )
+                            )
+                            .build()
+            );
+        }
 
         final double alignedY = robot.drive.pose.position.y;
 
