@@ -15,7 +15,6 @@ import org.firstinspires.ftc.teamcode.util.robot.AutoRobot;
 import org.firstinspires.ftc.teamcode.util.robot.arm.ArmRotation;
 import org.firstinspires.ftc.teamcode.util.robot.arm.WristRotation;
 import org.firstinspires.ftc.teamcode.util.robot.chassis.ChassisSpeed;
-import org.firstinspires.ftc.teamcode.util.vision.VisionProcessor;
 import org.firstinspires.ftc.vision.apriltag.AprilTagPoseFtc;
 
 import java.lang.Math;
@@ -50,7 +49,9 @@ public class PlacePixelTest extends LinearOpMode {
     @Override
     public void runOpMode() {
         robot = new AutoRobot(hardwareMap, new Pose2d(0, 0, 0));
-        robot.vision.startProcessor(VisionProcessor.APRIL_TAG_DETECTION);
+//        robot.vision.startProcessor(VisionProcessor.APRIL_TAG_DETECTION);
+
+        robot.vision.startProcessors();
 
         waitForStart();
 

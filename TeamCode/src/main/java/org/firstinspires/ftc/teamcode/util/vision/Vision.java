@@ -3,8 +3,6 @@ package org.firstinspires.ftc.teamcode.util.vision;
 import android.util.Size;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import org.firstinspires.ftc.robotcore.external.ClassFactory;
-import org.firstinspires.ftc.robotcore.external.hardware.camera.CameraName;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.teamcode.util.auto.AutoColor;
 import org.firstinspires.ftc.teamcode.util.auto.BoardPosition;
@@ -22,112 +20,61 @@ public class Vision {
     private final WebcamName frontCamera;
     private final WebcamName backCamera;
 
-    public static int AprilTagCameraWidth = 640;
-    public static int AprilTagCameraHeight = 480;
+    public VisionPortal spikeMarkPortal = null;
+    public VisionPortal aprilTagPortal = null;
 
-    public VisionPortal visionPortal = null;
-    public VisionPortal visionPortal2 = null;
     SpikeLocationDetectionProcessor spikeMarkDetectionProcessor = null;
     AprilTagProcessor aprilTagProcessor = null;
-
-    private boolean multiProcessor = false;
 
     public Vision(HardwareMap hardwareMap) {
         frontCamera = hardwareMap.get(WebcamName.class, "Webcam 2");
         backCamera = hardwareMap.get(WebcamName.class, "Webcam 1");
     }
 
-    public void startProcessor(VisionProcessor processingMode) {
-        VisionPortal.Builder builder = new VisionPortal.Builder();
-        builder.setCameraResolution(new Size(1280, 720));
-//        if (processingMode == VisionProcessor.APRIL_TAG_DETECTION) {
-//            builder.setStreamFormat(VisionPortal.StreamFormat.MJPEG);
-//            builder.setCameraResolution(new Size(AprilTagCameraWidth, AprilTagCameraHeight));
-//        }
-//        builder.setAutoStopLiveView(true);
-//        builder.enableLiveView(false);
-        switch (processingMode) {
-            case SPIKE_LOCATION_DETECTION:
-                builder.setCamera(frontCamera);
-                spikeMarkDetectionProcessor = new SpikeLocationDetectionProcessor();
-                builder.addProcessor(spikeMarkDetectionProcessor);
-                break;
-            case APRIL_TAG_DETECTION:
-                builder.setCamera(backCamera);
-                aprilTagProcessor = new AprilTagProcessor.Builder()
-                        .setLensIntrinsics(913.562, 913.562, 650.769, 346.753)
-                        .setDrawCubeProjection(true)
-                        .setDrawAxes(true)
-                        .build();
-                builder.addProcessor(aprilTagProcessor);
-                break;
-        }
-        if (visionPortal == null) visionPortal = builder.build();
-        else visionPortal2 = builder.build();
-    }
-
     public void startProcessors() {
-        multiProcessor = true;
-        VisionPortal.Builder builder = new VisionPortal.Builder();
-        builder.setCameraResolution(new Size(1280, 720));
-        CameraName switchableCamera = ClassFactory.getInstance()
-                .getCameraManager().nameForSwitchableCamera(frontCamera, backCamera);
-        builder.setCamera(switchableCamera);
+        int[] portalsList = VisionPortal.makeMultiPortalView(2, VisionPortal.MultiPortalLayout.HORIZONTAL);
+
         spikeMarkDetectionProcessor = new SpikeLocationDetectionProcessor();
-        builder.addProcessor(spikeMarkDetectionProcessor);
         aprilTagProcessor = new AprilTagProcessor.Builder()
                 .setLensIntrinsics(913.562, 913.562, 650.769, 346.753)
                 .setDrawCubeProjection(true)
                 .setDrawAxes(true)
                 .build();
-        builder.addProcessor(aprilTagProcessor);
-        visionPortal = builder.build();
+
+//        spikeMarkPortal = VisionPortal.easyCreateWithDefaults(frontCamera, spikeMarkDetectionProcessor, aprilTagProcessor);
+
+        VisionPortal.Builder builder1 = new VisionPortal.Builder();
+        builder1.setCameraResolution(new Size(1280, 720));
+        builder1.setCamera(frontCamera);
+        builder1.addProcessor(spikeMarkDetectionProcessor);
+        builder1.setLiveViewContainerId(portalsList[0]);
+        spikeMarkPortal = builder1.build();
+
+        VisionPortal.Builder builder2 = new VisionPortal.Builder();
+        builder2.setCameraResolution(new Size(1280, 720));
+        builder2.setCamera(backCamera);
+        builder2.addProcessor(aprilTagProcessor);
+        builder2.setLiveViewContainerId(portalsList[1]);
+        aprilTagPortal = builder2.build();
     }
 
-    public void setActiveCamera(VisionProcessor processor) {
-        if (!multiProcessor) return;
-        if (visionPortal.getCameraState() != VisionPortal.CameraState.STREAMING) return;
+    public void setActiveProcessor(VisionProcessor processor) {
         if (processor == VisionProcessor.APRIL_TAG_DETECTION) {
-//            visionPortal.setProcessorEnabled(aprilTagProcessor, true);
-//            visionPortal.setProcessorEnabled(spikeMarkDetectionProcessor, false);
-            visionPortal.setActiveCamera(backCamera);
+            aprilTagPortal.resumeStreaming();
+            spikeMarkPortal.stopStreaming();
         } else {
-//            visionPortal.setProcessorEnabled(aprilTagProcessor, false);
-//            visionPortal.setProcessorEnabled(spikeMarkDetectionProcessor, true);
-            visionPortal.setActiveCamera(frontCamera);
+            spikeMarkPortal.resumeStreaming();
+            aprilTagPortal.stopStreaming();
         }
-    }
-
-    public void setColor(AutoColor color) {
-        if (spikeMarkDetectionProcessor != null) spikeMarkDetectionProcessor.setColor(color);
-    }
-
-    public void setProcessorEnabled(VisionProcessor processor, boolean enabled) {
-        switch (processor) {
-            case SPIKE_LOCATION_DETECTION:
-                visionPortal.setProcessorEnabled(spikeMarkDetectionProcessor, enabled);
-                break;
-            case APRIL_TAG_DETECTION:
-                visionPortal.setProcessorEnabled(aprilTagProcessor, enabled);
-                break;
-        }
-    }
-
-    public void stopProcessors() {
-        visionPortal.setProcessorEnabled(spikeMarkDetectionProcessor, false);
-    }
-
-    public void toggleProcessorStreamingMode() {
-        if (spikeMarkDetectionProcessor != null) spikeMarkDetectionProcessor.toggleStreamingMode();
-    }
-
-    public void update() {
-
     }
 
     public BoardPosition getSpikeLocation() {
         if (spikeMarkDetectionProcessor != null) return spikeMarkDetectionProcessor.location;
         return null;
+    }
+
+    public void setColor(AutoColor color) {
+        if (spikeMarkDetectionProcessor != null) spikeMarkDetectionProcessor.setColor(color);
     }
 
     public boolean isBoardDetected() {
@@ -187,19 +134,8 @@ public class Vision {
         return aprilTagProcessor;
     }
 
-    public void nextPortal() {
-        visionPortal.close();
-        visionPortal = visionPortal2;
-    }
-
     public void close() {
-        if (visionPortal != null) {
-            visionPortal.close();
-        }
-    }
-
-    public boolean isReady() {
-        return true;
-//        return visionPortal.getCameraState() == VisionPortal.CameraState.CAMERA_DEVICE_READY;
+        if (spikeMarkPortal != null) spikeMarkPortal.close();
+        if (aprilTagPortal != null) aprilTagPortal.close();
     }
 }

@@ -16,7 +16,6 @@ import org.firstinspires.ftc.teamcode.util.robot.AutoRobot;
 import org.firstinspires.ftc.teamcode.util.robot.arm.ArmRotation;
 import org.firstinspires.ftc.teamcode.util.robot.arm.ArmSpeed;
 import org.firstinspires.ftc.teamcode.util.robot.arm.WristRotation;
-import org.firstinspires.ftc.teamcode.util.vision.VisionProcessor;
 import org.firstinspires.ftc.vision.apriltag.AprilTagPoseFtc;
 
 import java.lang.Math;
@@ -169,7 +168,7 @@ public abstract class AutoBase extends LinearOpMode {
         RobotStorage.armUp = false;
         robot = new AutoRobot(hardwareMap, startPose);
 
-        robot.vision.startProcessor(VisionProcessor.SPIKE_LOCATION_DETECTION);
+        robot.vision.startProcessors();
         robot.vision.setColor(COLOR);
 
         ElapsedTime elapsedTime = new ElapsedTime();
@@ -179,7 +178,7 @@ public abstract class AutoBase extends LinearOpMode {
         startHeading = COLOR == AutoColor.BLUE ? 270 : 90;
         isBlue = COLOR == AutoColor.BLUE;
 
-        while ((!isStarted() || !robot.vision.isReady()) && !isStopRequested()) {
+        while (!isStarted() && !isStopRequested()) {
             telemetry.addLine("Color: " + COLOR + " Side: " + SIDE);
             telemetry.addData("Status", "Initialized for " + Math.round(elapsedTime.seconds()));
             telemetry.addLine("---");
@@ -193,6 +192,8 @@ public abstract class AutoBase extends LinearOpMode {
                 telemetry.addData("Spike Location", "LOADING...");
             }
             telemetry.update();
+
+            sleep(10);
         }
 
         waitForStart();
@@ -225,8 +226,8 @@ public abstract class AutoBase extends LinearOpMode {
             pickUpFromWhiteStack();
 
             // Switch to April Tag detection
-            robot.vision.startProcessor(VisionProcessor.APRIL_TAG_DETECTION);
-            robot.vision.setActiveCamera(VisionProcessor.APRIL_TAG_DETECTION);
+//            robot.vision.startProcessor(VisionProcessor.APRIL_TAG_DETECTION);
+//            robot.vision.setActiveCamera(VisionProcessor.APRIL_TAG_DETECTION);
 
             deliverToBoardFromFar();
         } else {
