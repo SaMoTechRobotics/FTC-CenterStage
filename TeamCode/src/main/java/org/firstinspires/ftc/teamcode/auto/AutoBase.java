@@ -57,7 +57,7 @@ public abstract class AutoBase extends LinearOpMode {
     BoardPosition boardPosition = BoardPosition.CENTER;
 
     public static class StrategyConstants {
-        public static int Cycles = 2;
+        public static int Cycles = 0;
         public static CycleType[] CycleTypes = {CycleType.BACKSTAGE, CycleType.BACKDROP};
 
         public enum CycleType {
@@ -93,12 +93,12 @@ public abstract class AutoBase extends LinearOpMode {
          * The locations of where the robot should be to deliver the spike mark
          * Order: Inner X, Center Y, Outer X
          */
-        public static double[] blueSpikeMarks = new double[]{-30, 33, -44};
-        public static double[] redSpikeMarks = new double[]{-30, 33, -45};
+        public static double[] blueSpikeMarks = new double[]{-29, 35, -42.5};
+        public static double[] redSpikeMarks = new double[]{-30, 35.5, -44};
 
         // Order: Inner Y, Center Y, Outer Y
-        public static double[] blueBoardY = new double[]{46, 38, 32};
-        public static double[] redBoardY = new double[]{46, 38, 32};
+        public static double[] blueBoardY = new double[]{44.5, 38, 31};
+        public static double[] redBoardY = new double[]{46, 38, 31};
 
         public static double boardX = 30;
     }
@@ -119,25 +119,25 @@ public abstract class AutoBase extends LinearOpMode {
          * Order: Inner X, Center Y, Outer X
          */
         public static double[] blueSpikeMarks = new double[]{18, 32, 6};
-        public static double[] redSpikeMarks = new double[]{18, 32,};
+        public static double[] redSpikeMarks = new double[]{18, 32, 6};
 
         /**
          * The Y coordinate of where the robot should be to deliver the spike mark
          * Order: Inner Y, Center Y, Outer Y
          */
-        public static double[] blueBoardY = new double[]{44, 36, 28};
+        public static double[] blueBoardY = new double[]{44, 33, 28};
         public static double[] redBoardY = new double[]{46, 33, 28};
 
         public static double boardX = 30;
-        public static double pushBoardX = 32;
+        public static double pushBoardX = 33;
     }
 
     public static NearLocationConstants NEAR_LOCATION = new NearLocationConstants();
 
     public static class AlignmentConstants {
         // Order: Inner, Center, Outer
-        public static double[] BlueOffsets = new double[]{5.5, 6.0, -6};
-        public static double[] RedOffsets = new double[]{-5.5, -5.0, 6};
+        public static double[] BlueOffsets = new double[]{6, 6.0, -5.2};
+        public static double[] RedOffsets = new double[]{-5.5, -4.5, 6};
     }
 
     public static AlignmentConstants ALIGNMENT = new AlignmentConstants();
@@ -249,16 +249,28 @@ public abstract class AutoBase extends LinearOpMode {
         } else {
             deliverBothNear();
 
-            for (int i = 0; i < StrategyConstants.Cycles; i++) {
-                ElapsedTime cycleTime = new ElapsedTime();
+            if (StrategyConstants.Cycles > 0) {
+                for (int i = 0; i < StrategyConstants.Cycles; i++) {
+                    ElapsedTime cycleTime = new ElapsedTime();
 
-                StrategyConstants.CycleType cycleType = StrategyConstants.CycleTypes.length > i ? StrategyConstants.CycleTypes[i] : StrategyConstants.CycleType.BACKSTAGE;
-                cycleWhiteStack(cycleType);
+                    StrategyConstants.CycleType cycleType = StrategyConstants.CycleTypes.length > i ? StrategyConstants.CycleTypes[i] : StrategyConstants.CycleType.BACKSTAGE;
+                    cycleWhiteStack(cycleType);
 
-                telemetry.addData("Cycle Time", cycleTime.seconds());
-                telemetry.update();
-                saveToLog("Cycle " + i + 1 + " Time: " + Math.round(cycleTime.seconds() * 1000) / 1000);
+                    telemetry.addData("Cycle Time", cycleTime.seconds());
+                    telemetry.update();
+                    saveToLog("Cycle " + i + 1 + " Time: " + Math.round(cycleTime.seconds() * 1000) / 1000);
+                }
             }
+
+            robot.arm.setRotation(ArmRotation.Down);
+            robot.arm.setWristRotation(WristRotation.Down);
+
+            Actions.runBlocking(
+                    robot.drive.actionBuilder(robot.drive.pose)
+                            .strafeToLinearHeading(new Vector2d(NearLocationConstants.pushBoardX, NearLocationConstants.WallY * c), Math.toRadians(180))
+                            .build()
+            );
+
         }
 
         String log = "Auto Finished in " + Math.round(elapsedTime.seconds() * 1000) / 1000 + " seconds";
@@ -294,7 +306,7 @@ public abstract class AutoBase extends LinearOpMode {
                         new SequentialAction(
                                 robot.drive.actionBuilder(robot.drive.pose)
                                         .strafeToLinearHeading(
-                                                new Vector2d(-38, 54 * c),
+                                                new Vector2d(-40, 54 * c),
                                                 Math.toRadians(startHeading)
                                         )
                                         .splineToSplineHeading(
@@ -507,7 +519,7 @@ public abstract class AutoBase extends LinearOpMode {
 
         if (TimingConstants.Delay > 0) Actions.runBlocking(new SleepAction(TimingConstants.Delay));
 
-        double newHeading = robot.drive.imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES) + 90;
+        double newHeading = robot.drive.imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES) + startHeading;
         robot.drive.pose = new Pose2d(robot.drive.pose.position.x, robot.drive.pose.position.y, Math.toRadians(newHeading));
 
         Actions.runBlocking(
@@ -538,7 +550,7 @@ public abstract class AutoBase extends LinearOpMode {
         double placeOffset = 0;
 
         if (whiteTag == BoardPosition.INNER) {
-            placeOffset += 1 * c;
+            placeOffset += (isBlue ? 2 : 1) * c;
         } else if (whiteTag == BoardPosition.OUTER) {
             placeOffset -= 1 * c;
         }
