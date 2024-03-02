@@ -5,7 +5,7 @@ import com.acmerobotics.dashboard.config.Config;
 @Config
 public class WristRotation {
     public static double DefaultBoardAngle = 110.0; // 105.0
-    public static double AutoBoardAngle = 105.0; // 105.0
+    public static double AutoBoardAngle = 102.0; // 105.0
     public static double PickupComplementAngle = 180.0;
 
     public static double MinHighBoardAngle = 50.0; // 105.0

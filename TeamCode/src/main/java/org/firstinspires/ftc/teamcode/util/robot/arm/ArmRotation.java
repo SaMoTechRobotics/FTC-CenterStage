@@ -17,7 +17,7 @@ public class ArmRotation {
 
     public static int PrepAutoDeliver = 155;
     public static int AutoDeliver = 162;
-    public static int AutoDeliverLow = 168;
+    public static int AutoDeliverLow = 165;
 
     public static double HighWristMode = 140;
 

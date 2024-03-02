@@ -71,7 +71,7 @@ public abstract class AutoBase extends LinearOpMode {
     public static class TimingConstants {
         public static double Delay = 0;
 
-        public static double WhiteAlignWithBoardTime = 1;
+        public static double WhiteAlignWithBoardTime = 2;
         public static double FarAlignWithBoardTime = 2.5;
 
         public static double PushBoardParked = 2;
@@ -93,8 +93,8 @@ public abstract class AutoBase extends LinearOpMode {
          * The locations of where the robot should be to deliver the spike mark
          * Order: Inner X, Center Y, Outer X
          */
-        public static double[] blueSpikeMarks = new double[]{-30, 32, -44};
-        public static double[] redSpikeMarks = new double[]{-30, 32, -44};
+        public static double[] blueSpikeMarks = new double[]{-30, 33, -44};
+        public static double[] redSpikeMarks = new double[]{-30, 33, -45};
 
         // Order: Inner Y, Center Y, Outer Y
         public static double[] blueBoardY = new double[]{46, 38, 32};
@@ -136,7 +136,7 @@ public abstract class AutoBase extends LinearOpMode {
 
     public static class AlignmentConstants {
         // Order: Inner, Center, Outer
-        public static double[] BlueOffsets = new double[]{5.5, 6.0, -6.7};
+        public static double[] BlueOffsets = new double[]{5.5, 6.0, -6};
         public static double[] RedOffsets = new double[]{-5.5, -5.0, 6};
     }
 
@@ -539,9 +539,9 @@ public abstract class AutoBase extends LinearOpMode {
         double placeOffset = 0;
 
         if (whiteTag == BoardPosition.INNER) {
-            placeOffset -= 2 * c;
+            placeOffset += 1 * c;
         } else if (whiteTag == BoardPosition.OUTER) {
-            placeOffset += 2 * c;
+            placeOffset -= 1 * c;
         }
 
 
@@ -560,13 +560,15 @@ public abstract class AutoBase extends LinearOpMode {
 
         robot.claw.openNext();
 
+        robot.arm.setRotation(ArmRotation.PrepAutoDeliver);
+
         Actions.runBlocking(
                 new SequentialAction(
                         robot.drive
                                 .actionBuilder(robot.drive.pose, TrajectorySpeed.SLOW)
                                 .strafeTo(
                                         new Vector2d(
-                                                robot.drive.pose.position.x - 2,
+                                                FarLocationConstants.boardX,
                                                 robot.drive.pose.position.y
                                         )
                                 )
@@ -576,7 +578,7 @@ public abstract class AutoBase extends LinearOpMode {
                                 .strafeToLinearHeading(
                                         new Vector2d(
                                                 FarLocationConstants.boardX,
-                                                boardY * c
+                                                boardYLocations[targetTagForSwoop.getIndex()] * c
                                         ),
                                         goodHeading
                                 )
@@ -589,7 +591,7 @@ public abstract class AutoBase extends LinearOpMode {
 //        robot.arm.setBoardAngle(WristRotation.AutoBoardAngle);
         robot.arm.update();
 
-        robot.arm.setRotation(ArmRotation.AutoDeliverLow, ArmSpeed.Min);
+        robot.arm.setRotation(ArmRotation.AutoDeliverLow, ArmSpeed.Mid);
         robot.arm.update();
 
         boolean aligned = alignWithAprilTag(targetTagForSwoop, TimingConstants.FarAlignWithBoardTime);
@@ -655,13 +657,14 @@ public abstract class AutoBase extends LinearOpMode {
         final double alignedY = robot.drive.pose.position.y;
 
         robot.arm.setRotation(ArmRotation.AutoDeliverLow, ArmSpeed.Min);
+        robot.arm.update();
 
         Actions.runBlocking(
                 robot.drive
                         .actionBuilder(robot.drive.pose, TrajectorySpeed.SLOW)
                         .strafeTo(
                                 new Vector2d(
-                                        robot.drive.pose.position.x + 1.5,
+                                        robot.drive.pose.position.x + 1,
                                         alignedY
                                 )
                         )
@@ -940,7 +943,8 @@ public abstract class AutoBase extends LinearOpMode {
                     );
                 }
             } else {
-                robot.drive.setDrivePowers(new PoseVelocity2d(new Vector2d(0, -BoardAlignmentConstants.FindSpeed * c), 0));
+                int d = Math.abs(robot.drive.pose.position.y) > 40 ? -1 : 1;
+                robot.drive.setDrivePowers(new PoseVelocity2d(new Vector2d(0, -BoardAlignmentConstants.FindSpeed * c * d), 0));
             }
         }
         return aligned;
