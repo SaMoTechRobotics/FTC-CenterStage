@@ -179,34 +179,33 @@ public abstract class AutoBase extends LinearOpMode {
         startHeading = COLOR == AutoColor.BLUE ? 270 : 90;
         isBlue = COLOR == AutoColor.BLUE;
 
-//        boolean aprilTagCameraWorking = false;
-
-        ElapsedTime switchProcessor = new ElapsedTime();
-        boolean april = false;
+        ElapsedTime cameraTimer = new ElapsedTime();
+        boolean aprilTagCameraWorking = false;
 
         while (!isStarted() && !isStopRequested()) {
             telemetry.addLine("Color: " + COLOR + " Side: " + SIDE);
             telemetry.addData("Status", "Initialized for " + Math.round(elapsedTime.seconds()));
             telemetry.addLine("---");
 
-            if (switchProcessor.seconds() > 3 && !april) {
+            if (!robot.vision.getAprilTagProcessor().getDetections().isEmpty() && !aprilTagCameraWorking) {
                 robot.vision.setActiveProcessor(VisionProcessor.SPIKE_LOCATION_DETECTION);
-                april = true;
+                aprilTagCameraWorking = true;
             }
-//
-//            telemetry.addData("APRIL TAG CAMERA WORKING", aprilTagCameraWorking ? "YES IT IS" : "NO, THIS CAMERA IS STUPID");
-//            if (!robot.vision.getAprilTagProcessor().getDetections().isEmpty() && !aprilTagCameraWorking) {
-//                aprilTagCameraWorking = true;
-//                robot.vision.setActiveProcessor(VisionProcessor.SPIKE_LOCATION_DETECTION);
-//            }
 
-            BoardPosition spikeLocation = robot.vision.getSpikeLocation();
-            if (spikeLocation != null) {
-                boardPosition = spikeLocation;
-                telemetry.addData("Spike Location", boardPosition.getPlace(COLOR));
-                telemetry.addData("Spike Location (RAW)", boardPosition.toString());
+            if (cameraTimer.seconds() > 2) {
+                telemetry.addData("APRIL TAG CAMERA WORKING", aprilTagCameraWorking ? "YES IT IS" : "NO, SHOW IT AN APRIL TAG");
+                telemetry.addLine("---");
+
+                BoardPosition spikeLocation = robot.vision.getSpikeLocation();
+                if (spikeLocation != null) {
+                    boardPosition = spikeLocation;
+                    telemetry.addData("Spike Location", boardPosition.getPlace(COLOR));
+                    telemetry.addData("Spike Location (RAW)", boardPosition.toString());
+                } else {
+                    telemetry.addData("Spike Location", "LOADING...");
+                }
             } else {
-                telemetry.addData("Spike Location", "LOADING...");
+                telemetry.addLine("Cameras loading...");
             }
             telemetry.update();
 
