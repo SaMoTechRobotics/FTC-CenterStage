@@ -5,6 +5,7 @@ import com.acmerobotics.roadrunner.*;
 import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.roadrunner.speed.TrajectorySpeed;
 import org.firstinspires.ftc.teamcode.util.auto.AutoColor;
 import org.firstinspires.ftc.teamcode.util.auto.AutoSide;
@@ -92,7 +93,7 @@ public abstract class AutoBase extends LinearOpMode {
          * The locations of where the robot should be to deliver the spike mark
          * Order: Inner X, Center Y, Outer X
          */
-        public static double[] blueSpikeMarks = new double[]{-29, 32, -42};
+        public static double[] blueSpikeMarks = new double[]{-30, 32, -44};
         public static double[] redSpikeMarks = new double[]{-30, 32, -44};
 
         // Order: Inner Y, Center Y, Outer Y
@@ -198,6 +199,8 @@ public abstract class AutoBase extends LinearOpMode {
 
         if (isStopRequested()) return;
 
+        robot.drive.imu.resetYaw();
+
         elapsedTime.reset();
 
         robot.vision.close();
@@ -274,7 +277,7 @@ public abstract class AutoBase extends LinearOpMode {
                         new SequentialAction(
                                 robot.drive.actionBuilder(robot.drive.pose)
                                         .strafeToLinearHeading(
-                                                new Vector2d(-36, 54 * c),
+                                                new Vector2d(-38, 54 * c),
                                                 Math.toRadians(startHeading)
                                         )
                                         .splineToSplineHeading(
@@ -348,7 +351,7 @@ public abstract class AutoBase extends LinearOpMode {
                         new SequentialAction(
                                 robot.drive.actionBuilder(robot.drive.pose)
                                         .strafeToLinearHeading(
-                                                new Vector2d(c == 1 ? -36 : -38, 54 * c),
+                                                new Vector2d(-38, 54 * c),
                                                 Math.toRadians(startHeading)
                                         )
                                         .splineToSplineHeading(
@@ -453,14 +456,13 @@ public abstract class AutoBase extends LinearOpMode {
             targetTagForSwoop = BoardPosition.OUTER;
         }
 
-        BoardPosition whiteTag = BoardPosition.CENTER;
-
         double[] alignmentOffsets = isBlue ? AlignmentConstants.BlueOffsets : AlignmentConstants.RedOffsets;
 
         double[] boardYLocations = isBlue ? FarLocationConstants.blueBoardY : FarLocationConstants.redBoardY;
 
         double swoopOffset = alignmentOffsets[boardPosition.getIndex()];
 
+        BoardPosition whiteTag = BoardPosition.CENTER;
         switch (boardPosition) {
             case INNER:
                 whiteTag = BoardPosition.OUTER;
@@ -484,11 +486,18 @@ public abstract class AutoBase extends LinearOpMode {
                         new SleepAction(TimingConstants.Delay),
                         robot.drive.actionBuilder(new Pose2d(strafeToFarLaneX, FarLocationConstants.FarLaneY * c, Math.toRadians(180)), TrajectorySpeed.FAST)
                                 .strafeToLinearHeading(new Vector2d(FarLocationConstants.boardX, FarLocationConstants.FarLaneY * c), Math.toRadians(180))
-                                .build(),
-                        robot.drive.actionBuilder(new Pose2d(FarLocationConstants.boardX, FarLocationConstants.FarLaneY * c, Math.toRadians(180)))
-                                .strafeToLinearHeading(new Vector2d(FarLocationConstants.boardX, boardY * c), Math.toRadians(180))
                                 .build()
                 )
+        );
+
+        double newHeading = robot.drive.imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES) + 90;
+        robot.drive.pose = new Pose2d(robot.drive.pose.position.x, robot.drive.pose.position.y, Math.toRadians(newHeading));
+
+
+        Actions.runBlocking(
+                robot.drive.actionBuilder(new Pose2d(FarLocationConstants.boardX, FarLocationConstants.FarLaneY * c, Math.toRadians(180)))
+                        .strafeToLinearHeading(new Vector2d(FarLocationConstants.boardX, boardY * c), Math.toRadians(180))
+                        .build()
         );
 
 //        robot.arm.setRotation(ArmRotation.MidDeliver);

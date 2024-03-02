@@ -30,7 +30,7 @@ public class IMUTest extends LinearOpMode {
 
         while (opModeIsActive()) {
             double angle = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES);
-            double fieldAngle = angle - startAngle + offsetAngle;
+            double fieldAngle = angle + startAngle + offsetAngle;
             telemetry.addData("IMU (RAW DEGREES)", angle);
             telemetry.addData("IMU (FIELD DEGREES)", fieldAngle);
             telemetry.addLine("---");
