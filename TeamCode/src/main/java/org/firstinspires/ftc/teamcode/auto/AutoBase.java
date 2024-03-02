@@ -16,6 +16,7 @@ import org.firstinspires.ftc.teamcode.util.robot.AutoRobot;
 import org.firstinspires.ftc.teamcode.util.robot.arm.ArmRotation;
 import org.firstinspires.ftc.teamcode.util.robot.arm.ArmSpeed;
 import org.firstinspires.ftc.teamcode.util.robot.arm.WristRotation;
+import org.firstinspires.ftc.teamcode.util.vision.VisionProcessor;
 import org.firstinspires.ftc.vision.apriltag.AprilTagPoseFtc;
 
 import java.lang.Math;
@@ -178,10 +179,26 @@ public abstract class AutoBase extends LinearOpMode {
         startHeading = COLOR == AutoColor.BLUE ? 270 : 90;
         isBlue = COLOR == AutoColor.BLUE;
 
+//        boolean aprilTagCameraWorking = false;
+
+        ElapsedTime switchProcessor = new ElapsedTime();
+        boolean april = false;
+
         while (!isStarted() && !isStopRequested()) {
             telemetry.addLine("Color: " + COLOR + " Side: " + SIDE);
             telemetry.addData("Status", "Initialized for " + Math.round(elapsedTime.seconds()));
             telemetry.addLine("---");
+
+            if (switchProcessor.seconds() > 3 && !april) {
+                robot.vision.setActiveProcessor(VisionProcessor.SPIKE_LOCATION_DETECTION);
+                april = true;
+            }
+//
+//            telemetry.addData("APRIL TAG CAMERA WORKING", aprilTagCameraWorking ? "YES IT IS" : "NO, THIS CAMERA IS STUPID");
+//            if (!robot.vision.getAprilTagProcessor().getDetections().isEmpty() && !aprilTagCameraWorking) {
+//                aprilTagCameraWorking = true;
+//                robot.vision.setActiveProcessor(VisionProcessor.SPIKE_LOCATION_DETECTION);
+//            }
 
             BoardPosition spikeLocation = robot.vision.getSpikeLocation();
             if (spikeLocation != null) {
@@ -204,7 +221,7 @@ public abstract class AutoBase extends LinearOpMode {
 
         elapsedTime.reset();
 
-        robot.vision.close();
+        robot.vision.setActiveProcessor(VisionProcessor.APRIL_TAG_DETECTION);
 
         robot.claw.close();
 
