@@ -730,25 +730,22 @@ public abstract class AutoBase extends LinearOpMode {
                         new SequentialAction(
                                 robot.drive.actionBuilder(robot.drive.pose)
                                         .strafeToLinearHeading(
-                                                new Vector2d(12, 54 * c),
-                                                Math.toRadians(startHeading)
-                                        )
-                                        .splineToSplineHeading(
-                                                new Pose2d(innerX, (38 + 2) * c, Math.toRadians(startHeading + 45 * c)),
-                                                Math.toRadians(startHeading + 45 * c)
+                                                new Vector2d(innerX, 40 * c),
+                                                Math.toRadians(180),
+                                                robot.drive.getSpeedConstraint(TrajectorySpeed.SLOW).velConstraint
                                         )
                                         .strafeToLinearHeading(
                                                 new Vector2d(innerX, 38 * c),
-                                                Math.toRadians(startHeading + 45 * c),
+                                                Math.toRadians(180),
                                                 robot.drive.getSpeedConstraint(TrajectorySpeed.SLOW).velConstraint
                                         ).build(),
                                 new SleepAction(0.2),
                                 robot.openNextClaw(),
                                 new SleepAction(0.2),
-                                robot.drive.actionBuilder(new Pose2d(innerX, 38 * c, Math.toRadians(startHeading + 45 * c)))
+                                robot.drive.actionBuilder(new Pose2d(innerX, 38 * c, Math.toRadians(180)))
                                         .strafeToLinearHeading(
-                                                new Vector2d(12, 48 * c),
-                                                Math.toRadians(startHeading + 45 * c)
+                                                new Vector2d(28, 38 * c),
+                                                Math.toRadians(180)
                                         )
                                         .build()
                         )
@@ -786,29 +783,27 @@ public abstract class AutoBase extends LinearOpMode {
                 break;
             case OUTER:
                 double outerX = isBlue ? NearLocationConstants.blueSpikeMarks[2] : NearLocationConstants.redSpikeMarks[2];
+                double angle = -20 * c;
                 Actions.runBlocking(
                         new SequentialAction(
                                 robot.drive.actionBuilder(robot.drive.pose)
-                                        .strafeToLinearHeading(
-                                                new Vector2d(12, 54 * c),
-                                                Math.toRadians(startHeading)
-                                        )
+                                        .splineTo(new Vector2d(16, -48 * c), Math.toRadians(startHeading))
                                         .splineToSplineHeading(
-                                                new Pose2d(outerX, (32 + 2) * c, Math.toRadians(startHeading - 45 * c)),
-                                                Math.toRadians(startHeading - 45 * c)
+                                                new Pose2d(outerX, (32 + 2) * c, Math.toRadians(startHeading + angle)),
+                                                Math.toRadians(startHeading + angle)
                                         )
                                         .strafeToLinearHeading(
                                                 new Vector2d(outerX, 32 * c),
-                                                Math.toRadians(startHeading - 45 * c),
+                                                Math.toRadians(startHeading + angle),
                                                 robot.drive.getSpeedConstraint(TrajectorySpeed.SLOW).velConstraint
                                         ).build(),
                                 new SleepAction(0.2),
                                 robot.openNextClaw(),
                                 new SleepAction(0.2),
-                                robot.drive.actionBuilder(new Pose2d(outerX, 32 * c, Math.toRadians(startHeading - 45 * c)))
+                                robot.drive.actionBuilder(new Pose2d(outerX, 32 * c, Math.toRadians(startHeading + angle)))
                                         .strafeToLinearHeading(
                                                 new Vector2d(12, 48 * c),
-                                                Math.toRadians(startHeading - 45 * c)
+                                                Math.toRadians(startHeading + angle)
                                         )
                                         .build()
                         )
