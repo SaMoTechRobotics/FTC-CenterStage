@@ -56,13 +56,11 @@ public abstract class AutoBase extends LinearOpMode {
     BoardPosition boardPosition = BoardPosition.CENTER;
 
     public static class StrategyConstants {
-        public static int Cycles = 2;
-        public static CycleType[] CycleTypes = {CycleType.BACKSTAGE, CycleType.PARK};
+        public static DeliveryType cycleType = DeliveryType.BACKSTAGE;
 
-        public enum CycleType {
+        public enum DeliveryType {
             BACKSTAGE,
-            BACKDROP,
-            PARK
+            BACKDROP
         }
     }
 
@@ -74,7 +72,7 @@ public abstract class AutoBase extends LinearOpMode {
         public static double WhiteAlignWithBoardTime = 2;
         public static double FarAlignWithBoardTime = 2.5;
 
-        public static double CloseAlignForYellowTime = 0.5;
+        public static double CloseAlignForYellowTime = 1;
 
         public static double PushBoardParked = 2;
 
@@ -82,7 +80,7 @@ public abstract class AutoBase extends LinearOpMode {
 
         public static double DriveIntoWhiteStackCycle = 1;
 
-        public static double StrafeAlignWithWall = 0.6;
+        public static double StrafeAlignWithWall = 1;
     }
 
     public static TimingConstants TIMING = new TimingConstants();
@@ -123,18 +121,20 @@ public abstract class AutoBase extends LinearOpMode {
          * The locations of where the robot should be to deliver the spike mark
          * Order: Inner X, Center Y, Outer X
          */
-        public static double[] blueSpikeMarks = new double[]{18, 32, 7.5};
+        public static double[] blueSpikeMarks = new double[]{29.5, 32, 7.5};
         public static double[] redSpikeMarks = new double[]{18, 32, 7.5};
 
         /**
          * The Y coordinate of where the robot should be to deliver the spike mark
          * Order: Inner Y, Center Y, Outer Y
          */
-        public static double[] blueBoardY = new double[]{44, 33, 30};
+        public static double[] blueBoardY = new double[]{44, 39, 30};
         public static double[] redBoardY = new double[]{46, 33, 28};
 
         public static double boardX = 34;
-        public static double pushBoardX = 38;
+        public static double pushBoardX = 37;
+
+        public static double pushBoardDist = 1.5;
 
         public static double ParkX = 56;
     }
@@ -260,25 +260,14 @@ public abstract class AutoBase extends LinearOpMode {
 
             deliverBothNear();
 
-            if (StrategyConstants.Cycles > 0) {
-                for (int i = 0; i < StrategyConstants.Cycles; i++) {
-                    ElapsedTime cycleTime = new ElapsedTime();
-
-                    StrategyConstants.CycleType cycleType = StrategyConstants.CycleTypes.length > i ? StrategyConstants.CycleTypes[i] : StrategyConstants.CycleType.BACKSTAGE;
-                    cycleWhiteStack(cycleType, i);
-
-                    telemetry.addData("Cycle Time", cycleTime.seconds());
-                    telemetry.update();
-                    saveToLog("Cycle " + i + 1 + " Time: " + Math.round(cycleTime.seconds() * 1000) / 1000);
-                }
-            }
+            cycleWhiteStack(StrategyConstants.cycleType);
 
             robot.arm.setRotation(ArmRotation.Down);
             robot.arm.setWristRotation(WristRotation.Down);
 
             Actions.runBlocking(
                     robot.drive.actionBuilder(robot.drive.pose)
-                            .strafeToLinearHeading(new Vector2d(NearLocationConstants.ParkX, NearLocationConstants.WallY * c), Math.toRadians(180))
+                            .strafeTo(new Vector2d(NearLocationConstants.ParkX, NearLocationConstants.WallY * c))
                             .build()
             );
 
@@ -552,7 +541,7 @@ public abstract class AutoBase extends LinearOpMode {
         robot.arm.setGlobalWristRotation(true);
         robot.arm.update();
 
-        boolean whiteAligned = alignWithAprilTag(whiteTag, TimingConstants.WhiteAlignWithBoardTime);
+        boolean whiteAligned = alignWithAprilTag(whiteTag, TimingConstants.WhiteAlignWithBoardTime, true);
 
         robot.arm.setRotation(ArmRotation.AutoDeliver, ArmSpeed.Mid);
         robot.arm.update();
@@ -617,7 +606,7 @@ public abstract class AutoBase extends LinearOpMode {
         robot.arm.setRotation(ArmRotation.AutoDeliverLow, ArmSpeed.Mid);
         robot.arm.update();
 
-        boolean aligned = alignWithAprilTag(targetTagForSwoop, TimingConstants.FarAlignWithBoardTime);
+        boolean aligned = alignWithAprilTag(targetTagForSwoop, TimingConstants.FarAlignWithBoardTime, true);
 //
 //        if (!aligned) {
 //            telemetry.addLine("ERROR: APRIL TAG CAMERA NOT WORKING!!!");
@@ -742,21 +731,24 @@ public abstract class AutoBase extends LinearOpMode {
                         new SequentialAction(
                                 robot.drive.actionBuilder(robot.drive.pose)
                                         .strafeToLinearHeading(
-                                                new Vector2d(innerX, 40 * c),
-                                                Math.toRadians(180),
-                                                robot.drive.getSpeedConstraint(TrajectorySpeed.SLOW).velConstraint
+                                                new Vector2d(14, 54 * c),
+                                                Math.toRadians(startHeading)
                                         )
                                         .strafeToLinearHeading(
-                                                new Vector2d(innerX, 38 * c),
+                                                new Vector2d(innerX, 48 * c),
+                                                Math.toRadians(180)
+                                        )
+                                        .strafeToLinearHeading(
+                                                new Vector2d(innerX, 36 * c),
                                                 Math.toRadians(180),
                                                 robot.drive.getSpeedConstraint(TrajectorySpeed.SLOW).velConstraint
                                         ).build(),
                                 new SleepAction(0.2),
                                 robot.openNextClaw(),
                                 new SleepAction(0.2),
-                                robot.drive.actionBuilder(new Pose2d(innerX, 38 * c, Math.toRadians(180)))
+                                robot.drive.actionBuilder(new Pose2d(innerX, 36 * c, Math.toRadians(180)))
                                         .strafeToLinearHeading(
-                                                new Vector2d(28, 38 * c),
+                                                new Vector2d(innerX + 1, 38 * c),
                                                 Math.toRadians(180)
                                         )
                                         .build()
@@ -788,6 +780,10 @@ public abstract class AutoBase extends LinearOpMode {
                                         .strafeToLinearHeading(
                                                 new Vector2d(12, 48 * c),
                                                 Math.toRadians(startHeading)
+                                        )
+                                        .strafeToLinearHeading(
+                                                new Vector2d(36, 36 * c),
+                                                Math.toRadians(180)
                                         )
                                         .build()
                         )
@@ -837,15 +833,27 @@ public abstract class AutoBase extends LinearOpMode {
         robot.arm.update();
 
         Actions.runBlocking(
-                new SequentialAction(
-                        robot.drive.actionBuilder(robot.drive.pose, TrajectorySpeed.FAST)
-                                .strafeToLinearHeading(new Vector2d(NearLocationConstants.boardX, boardY * c), Math.toRadians(180))
-                                .build(),
-                        robot.drive.actionBuilder(new Pose2d(NearLocationConstants.boardX, boardY * c, Math.toRadians(180)), TrajectorySpeed.SLOW)
-                                .strafeToLinearHeading(new Vector2d(NearLocationConstants.pushBoardX, boardY * c), Math.toRadians(180))
-                                .build()
-                )
+                robot.drive.actionBuilder(robot.drive.pose)
+                        .strafeToLinearHeading(new Vector2d(NearLocationConstants.boardX, boardY * c), Math.toRadians(180))
+                        .build()
         );
+
+        boolean aligned = alignWithAprilTag(boardPosition, TimingConstants.CloseAlignForYellowTime, false);
+
+
+        if (aligned) {
+            Actions.runBlocking(
+                    robot.drive.actionBuilder(robot.drive.pose)
+                            .strafeToLinearHeading(new Vector2d(robot.drive.pose.position.x + NearLocationConstants.pushBoardDist, robot.drive.pose.position.y), robot.drive.pose.heading)
+                            .build()
+            );
+        } else {
+            Actions.runBlocking(
+                    robot.drive.actionBuilder(robot.drive.pose)
+                            .strafeToLinearHeading(new Vector2d(NearLocationConstants.pushBoardX, boardY * c), Math.toRadians(180))
+                            .build()
+            );
+        }
 
 //        if (TimingConstants.CloseAlignForYellowTime > 0) {
 //            alignWithAprilTag(boardPosition, TimingConstants.CloseAlignForYellowTime);
@@ -866,7 +874,7 @@ public abstract class AutoBase extends LinearOpMode {
      *
      * @param cycleType Where to deliver the 2 white pixels
      */
-    public void cycleWhiteStack(StrategyConstants.CycleType cycleType, int previousCycles) {
+    public void cycleWhiteStack(StrategyConstants.DeliveryType cycleType) {
         robot.resetForIntake();
 
         Actions.runBlocking(
@@ -889,10 +897,8 @@ public abstract class AutoBase extends LinearOpMode {
 
         robot.resetForIntake();
 
-        if (previousCycles == 0) {
-            robot.arm.setRotation(ArmRotation.Stack5, ArmSpeed.Mid);
-            robot.arm.setWristRotation(WristRotation.StackDown);
-        }
+        robot.arm.setRotation(ArmRotation.Stack5, ArmSpeed.Mid);
+        robot.arm.setWristRotation(WristRotation.StackDown);
 
         Actions.runBlocking(
                 robot.drive.actionBuilder(robot.drive.pose)
@@ -935,7 +941,7 @@ public abstract class AutoBase extends LinearOpMode {
 
         Actions.runBlocking(
                 new SequentialAction(
-                        robot.drive.actionBuilder(robot.drive.pose, TrajectorySpeed.FAST)
+                        robot.drive.actionBuilder(robot.drive.pose)
                                 .strafeToLinearHeading(new Vector2d(NearLocationConstants.stackX, stackY * c), Math.toRadians(180))
                                 .splineToConstantHeading(new Vector2d(-36, NearLocationConstants.BackCloseLaneY * c), Math.toRadians(180))
                                 .build(),
@@ -952,30 +958,16 @@ public abstract class AutoBase extends LinearOpMode {
                         new SequentialAction(
                                 robot.drive.actionBuilder(robot.drive.pose, TrajectorySpeed.FAST)
                                         .strafeToLinearHeading(new Vector2d(20, NearLocationConstants.BackCloseLaneY * c), Math.toRadians(180))
-                                        .build(),
-                                robot.prepareForBackstageDelivery(),
-                                robot.drive.actionBuilder(new Pose2d(20, NearLocationConstants.BackCloseLaneY * c, Math.toRadians(180)), TrajectorySpeed.FAST)
-                                        .strafeToLinearHeading(new Vector2d(36, 60 * c), Math.toRadians(180))
+                                        .strafeToLinearHeading(new Vector2d(58, 56 * c), Math.toRadians(180))
                                         .build()
                         )
                 );
-
                 robot.claw.open();
-                break;
-            case PARK:
                 Actions.runBlocking(
-                        new SequentialAction(
-                                robot.drive.actionBuilder(robot.drive.pose, TrajectorySpeed.FAST)
-                                        .strafeToLinearHeading(new Vector2d(-36, NearLocationConstants.BackCloseLaneY * c), Math.toRadians(180))
-                                        .build(),
-                                robot.drive.correctHeadingWithIMUAction(),
-                                robot.drive.actionBuilder(robot.drive.pose, TrajectorySpeed.FAST)
-                                        .strafeToLinearHeading(new Vector2d(NearLocationConstants.ParkX, NearLocationConstants.BackCloseLaneY * c), Math.toRadians(0))
-                                        .build()
-                        )
+                        robot.drive.actionBuilder(robot.drive.pose)
+                                .strafeToLinearHeading(new Vector2d(NearLocationConstants.ParkX, 58 * c), Math.toRadians(0))
+                                .build()
                 );
-
-                robot.claw.open();
                 break;
             case BACKDROP:
                 Actions.runBlocking(
@@ -983,7 +975,6 @@ public abstract class AutoBase extends LinearOpMode {
                                 .strafeToLinearHeading(new Vector2d(40, 54 * c), Math.toRadians(180))
                                 .build()
                 );
-
                 break;
         }
     }
@@ -995,7 +986,7 @@ public abstract class AutoBase extends LinearOpMode {
      * @param timeout   The maximum time to align
      * @return Whether the robot was aligned with the board, basically always true unless the camera is not working
      */
-    public boolean alignWithAprilTag(BoardPosition targetTag, double timeout) {
+    public boolean alignWithAprilTag(BoardPosition targetTag, double timeout, boolean tryFinding) {
         ElapsedTime time = new ElapsedTime();
 
         boolean aligned = false;
@@ -1028,7 +1019,7 @@ public abstract class AutoBase extends LinearOpMode {
                                     .build()
                     );
                 }
-            } else {
+            } else if (tryFinding) {
                 int d = Math.abs(robot.drive.pose.position.y) > 40 ? -1 : 1;
                 robot.drive.setDrivePowers(new PoseVelocity2d(new Vector2d(0, -BoardAlignmentConstants.FindSpeed * c * d), 0));
             }
