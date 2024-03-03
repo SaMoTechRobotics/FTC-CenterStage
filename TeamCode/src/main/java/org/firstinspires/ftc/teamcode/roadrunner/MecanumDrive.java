@@ -114,6 +114,9 @@ public final class MecanumDrive {
 
     public final IMU imu;
 
+    // Starting heading for imu heading correction, in RADIANS
+    private final double startHeading;
+
     public final Localizer localizer;
     public Pose2d pose;
 
@@ -184,6 +187,7 @@ public final class MecanumDrive {
 
     public MecanumDrive(HardwareMap hardwareMap, Pose2d pose) {
         this.pose = pose;
+        this.startHeading = pose.heading.toDouble();
 
         LynxFirmware.throwIfModulesAreOutdated(hardwareMap);
 
@@ -219,6 +223,11 @@ public final class MecanumDrive {
 //        localizer = new TwoDeadWheelLocalizer(hardwareMap, imu, PARAMS.inPerTick);
 
 //        FlightRecorder.write("MECANUM_PARAMS", PARAMS);
+    }
+
+    public void correctHeadingWithIMU() {
+        double newHeading = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS) + startHeading;
+        pose = new Pose2d(pose.position.x, pose.position.y, newHeading);
     }
 
     public void setDrivePowers(PoseVelocity2d powers) {
