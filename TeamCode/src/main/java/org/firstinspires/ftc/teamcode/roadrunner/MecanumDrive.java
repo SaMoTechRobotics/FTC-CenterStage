@@ -230,6 +230,13 @@ public final class MecanumDrive {
         pose = new Pose2d(pose.position.x, pose.position.y, newHeading);
     }
 
+    public Action correctHeadingWithIMUAction() {
+        return packet -> {
+            correctHeadingWithIMU();
+            return false;
+        };
+    }
+
     public void setDrivePowers(PoseVelocity2d powers) {
         MecanumKinematics.WheelVelocities<Time> wheelVels = new MecanumKinematics(1).inverse(
                 PoseVelocity2dDual.constant(powers, 1));

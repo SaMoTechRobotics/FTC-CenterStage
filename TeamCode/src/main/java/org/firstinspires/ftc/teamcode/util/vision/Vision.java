@@ -130,6 +130,11 @@ public class Vision {
         return new Pose2d(x, y, heading);
     }
 
+    public boolean isBackCameraWorking() {
+        aprilTagPortal.getCameraState();
+        return false;
+    }
+
     public AprilTagProcessor getAprilTagProcessor() {
         return aprilTagProcessor;
     }

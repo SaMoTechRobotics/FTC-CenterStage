@@ -57,6 +57,14 @@ public class AutoRobot {
         };
     }
 
+    public Action prepareForBackstageDelivery() {
+        return packet -> {
+            arm.setRotation(ArmRotation.BackDown);
+            arm.setWristRotation(WristRotation.PickupBack);
+            return false;
+        };
+    }
+
     public Action closeClaw() {
         return packet -> {
             claw.close();

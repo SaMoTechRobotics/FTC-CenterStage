@@ -19,6 +19,8 @@ public class ArmRotation {
     public static int AutoDeliver = 162;
     public static int AutoDeliverLow = 168;
 
+    public static int CloseAutoDeliver = 160;
+
     public static double HighWristMode = 140;
 
     public static int DroneLaunch = 136;
