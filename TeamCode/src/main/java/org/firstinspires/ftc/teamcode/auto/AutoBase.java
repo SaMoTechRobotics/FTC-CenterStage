@@ -56,6 +56,8 @@ public abstract class AutoBase extends LinearOpMode {
     BoardPosition boardPosition = BoardPosition.CENTER;
 
     public static class StrategyConstants {
+        public static DeliveryType farCycleType = DeliveryType.BACKSTAGE;
+
         public static DeliveryType cycleType = DeliveryType.BACKSTAGE;
 
         public enum DeliveryType {
@@ -67,7 +69,7 @@ public abstract class AutoBase extends LinearOpMode {
     public static StrategyConstants STRATEGY = new StrategyConstants();
 
     public static class TimingConstants {
-        public static double Delay = 0;
+        public static double Delay = 2;
 
         public static double WhiteAlignWithBoardTime = 2;
         public static double FarAlignWithBoardTime = 2.5;
@@ -95,14 +97,15 @@ public abstract class AutoBase extends LinearOpMode {
          * The locations of where the robot should be to deliver the spike mark
          * Order: Inner X, Center Y, Outer X
          */
-        public static double[] blueSpikeMarks = new double[]{-29, 35, -42.5};
-        public static double[] redSpikeMarks = new double[]{-30, 35.5, -44};
+        public static double[] blueSpikeMarks = new double[]{-29, 36.5, -42.5};
+        public static double[] redSpikeMarks = new double[]{-30, 35, -44};
 
         // Order: Inner Y, Center Y, Outer Y
         public static double[] blueBoardY = new double[]{44.5, 38, 31};
         public static double[] redBoardY = new double[]{46, 38, 31};
 
         public static double boardX = 30;
+        public static double moveBoardX = 32;
     }
 
     public static FarLocationConstants FAR_LOCATION = new FarLocationConstants();
@@ -121,7 +124,7 @@ public abstract class AutoBase extends LinearOpMode {
          * The locations of where the robot should be to deliver the spike mark
          * Order: Inner X, Center Y, Outer X
          */
-        public static double[] blueSpikeMarks = new double[]{29.5, 32, 7.5};
+        public static double[] blueSpikeMarks = new double[]{29.5, 35.2, 7.5};
         public static double[] redSpikeMarks = new double[]{18, 32, 7.5};
 
         /**
@@ -143,7 +146,7 @@ public abstract class AutoBase extends LinearOpMode {
 
     public static class AlignmentConstants {
         // Order: Inner, Center, Outer
-        public static double[] BlueOffsets = new double[]{6, 6.0, -5.2};
+        public static double[] BlueOffsets = new double[]{6, 6.0, -4.8};
         public static double[] RedOffsets = new double[]{-5.5, -4.5, 6};
     }
 
@@ -516,89 +519,121 @@ public abstract class AutoBase extends LinearOpMode {
                 )
         );
 
-        if (TimingConstants.Delay > 0) Actions.runBlocking(new SleepAction(TimingConstants.Delay));
+//        if (TimingConstants.Delay > 0) Actions.runBlocking(new SleepAction(TimingConstants.Delay));
 
 //        double newHeading = robot.drive.imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES) + startHeading;
 //        robot.drive.pose = new Pose2d(robot.drive.pose.position.x, robot.drive.pose.position.y, Math.toRadians(newHeading));
         robot.drive.correctHeadingWithIMU();
 
-        Actions.runBlocking(
-                robot.drive.actionBuilder(robot.drive.pose, TrajectorySpeed.FAST)
-                        .turnTo(Math.toRadians(180))
-                        .strafeToLinearHeading(new Vector2d(FarLocationConstants.boardX, FarLocationConstants.FarLaneY * c), Math.toRadians(180))
-                        .splineToConstantHeading(new Vector2d(36, 20 * c), Math.toRadians(180))
-                        .strafeToLinearHeading(new Vector2d(FarLocationConstants.boardX, boardY * c), Math.toRadians(180))
-                        .build()
-        );
 
 //        robot.arm.setRotation(ArmRotation.MidDeliver);
 //        robot.arm.update();
 
         // Delivery to board
 
-        robot.arm.setRotation(ArmRotation.MidDeliver);
-        robot.arm.setGlobalWristRotation(true);
-        robot.arm.update();
+        if (StrategyConstants.farCycleType == StrategyConstants.DeliveryType.BACKSTAGE) {
+            Actions.runBlocking(
+                    new SequentialAction(
+                            robot.drive.actionBuilder(robot.drive.pose, TrajectorySpeed.FAST)
+                                    .turnTo(Math.toRadians(180))
+                                    .strafeToLinearHeading(new Vector2d(FarLocationConstants.boardX, FarLocationConstants.FarLaneY * c), Math.toRadians(180))
+                                    .build(),
+                            robot.prepareForBackstageDelivery(),
+                            robot.drive.actionBuilder(new Pose2d(FarLocationConstants.boardX, FarLocationConstants.FarLaneY * c, Math.toRadians(180)))
+                                    .strafeToLinearHeading(new Vector2d(38, FarLocationConstants.FarLaneY * c), Math.toRadians(180))
+                                    .build()
+                    )
+            );
 
-        boolean whiteAligned = alignWithAprilTag(whiteTag, TimingConstants.WhiteAlignWithBoardTime, true);
+            robot.claw.openNext();
 
-        robot.arm.setRotation(ArmRotation.AutoDeliver, ArmSpeed.Mid);
-        robot.arm.update();
+            Actions.runBlocking(new SleepAction(0.5 + TimingConstants.Delay));
 
-        Rotation2d goodHeading = robot.drive.pose.heading;
+            robot.arm.setRotation(ArmRotation.PrepAutoDeliver);
+            robot.arm.setGlobalWristRotation(true);
+            robot.arm.update();
 
-        double placeOffset = 0;
+            Actions.runBlocking(
+                    robot.drive.actionBuilder(robot.drive.pose)
+                            .strafeToLinearHeading(new Vector2d(FarLocationConstants.moveBoardX, FarLocationConstants.FarLaneY * c), Math.toRadians(180))
+                            .strafeToLinearHeading(new Vector2d(FarLocationConstants.moveBoardX, boardYLocations[targetTagForSwoop.getIndex()] * c), Math.toRadians(180))
+                            .build()
+            );
+        } else {
+            Actions.runBlocking(
+                    robot.drive.actionBuilder(robot.drive.pose, TrajectorySpeed.FAST)
+                            .turnTo(Math.toRadians(180))
+                            .strafeToLinearHeading(new Vector2d(FarLocationConstants.boardX, FarLocationConstants.FarLaneY * c), Math.toRadians(180))
+                            .splineToConstantHeading(new Vector2d(36, 20 * c), Math.toRadians(180))
+                            .strafeToLinearHeading(new Vector2d(FarLocationConstants.boardX, boardY * c), Math.toRadians(180))
+                            .build()
+            );
 
-        if (whiteTag == BoardPosition.INNER) {
-            placeOffset += (isBlue ? 2 : 1) * c;
-        } else if (whiteTag == BoardPosition.OUTER) {
-            placeOffset -= 1 * c;
+            robot.arm.setRotation(ArmRotation.MidDeliver);
+            robot.arm.setGlobalWristRotation(true);
+            robot.arm.update();
+
+            boolean whiteAligned = alignWithAprilTag(whiteTag, TimingConstants.WhiteAlignWithBoardTime, true);
+
+            robot.arm.setRotation(ArmRotation.AutoDeliver, ArmSpeed.Mid);
+            robot.arm.update();
+
+            Rotation2d goodHeading = robot.drive.pose.heading;
+
+            double placeOffset = 0;
+
+            if (whiteTag == BoardPosition.INNER) {
+                placeOffset += (isBlue ? 2 : 1) * c;
+            } else if (whiteTag == BoardPosition.OUTER) {
+                placeOffset -= 1 * c;
+            }
+
+
+            Actions.runBlocking(
+                    robot.drive
+                            .actionBuilder(robot.drive.pose, TrajectorySpeed.SLOW)
+                            .strafeToLinearHeading(
+                                    new Vector2d(
+                                            robot.drive.pose.position.x + 2,
+                                            robot.drive.pose.position.y + placeOffset
+                                    ),
+                                    goodHeading
+                            )
+                            .build()
+            );
+
+            robot.claw.openNext();
+
+            robot.arm.setRotation(ArmRotation.PrepAutoDeliver);
+
+            Actions.runBlocking(
+                    new SequentialAction(
+                            robot.drive
+                                    .actionBuilder(robot.drive.pose, TrajectorySpeed.SLOW)
+                                    .strafeTo(
+                                            new Vector2d(
+                                                    FarLocationConstants.boardX,
+                                                    robot.drive.pose.position.y
+                                            )
+                                    )
+                                    .build(),
+                            robot.drive
+                                    .actionBuilder(robot.drive.pose, TrajectorySpeed.SLOW)
+                                    .strafeToLinearHeading(
+                                            new Vector2d(
+                                                    FarLocationConstants.boardX,
+                                                    boardYLocations[targetTagForSwoop.getIndex()] * c
+                                            ),
+                                            goodHeading
+                                    )
+                                    .build()
+                    )
+            );
         }
-
-
-        Actions.runBlocking(
-                robot.drive
-                        .actionBuilder(robot.drive.pose, TrajectorySpeed.SLOW)
-                        .strafeToLinearHeading(
-                                new Vector2d(
-                                        robot.drive.pose.position.x + 2,
-                                        robot.drive.pose.position.y + placeOffset
-                                ),
-                                goodHeading
-                        )
-                        .build()
-        );
-
-        robot.claw.openNext();
-
-        robot.arm.setRotation(ArmRotation.PrepAutoDeliver);
-
-        Actions.runBlocking(
-                new SequentialAction(
-                        robot.drive
-                                .actionBuilder(robot.drive.pose, TrajectorySpeed.SLOW)
-                                .strafeTo(
-                                        new Vector2d(
-                                                FarLocationConstants.boardX,
-                                                robot.drive.pose.position.y
-                                        )
-                                )
-                                .build(),
-                        robot.drive
-                                .actionBuilder(robot.drive.pose, TrajectorySpeed.SLOW)
-                                .strafeToLinearHeading(
-                                        new Vector2d(
-                                                FarLocationConstants.boardX,
-                                                boardYLocations[targetTagForSwoop.getIndex()] * c
-                                        ),
-                                        goodHeading
-                                )
-                                .build()
-                )
-        );
 
         robot.arm.setRotation(ArmRotation.AutoDeliver);
         robot.arm.setBoardAngle(WristRotation.AutoBoardAngle);
+        robot.arm.setGlobalWristRotation(true);
 //        robot.arm.setBoardAngle(WristRotation.AutoBoardAngle);
         robot.arm.update();
 
