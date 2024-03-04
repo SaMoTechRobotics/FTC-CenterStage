@@ -131,8 +131,7 @@ public class Vision {
     }
 
     public boolean isBackCameraWorking() {
-        aprilTagPortal.getCameraState();
-        return false;
+        return !aprilTagProcessor.getDetections().isEmpty();
     }
 
     public AprilTagProcessor getAprilTagProcessor() {
