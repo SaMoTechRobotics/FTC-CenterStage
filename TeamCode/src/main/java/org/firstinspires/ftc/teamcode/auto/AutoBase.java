@@ -56,9 +56,9 @@ public abstract class AutoBase extends LinearOpMode {
     BoardPosition boardPosition = BoardPosition.CENTER;
 
     public static class StrategyConstants {
-        public static DeliveryType farCycleType = DeliveryType.BACKSTAGE;
+        public static DeliveryType farCycleType = DeliveryType.BACKDROP;
 
-        public static DeliveryType cycleType = DeliveryType.BACKSTAGE;
+        public static DeliveryType cycleType = DeliveryType.BACKDROP;
 
         public enum DeliveryType {
             BACKSTAGE,
@@ -83,6 +83,8 @@ public abstract class AutoBase extends LinearOpMode {
         public static double DriveIntoWhiteStackCycle = 1;
 
         public static double StrafeAlignWithWall = 1;
+
+        public static double CycleAlignTime = 1.5;
     }
 
     public static TimingConstants TIMING = new TimingConstants();
@@ -98,7 +100,7 @@ public abstract class AutoBase extends LinearOpMode {
          * Order: Inner X, Center Y, Outer X
          */
         public static double[] blueSpikeMarks = new double[]{-29, 36.5, -42.5};
-        public static double[] redSpikeMarks = new double[]{-30, 35, -44};
+        public static double[] redSpikeMarks = new double[]{-30, 34.8, -44};
 
         // Order: Inner Y, Center Y, Outer Y
         public static double[] blueBoardY = new double[]{44.5, 38, 31};
@@ -125,17 +127,21 @@ public abstract class AutoBase extends LinearOpMode {
          * Order: Inner X, Center Y, Outer X
          */
         public static double[] blueSpikeMarks = new double[]{29.5, 35.2, 7.5};
-        public static double[] redSpikeMarks = new double[]{18, 32, 7.5};
+        public static double[] redSpikeMarks = new double[]{28.5, 32, 7.5};
 
         /**
          * The Y coordinate of where the robot should be to deliver the spike mark
          * Order: Inner Y, Center Y, Outer Y
          */
-        public static double[] blueBoardY = new double[]{44, 39, 30};
-        public static double[] redBoardY = new double[]{46, 33, 28};
+        public static double[] blueBoardY = new double[]{42, 39, 30};
+        public static double[] redBoardY = new double[]{41, 39, 30};
 
         public static double boardX = 34;
         public static double pushBoardX = 37;
+
+        public static double boardCycleX = 42;
+
+        public static double pushBoardCycleDist = 2;
 
         public static double pushBoardDist = 2;
 
@@ -549,13 +555,22 @@ public abstract class AutoBase extends LinearOpMode {
 
             Actions.runBlocking(new SleepAction(0.5 + TimingConstants.Delay));
 
+            robot.arm.setRotation(ArmRotation.MidDeliver);
+            robot.arm.setGlobalWristRotation(true);
+            robot.arm.update();
+
+            Actions.runBlocking(
+                    robot.drive.actionBuilder(robot.drive.pose)
+                            .strafeToLinearHeading(new Vector2d(FarLocationConstants.boardX, FarLocationConstants.FarLaneY * c), Math.toRadians(180))
+                            .build()
+            );
+
             robot.arm.setRotation(ArmRotation.PrepAutoDeliver);
             robot.arm.setGlobalWristRotation(true);
             robot.arm.update();
 
             Actions.runBlocking(
                     robot.drive.actionBuilder(robot.drive.pose)
-                            .strafeToLinearHeading(new Vector2d(FarLocationConstants.moveBoardX, FarLocationConstants.FarLaneY * c), Math.toRadians(180))
                             .strafeToLinearHeading(new Vector2d(FarLocationConstants.moveBoardX, boardYLocations[targetTagForSwoop.getIndex()] * c), Math.toRadians(180))
                             .build()
             );
@@ -1006,8 +1021,61 @@ public abstract class AutoBase extends LinearOpMode {
                 break;
             case BACKDROP:
                 Actions.runBlocking(
+                        new SequentialAction(
+                                robot.drive.actionBuilder(robot.drive.pose, TrajectorySpeed.FAST)
+                                        .strafeToLinearHeading(new Vector2d(20, NearLocationConstants.BackCloseLaneY * c), Math.toRadians(180))
+                                        .build()
+                        )
+                );
+
+                double boardY = isBlue ? NearLocationConstants.blueBoardY[1] : NearLocationConstants.redBoardY[1];
+
+                Actions.runBlocking(
                         robot.drive.actionBuilder(robot.drive.pose)
-                                .strafeToLinearHeading(new Vector2d(40, 54 * c), Math.toRadians(180))
+                                .strafeToLinearHeading(new Vector2d(NearLocationConstants.boardCycleX, boardY * c), Math.toRadians(180))
+                                .build()
+                );
+
+                robot.arm.setRotation(ArmRotation.HighDeliver);
+                robot.arm.setGlobalWristRotation(true);
+                robot.arm.update();
+
+                alignWithAprilTag(BoardPosition.CENTER, TimingConstants.CycleAlignTime, false);
+
+                robot.arm.setRotation(ArmRotation.MidDeliver, ArmSpeed.Min);
+                robot.arm.update();
+
+                double goodY = robot.drive.pose.position.y;
+
+                Actions.runBlocking(
+                        robot.drive.actionBuilder(robot.drive.pose)
+                                .strafeToLinearHeading(new Vector2d(robot.drive.pose.position.x + NearLocationConstants.pushBoardCycleDist, robot.drive.pose.position.y), robot.drive.pose.heading)
+                                .build()
+                );
+
+                robot.claw.openNext();
+
+                robot.arm.setRotation(robot.arm.getRotation() - ArmRotation.UpAfterDrop);
+                robot.arm.update();
+
+                Actions.runBlocking(
+                        robot.drive.actionBuilder(robot.drive.pose)
+                                .strafeToLinearHeading(new Vector2d(robot.drive.pose.position.x + NearLocationConstants.pushBoardCycleDist, robot.drive.pose.position.y), robot.drive.pose.heading)
+                                .build()
+                );
+
+                robot.claw.openNext();
+
+                robot.arm.setRotation(robot.arm.getRotation() - ArmRotation.UpAfterDrop);
+                robot.arm.update();
+
+                Actions.runBlocking(new SleepAction(0.2));
+
+                robot.resetForIntake();
+
+                Actions.runBlocking(
+                        robot.drive.actionBuilder(robot.drive.pose)
+                                .strafeTo(new Vector2d(robot.drive.pose.position.x - 2, NearLocationConstants.CloseLaneY * c))
                                 .build()
                 );
                 break;

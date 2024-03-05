@@ -53,7 +53,7 @@ public final class MecanumDrive {
         );
 
         public SpeedConstraintParams fastSpeeds = new SpeedConstraintParams(
-                100, 3 * Math.PI, 3 * Math.PI, -50, 80
+                80, 1 * Math.PI, 0.5 * Math.PI, -50, 70
         );
 
 
