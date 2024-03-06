@@ -99,8 +99,8 @@ public abstract class AutoBase extends LinearOpMode {
          * The locations of where the robot should be to deliver the spike mark
          * Order: Inner X, Center Y, Outer X
          */
-        public static double[] blueSpikeMarks = new double[]{-29, 36.5, -42.5};
-        public static double[] redSpikeMarks = new double[]{-30, 34.8, -44};
+        public static double[] blueSpikeMarks = new double[]{-29, 31, -42.5};
+        public static double[] redSpikeMarks = new double[]{-30.5, 31, -44};
 
         // Order: Inner Y, Center Y, Outer Y
         public static double[] blueBoardY = new double[]{44.5, 38, 31};
@@ -314,7 +314,7 @@ public abstract class AutoBase extends LinearOpMode {
                         new SequentialAction(
                                 robot.drive.actionBuilder(robot.drive.pose)
                                         .strafeToLinearHeading(
-                                                new Vector2d(-40, 54 * c),
+                                                new Vector2d(-40, 52 * c),
                                                 Math.toRadians(startHeading)
                                         )
                                         .splineToSplineHeading(
@@ -355,13 +355,14 @@ public abstract class AutoBase extends LinearOpMode {
                                                 Math.toRadians(startHeading)
                                         )
                                         .splineToSplineHeading(
-                                                new Pose2d(-36, (centerY + 2) * c, Math.toRadians(startHeading)),
+                                                new Pose2d(-36, (centerY + 4) * c, Math.toRadians(startHeading)),
                                                 Math.toRadians(startHeading)
                                         )
                                         .strafeToLinearHeading(
                                                 new Vector2d(-36, centerY * c),
                                                 Math.toRadians(startHeading),
-                                                robot.drive.getSpeedConstraint(TrajectorySpeed.SLOW).velConstraint
+                                                robot.drive.getSpeedConstraint(TrajectorySpeed.SLOW).velConstraint,
+                                                robot.drive.getSpeedConstraint(TrajectorySpeed.SLOW).accelConstraint
                                         ).build(),
                                 new SleepAction(0.2),
                                 robot.openNextClaw(),
