@@ -208,6 +208,7 @@ public final class MecanumDrive {
         rightBack.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         rightFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
+        // This is to prevent the rr bug of when the motor mode is set to RUN_TO_POSITION and there is no target position set
         leftFront.setTargetPosition(0);
         leftBack.setTargetPosition(0);
         rightBack.setTargetPosition(0);
