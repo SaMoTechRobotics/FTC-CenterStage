@@ -58,7 +58,7 @@ public abstract class AutoBase extends LinearOpMode {
     public static class StrategyConstants {
         public static DeliveryType farCycleType = DeliveryType.BACKDROP;
 
-        public static DeliveryType cycleType = DeliveryType.BACKDROP;
+        public static DeliveryType cycleType = DeliveryType.BACKSTAGE;
 
         public enum DeliveryType {
             BACKSTAGE,
