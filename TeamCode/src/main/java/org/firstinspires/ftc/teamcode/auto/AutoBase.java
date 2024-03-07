@@ -92,8 +92,8 @@ public abstract class AutoBase extends LinearOpMode {
     public static class FarLocationConstants {
         public static double FarLaneY = 14;
 
-        public static double blueStackY = 38.6;
-        public static double redStackY = 39;
+        public static double blueStackY = 37;
+        public static double redStackY = 37;
 
         /**
          * The locations of where the robot should be to deliver the spike mark
@@ -153,7 +153,7 @@ public abstract class AutoBase extends LinearOpMode {
     public static class AlignmentConstants {
         // Order: Inner, Center, Outer
         public static double[] BlueOffsets = new double[]{6, 6.0, -4.8};
-        public static double[] RedOffsets = new double[]{-5.5, -4.5, 6};
+        public static double[] RedOffsets = new double[]{-5.2, -4.5, 6};
     }
 
     public static AlignmentConstants ALIGNMENT = new AlignmentConstants();
@@ -438,6 +438,14 @@ public abstract class AutoBase extends LinearOpMode {
 
         double stackY = isBlue ? FarLocationConstants.blueStackY : FarLocationConstants.redStackY;
 
+        robot.drive.correctHeadingWithIMU();
+
+        Actions.runBlocking(
+                robot.drive.actionBuilder(robot.drive.pose, TrajectorySpeed.SLOW)
+                        .strafeToLinearHeading(new Vector2d(-52, stackY * c), Math.toRadians(180))
+                        .build()
+        );
+
         Actions.runBlocking(
                 robot.drive.actionBuilder(robot.drive.pose, TrajectorySpeed.SLOW)
                         .strafeToLinearHeading(new Vector2d(-62, stackY * c), Math.toRadians(180))
@@ -453,7 +461,7 @@ public abstract class AutoBase extends LinearOpMode {
 
         Actions.runBlocking(
                 robot.drive.actionBuilder(robot.drive.pose, TrajectorySpeed.SLOW)
-                        .strafeToLinearHeading(new Vector2d(-63.5, stackY * c), Math.toRadians(180))
+                        .strafeToLinearHeading(new Vector2d(-63.5, robot.drive.pose.position.y), Math.toRadians(180))
                         .build()
         );
 
@@ -462,7 +470,7 @@ public abstract class AutoBase extends LinearOpMode {
 
         Actions.runBlocking(
                 robot.drive.actionBuilder(robot.drive.pose, TrajectorySpeed.SLOW)
-                        .strafeToLinearHeading(new Vector2d(-65, stackY * c), Math.toRadians(180))
+                        .strafeToLinearHeading(new Vector2d(-65, robot.drive.pose.position.y), Math.toRadians(180))
                         .build()
         );
 
@@ -547,7 +555,7 @@ public abstract class AutoBase extends LinearOpMode {
                                     .build(),
                             robot.prepareForBackstageDelivery(),
                             robot.drive.actionBuilder(new Pose2d(FarLocationConstants.boardX, FarLocationConstants.FarLaneY * c, Math.toRadians(180)))
-                                    .strafeToLinearHeading(new Vector2d(38, FarLocationConstants.FarLaneY * c), Math.toRadians(180))
+                                    .strafeToLinearHeading(new Vector2d(38, FarLocationConstants.FarLaneY * c), Math.toRadians(180), robot.drive.getSpeedConstraint(TrajectorySpeed.SLOW).velConstraint)
                                     .build()
                     )
             );
