@@ -588,8 +588,9 @@ public abstract class AutoBase extends LinearOpMode {
                     robot.drive.actionBuilder(robot.drive.pose, TrajectorySpeed.FAST)
                             .turnTo(Math.toRadians(180))
                             .strafeToLinearHeading(new Vector2d(FarLocationConstants.boardX, FarLocationConstants.FarLaneY * c), Math.toRadians(180))
-                            .splineToConstantHeading(new Vector2d(36, 20 * c), Math.toRadians(180))
-                            .strafeToLinearHeading(new Vector2d(FarLocationConstants.boardX, boardY * c), Math.toRadians(180))
+//                            .splineToConstantHeading(new Vector2d(FarLocationConstants.moveBoardX, 20 * c), Math.toRadians(180))
+                            .strafeToLinearHeading(new Vector2d(FarLocationConstants.moveBoardX + 2, boardY * c), Math.toRadians(180))
+                            .strafeToLinearHeading(new Vector2d(FarLocationConstants.moveBoardX, boardY * c), Math.toRadians(180), robot.drive.getSpeedConstraint(TrajectorySpeed.SLOW).velConstraint, robot.drive.getSpeedConstraint(TrajectorySpeed.SLOW).accelConstraint)
                             .build()
             );
 
@@ -636,7 +637,7 @@ public abstract class AutoBase extends LinearOpMode {
                                     .actionBuilder(robot.drive.pose, TrajectorySpeed.SLOW)
                                     .strafeTo(
                                             new Vector2d(
-                                                    FarLocationConstants.boardX,
+                                                    FarLocationConstants.moveBoardX,
                                                     robot.drive.pose.position.y
                                             )
                                     )
@@ -645,7 +646,7 @@ public abstract class AutoBase extends LinearOpMode {
                                     .actionBuilder(robot.drive.pose, TrajectorySpeed.SLOW)
                                     .strafeToLinearHeading(
                                             new Vector2d(
-                                                    FarLocationConstants.boardX,
+                                                    FarLocationConstants.moveBoardX,
                                                     boardYLocations[targetTagForSwoop.getIndex()] * c
                                             ),
                                             goodHeading
