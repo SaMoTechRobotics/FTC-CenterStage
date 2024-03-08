@@ -4,6 +4,7 @@ import android.util.Size;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
+import org.firstinspires.ftc.robotcore.internal.usb.UsbSerialNumber;
 import org.firstinspires.ftc.teamcode.util.auto.AutoColor;
 import org.firstinspires.ftc.teamcode.util.auto.BoardPosition;
 import org.firstinspires.ftc.teamcode.util.auto.constants.BoardAlignmentConstants;
@@ -27,8 +28,12 @@ public class Vision {
     AprilTagProcessor aprilTagProcessor = null;
 
     public Vision(HardwareMap hardwareMap) {
-        frontCamera = hardwareMap.get(WebcamName.class, "Webcam 2");
-        backCamera = hardwareMap.get(WebcamName.class, "Webcam 1");
+//        frontCamera = hardwareMap.get(WebcamName.class, "Webcam 2");
+//        backCamera = hardwareMap.get(WebcamName.class, "Webcam 1");
+
+        frontCamera = hardwareMap.get(WebcamName.class, new UsbSerialNumber("6234BF60"));
+//        frontCamera = hardwareMap.get(WebcamName.class, new UsbSerialNumber("9B9EAF60"));
+        backCamera = hardwareMap.get(WebcamName.class, new UsbSerialNumber("UC762"));
     }
 
     public void startProcessors() {
@@ -42,12 +47,12 @@ public class Vision {
                 .build();
 
 //        spikeMarkPortal = VisionPortal.easyCreateWithDefaults(frontCamera, spikeMarkDetectionProcessor, aprilTagProcessor);
-
         VisionPortal.Builder builder1 = new VisionPortal.Builder();
         builder1.setCameraResolution(new Size(1280, 720));
         builder1.setCamera(frontCamera);
         builder1.addProcessor(spikeMarkDetectionProcessor);
         builder1.setLiveViewContainerId(portalsList[0]);
+//        builder1.enableLiveView(false);
         spikeMarkPortal = builder1.build();
 
         VisionPortal.Builder builder2 = new VisionPortal.Builder();
@@ -55,16 +60,21 @@ public class Vision {
         builder2.setCamera(backCamera);
         builder2.addProcessor(aprilTagProcessor);
         builder2.setLiveViewContainerId(portalsList[1]);
+//        builder2.enableLiveView(false);
         aprilTagPortal = builder2.build();
     }
 
     public void setActiveProcessor(VisionProcessor processor) {
         if (processor == VisionProcessor.APRIL_TAG_DETECTION) {
             aprilTagPortal.resumeStreaming();
+            aprilTagPortal.resumeLiveView();
             spikeMarkPortal.stopStreaming();
+            spikeMarkPortal.resumeLiveView();
         } else {
             spikeMarkPortal.resumeStreaming();
+            spikeMarkPortal.resumeLiveView();
             aprilTagPortal.stopStreaming();
+            aprilTagPortal.resumeLiveView();
         }
     }
 
