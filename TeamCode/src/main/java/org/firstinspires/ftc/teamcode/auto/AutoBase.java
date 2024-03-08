@@ -153,7 +153,7 @@ public abstract class AutoBase extends LinearOpMode {
     public static class AlignmentConstants {
         // Order: Inner, Center, Outer
         public static double[] BlueOffsets = new double[]{6, 6.0, -4.8};
-        public static double[] RedOffsets = new double[]{-5.2, -4.5, 6};
+        public static double[] RedOffsets = new double[]{-5, -4.3, 6};
     }
 
     public static AlignmentConstants ALIGNMENT = new AlignmentConstants();
@@ -204,6 +204,10 @@ public abstract class AutoBase extends LinearOpMode {
             telemetry.addLine("---");
 
             telemetry.addData("APRIL TAG CAMERA STATE", robot.vision.aprilTagPortal.getCameraState());
+
+//            if (robot.vision.aprilTagPortal.getCameraState() == VisionPortal.CameraState.STREAMING) {
+//                robot.vision.aprilTagPortal.stopStreaming();
+//            }
 
             if (robot.vision.isBackCameraWorking() && !aprilTagCameraWorking) {
                 robot.vision.setActiveProcessor(VisionProcessor.SPIKE_LOCATION_DETECTION);
@@ -393,33 +397,36 @@ public abstract class AutoBase extends LinearOpMode {
                                                 Math.toRadians(startHeading)
                                         )
                                         .splineToSplineHeading(
-                                                new Pose2d(outerX, (32 + 2) * c, Math.toRadians(startHeading - 45 * c)),
-                                                Math.toRadians(startHeading - 45 * c)
+                                                new Pose2d(outerX, (32 + 4) * c, Math.toRadians(startHeading - 45 * c)),
+                                                Math.toRadians(startHeading - 45 * c),
+                                                robot.drive.getSpeedConstraint(TrajectorySpeed.NORMAL).velConstraint,
+                                                robot.drive.getSpeedConstraint(TrajectorySpeed.SLOW).accelConstraint
                                         )
                                         .strafeToLinearHeading(
                                                 new Vector2d(outerX, 32 * c),
                                                 Math.toRadians(startHeading - 45 * c),
-                                                robot.drive.getSpeedConstraint(TrajectorySpeed.SLOW).velConstraint
+                                                robot.drive.getSpeedConstraint(TrajectorySpeed.SLOW).velConstraint,
+                                                robot.drive.getSpeedConstraint(TrajectorySpeed.SLOW).accelConstraint
                                         ).build(),
                                 new SleepAction(0.2),
                                 robot.openNextClaw(),
                                 new SleepAction(0.2),
                                 robot.drive.actionBuilder(new Pose2d(outerX, 32 * c, Math.toRadians(startHeading - 45 * c)))
                                         .strafeToLinearHeading(
-                                                new Vector2d(-36, 48 * c),
+                                                new Vector2d(-34, 40 * c),
                                                 Math.toRadians(startHeading - 45 * c)
                                         )
                                         .build(),
                                 robot.raiseArmForStack(),
                                 robot.drive.actionBuilder(new Pose2d(-36, 48 * c, Math.toRadians(startHeading - 45 * c)))
                                         .splineToLinearHeading(
-                                                new Pose2d(-50 + 2, stackY * c, Math.toRadians(180)),
+                                                new Pose2d(-50, stackY * c, Math.toRadians(180)),
                                                 Math.toRadians(0)
                                         )
                                         .build(),
                                 robot.drive.actionBuilder(new Pose2d(-50 + 2, stackY * c, Math.toRadians(180)), TrajectorySpeed.SLOW)
                                         .strafeToLinearHeading(
-                                                new Vector2d(-50, stackY * c),
+                                                new Vector2d(-52, stackY * c),
                                                 Math.toRadians(180)
                                         )
                                         .build()
@@ -584,21 +591,36 @@ public abstract class AutoBase extends LinearOpMode {
                             .build()
             );
         } else {
-            Actions.runBlocking(
-                    robot.drive.actionBuilder(robot.drive.pose, TrajectorySpeed.FAST)
-                            .turnTo(Math.toRadians(180))
-                            .strafeToLinearHeading(new Vector2d(FarLocationConstants.boardX, FarLocationConstants.FarLaneY * c), Math.toRadians(180))
+            if (boardPosition == BoardPosition.OUTER) {
+                Actions.runBlocking(
+                        robot.drive.actionBuilder(robot.drive.pose, TrajectorySpeed.FAST)
+                                .turnTo(Math.toRadians(180))
+                                .strafeToLinearHeading(new Vector2d(FarLocationConstants.boardX, FarLocationConstants.FarLaneY * c), Math.toRadians(180))
+                                .splineToConstantHeading(new Vector2d(FarLocationConstants.moveBoardX, 20 * c), Math.toRadians(180))
+                                .strafeToLinearHeading(new Vector2d(FarLocationConstants.moveBoardX, boardY * c), Math.toRadians(180))
+                                .build()
+                );
+
+                robot.drive.correctHeadingWithIMU();
+            } else {
+                Actions.runBlocking(
+                        robot.drive.actionBuilder(robot.drive.pose, TrajectorySpeed.FAST)
+                                .turnTo(Math.toRadians(180))
+                                .strafeToLinearHeading(new Vector2d(FarLocationConstants.boardX, FarLocationConstants.FarLaneY * c), Math.toRadians(180))
 //                            .splineToConstantHeading(new Vector2d(FarLocationConstants.moveBoardX, 20 * c), Math.toRadians(180))
-                            .strafeToLinearHeading(new Vector2d(FarLocationConstants.moveBoardX + 2, boardY * c), Math.toRadians(180))
-                            .strafeToLinearHeading(new Vector2d(FarLocationConstants.moveBoardX, boardY * c), Math.toRadians(180), robot.drive.getSpeedConstraint(TrajectorySpeed.SLOW).velConstraint, robot.drive.getSpeedConstraint(TrajectorySpeed.SLOW).accelConstraint)
-                            .build()
-            );
+                                .strafeToLinearHeading(new Vector2d(FarLocationConstants.moveBoardX + 2, boardY * c), Math.toRadians(180))
+                                .strafeToLinearHeading(new Vector2d(FarLocationConstants.moveBoardX, boardY * c), Math.toRadians(180), robot.drive.getSpeedConstraint(TrajectorySpeed.SLOW).velConstraint, robot.drive.getSpeedConstraint(TrajectorySpeed.SLOW).accelConstraint)
+                                .build()
+                );
+            }
 
             robot.arm.setRotation(ArmRotation.MidDeliver);
             robot.arm.setGlobalWristRotation(true);
             robot.arm.update();
 
             boolean whiteAligned = alignWithAprilTag(whiteTag, TimingConstants.WhiteAlignWithBoardTime, true);
+
+            robot.drive.correctHeadingWithIMU();
 
             robot.arm.setRotation(ArmRotation.AutoDeliver, ArmSpeed.Mid);
             robot.arm.update();
@@ -1108,8 +1130,16 @@ public abstract class AutoBase extends LinearOpMode {
             robot.arm.update();
             if (robot.vision.isBoardDetected(targetTag)) {
                 Optional<AprilTagPoseFtc> tpose = robot.vision.getBoardPose(targetTag);
+
                 if (tpose.isPresent()) {
-                    double margin = 0.0;
+                    telemetry.addData("Yaw", Math.abs(tpose.get().yaw));
+                    telemetry.update();
+
+                    if (Math.abs(tpose.get().y - (BoardAlignmentConstants.DistFromBoard + 1)) < BoardAlignmentConstants.YMargin &&
+                            (tpose.get().x) < BoardAlignmentConstants.XMargin &&
+                            Math.abs(tpose.get().yaw) < BoardAlignmentConstants.RotMargin) {
+                        break;
+                    }
 
                     Vector2d newPose = new Vector2d(
                             robot.drive.pose.position.x +
@@ -1119,6 +1149,7 @@ public abstract class AutoBase extends LinearOpMode {
                     Rotation2d heading = robot.drive.pose.heading.plus(
                             Math.toRadians(tpose.get().yaw)
                     );
+
 
                     aligned = true;
 
