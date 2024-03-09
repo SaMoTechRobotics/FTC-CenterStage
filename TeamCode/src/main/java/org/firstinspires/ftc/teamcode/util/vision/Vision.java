@@ -31,8 +31,8 @@ public class Vision {
 //        frontCamera = hardwareMap.get(WebcamName.class, "Webcam 2");
 //        backCamera = hardwareMap.get(WebcamName.class, "Webcam 1");
 
-        frontCamera = hardwareMap.get(WebcamName.class, new UsbSerialNumber("6234BF60"));
-//        frontCamera = hardwareMap.get(WebcamName.class, new UsbSerialNumber("9B9EAF60"));
+//        frontCamera = hardwareMap.get(WebcamName.class, new UsbSerialNumber("6234BF60"));
+        frontCamera = hardwareMap.get(WebcamName.class, new UsbSerialNumber("SN0001"));
         backCamera = hardwareMap.get(WebcamName.class, new UsbSerialNumber("UC762"));
     }
 
@@ -54,6 +54,8 @@ public class Vision {
         builder1.setLiveViewContainerId(portalsList[0]);
 //        builder1.enableLiveView(false);
         spikeMarkPortal = builder1.build();
+        //set exposure
+//        spikeMarkPortal.getCameraControl(ExposureControl.class).setMode(ExposureControl.Mode.Auto);
 
         VisionPortal.Builder builder2 = new VisionPortal.Builder();
         builder2.setCameraResolution(new Size(1280, 720));
