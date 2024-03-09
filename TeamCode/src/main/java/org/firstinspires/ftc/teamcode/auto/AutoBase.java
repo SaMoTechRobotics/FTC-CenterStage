@@ -71,6 +71,8 @@ public abstract class AutoBase extends LinearOpMode {
     public static class TimingConstants {
         public static double Delay = 2;
 
+        public static double CycleDelay = 3;
+
         public static double WhiteAlignWithBoardTime = 2;
         public static double FarAlignWithBoardTime = 2.5;
 
@@ -120,24 +122,27 @@ public abstract class AutoBase extends LinearOpMode {
 
         public static double stackX = -50;
         public static double blueStackY = 36.5;
-        public static double redStackY = 36;
+        public static double redStackY = 36.5;
 
         /**
          * The locations of where the robot should be to deliver the spike mark
          * Order: Inner X, Center Y, Outer X
          */
-        public static double[] blueSpikeMarks = new double[]{29.5, 35.2, 7.5};
-        public static double[] redSpikeMarks = new double[]{28.5, 32, 7.5};
+        public static double[] blueSpikeMarks = new double[]{29.8, 31, 7.5};
+        public static double[] redSpikeMarks = new double[]{28, 31, 5.5};
 
         /**
          * The Y coordinate of where the robot should be to deliver the spike mark
          * Order: Inner Y, Center Y, Outer Y
          */
-        public static double[] blueBoardY = new double[]{42, 39, 30};
-        public static double[] redBoardY = new double[]{41, 39, 30};
+        public static double[] blueBoardY = new double[]{44.5, 38, 30};
+        public static double[] redBoardY = new double[]{41, 36, 29};
 
-        public static double boardX = 34;
-        public static double pushBoardX = 37;
+        public static double blueBoardX = 34;
+        public static double bluePushBoardX = 37.2;
+
+        public static double redBoardX = 32;
+        public static double redPushBoardX = 34.7;
 
         public static double boardCycleX = 42;
 
@@ -280,7 +285,7 @@ public abstract class AutoBase extends LinearOpMode {
 
             Actions.runBlocking(
                     robot.drive.actionBuilder(robot.drive.pose)
-                            .strafeTo(new Vector2d(NearLocationConstants.ParkX, NearLocationConstants.CloseLaneY * c))
+                            .strafeTo(new Vector2d(NearLocationConstants.ParkX, isBlue ? NearLocationConstants.CloseLaneY * c : 68 * c))
                             .build()
             );
         }
@@ -917,26 +922,29 @@ public abstract class AutoBase extends LinearOpMode {
 
         Actions.runBlocking(
                 robot.drive.actionBuilder(robot.drive.pose)
-                        .strafeToLinearHeading(new Vector2d(NearLocationConstants.boardX, boardY * c), Math.toRadians(180))
+                        .strafeToLinearHeading(new Vector2d(isBlue ? NearLocationConstants.blueBoardX : NearLocationConstants.redBoardX, boardY * c), Math.toRadians(180))
                         .build()
         );
 
-        boolean aligned = alignWithAprilTag(boardPosition, TimingConstants.CloseAlignForYellowTime, false);
+//        boolean aligned = alignWithAprilTag(boardPosition, TimingConstants.CloseAlignForYellowTime, false);
 
 
-        if (aligned) {
-            Actions.runBlocking(
-                    robot.drive.actionBuilder(robot.drive.pose)
-                            .strafeToLinearHeading(new Vector2d(robot.drive.pose.position.x + NearLocationConstants.pushBoardDist, robot.drive.pose.position.y), robot.drive.pose.heading)
-                            .build()
-            );
-        } else {
-            Actions.runBlocking(
-                    robot.drive.actionBuilder(robot.drive.pose)
-                            .strafeToLinearHeading(new Vector2d(NearLocationConstants.pushBoardX, boardY * c), Math.toRadians(180))
-                            .build()
-            );
-        }
+//        if (aligned) {
+//            Actions.runBlocking(
+//                    robot.drive.actionBuilder(robot.drive.pose)
+//                            .strafeToLinearHeading(new Vector2d(robot.drive.pose.position.x + NearLocationConstants.pushBoardDist, robot.drive.pose.position.y), robot.drive.pose.heading)
+//                            .build()
+//            );
+//        } else {
+
+        robot.drive.correctHeadingWithIMU();
+
+        Actions.runBlocking(
+                robot.drive.actionBuilder(robot.drive.pose)
+                        .strafeToLinearHeading(new Vector2d(isBlue ? NearLocationConstants.bluePushBoardX : NearLocationConstants.redPushBoardX, boardY * c), Math.toRadians(180))
+                        .build()
+        );
+//        }
 
 //        if (TimingConstants.CloseAlignForYellowTime > 0) {
 //            alignWithAprilTag(boardPosition, TimingConstants.CloseAlignForYellowTime);
@@ -965,8 +973,9 @@ public abstract class AutoBase extends LinearOpMode {
                         robot.drive.actionBuilder(robot.drive.pose)
                                 .splineToConstantHeading(new Vector2d(20, NearLocationConstants.CloseLaneY * c), Math.toRadians(180))
                                 .build(),
+                        new SleepAction(TimingConstants.CycleDelay),
                         robot.drive.correctHeadingWithIMUAction(),
-                        robot.drive.actionBuilder(new Pose2d(20, NearLocationConstants.CloseLaneY * c, Math.toRadians(180)), TrajectorySpeed.FAST)
+                        robot.drive.actionBuilder(new Pose2d(20, NearLocationConstants.CloseLaneY * c, Math.toRadians(180)))
                                 .strafeToLinearHeading(new Vector2d(-36, NearLocationConstants.CloseLaneY * c), Math.toRadians(180))
                                 .build()
                 )
@@ -1026,10 +1035,11 @@ public abstract class AutoBase extends LinearOpMode {
                 new SequentialAction(
                         robot.drive.actionBuilder(robot.drive.pose)
                                 .strafeToLinearHeading(new Vector2d(NearLocationConstants.stackX, stackY * c), Math.toRadians(180))
-                                .splineToConstantHeading(new Vector2d(-36, NearLocationConstants.BackCloseLaneY * c), Math.toRadians(180))
+                                .splineToConstantHeading(new Vector2d(-45, 50 * c), Math.toRadians(180))
+                                .splineToConstantHeading(new Vector2d(-40, NearLocationConstants.BackCloseLaneY * c), Math.toRadians(180))
                                 .build(),
                         robot.drive.correctHeadingWithIMUAction(),
-                        robot.drive.actionBuilder(new Pose2d(-36, NearLocationConstants.BackCloseLaneY * c, Math.toRadians(180)), TrajectorySpeed.SLOW)
+                        robot.drive.actionBuilder(new Pose2d(-40, NearLocationConstants.BackCloseLaneY * c, Math.toRadians(180)), TrajectorySpeed.SLOW)
                                 .strafeToLinearHeading(new Vector2d(-35, NearLocationConstants.BackCloseLaneY * c), Math.toRadians(180))
                                 .build()
                 )
@@ -1041,15 +1051,18 @@ public abstract class AutoBase extends LinearOpMode {
                         new SequentialAction(
                                 robot.drive.actionBuilder(robot.drive.pose, TrajectorySpeed.FAST)
                                         .strafeToLinearHeading(new Vector2d(20, NearLocationConstants.BackCloseLaneY * c), Math.toRadians(180))
-                                        .strafeToLinearHeading(new Vector2d(59, 53 * c), Math.toRadians(0))
+                                        .strafeToLinearHeading(new Vector2d(25, NearLocationConstants.BackCloseLaneY * c), Math.toRadians(180 - 20 * c))
+                                        .strafeToLinearHeading(new Vector2d(59, isBlue ? 53 * c : 63 * c), Math.toRadians(0))
                                         .build()
                         )
                 );
+                robot.arm.setRotation(ArmRotation.Down);
+                robot.arm.setWristRotation(WristRotation.Down);
                 Actions.runBlocking(new SleepAction(0.2));
                 robot.claw.open();
                 Actions.runBlocking(
                         robot.drive.actionBuilder(robot.drive.pose)
-                                .strafeToLinearHeading(new Vector2d(NearLocationConstants.ParkX, 56 * c), Math.toRadians(0))
+                                .strafeToLinearHeading(new Vector2d(NearLocationConstants.ParkX, isBlue ? 56 * c : 67 * c), Math.toRadians(0))
                                 .build()
                 );
                 break;
@@ -1194,5 +1207,3 @@ public abstract class AutoBase extends LinearOpMode {
         telemetry.log().add(message);
     }
 }
-
-
