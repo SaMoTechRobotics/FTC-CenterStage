@@ -153,7 +153,7 @@ public abstract class AutoBase extends LinearOpMode {
     public static class AlignmentConstants {
         // Order: Inner, Center, Outer
         public static double[] BlueOffsets = new double[]{6, 6.0, -4.8};
-        public static double[] RedOffsets = new double[]{-5, -4.3, 6};
+        public static double[] RedOffsets = new double[]{-5, -4.1, 6};
     }
 
     public static AlignmentConstants ALIGNMENT = new AlignmentConstants();
@@ -1140,6 +1140,7 @@ public abstract class AutoBase extends LinearOpMode {
                     if (Math.abs(tpose.get().y - (BoardAlignmentConstants.DistFromBoard + 1)) < BoardAlignmentConstants.YMargin &&
                             (tpose.get().x) < BoardAlignmentConstants.XMargin &&
                             Math.abs(tpose.get().yaw) < BoardAlignmentConstants.RotMargin) {
+                        aligned = true;
                         break;
                     }
 
