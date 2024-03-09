@@ -1052,7 +1052,7 @@ public abstract class AutoBase extends LinearOpMode {
                                 robot.drive.actionBuilder(robot.drive.pose, TrajectorySpeed.FAST)
                                         .strafeToLinearHeading(new Vector2d(20, NearLocationConstants.BackCloseLaneY * c), Math.toRadians(180))
                                         .strafeToLinearHeading(new Vector2d(25, NearLocationConstants.BackCloseLaneY * c), Math.toRadians(180 - 20 * c))
-                                        .strafeToLinearHeading(new Vector2d(59, isBlue ? 53 * c : 63 * c), Math.toRadians(0))
+                                        .strafeToLinearHeading(new Vector2d(59, isBlue ? 56 * c : 63 * c), Math.toRadians(0))
                                         .build()
                         )
                 );
@@ -1062,7 +1062,7 @@ public abstract class AutoBase extends LinearOpMode {
                 robot.claw.open();
                 Actions.runBlocking(
                         robot.drive.actionBuilder(robot.drive.pose)
-                                .strafeToLinearHeading(new Vector2d(NearLocationConstants.ParkX, isBlue ? 56 * c : 67 * c), Math.toRadians(0))
+                                .strafeToLinearHeading(new Vector2d(NearLocationConstants.ParkX, isBlue ? 60 * c : 67 * c), Math.toRadians(0))
                                 .build()
                 );
                 break;
