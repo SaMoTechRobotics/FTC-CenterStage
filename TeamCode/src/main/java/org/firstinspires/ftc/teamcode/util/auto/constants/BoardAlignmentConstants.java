@@ -13,7 +13,7 @@ public class BoardAlignmentConstants {
 
     public static double FindSpeed = 0.3;
 
-    public static double XMargin = 1;
+    public static double XMargin = 0.2;
     public static double YMargin = 1;
     public static double RotMargin = 4;
 }

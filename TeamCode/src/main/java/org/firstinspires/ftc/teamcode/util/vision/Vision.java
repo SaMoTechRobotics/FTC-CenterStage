@@ -31,8 +31,8 @@ public class Vision {
 //        frontCamera = hardwareMap.get(WebcamName.class, "Webcam 2");
 //        backCamera = hardwareMap.get(WebcamName.class, "Webcam 1");
 
-//        frontCamera = hardwareMap.get(WebcamName.class, new UsbSerialNumber("6234BF60"));
-        frontCamera = hardwareMap.get(WebcamName.class, new UsbSerialNumber("SN0001"));
+        frontCamera = hardwareMap.get(WebcamName.class, new UsbSerialNumber("6234BF60"));
+//        frontCamera = hardwareMap.get(WebcamName.class, new UsbSerialNumber("SN0001"));
         backCamera = hardwareMap.get(WebcamName.class, new UsbSerialNumber("UC762"));
     }
 

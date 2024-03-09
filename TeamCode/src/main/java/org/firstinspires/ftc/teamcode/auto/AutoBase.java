@@ -99,7 +99,7 @@ public abstract class AutoBase extends LinearOpMode {
          * The locations of where the robot should be to deliver the spike mark
          * Order: Inner X, Center Y, Outer X
          */
-        public static double[] blueSpikeMarks = new double[]{-29, 31, -42.5};
+        public static double[] blueSpikeMarks = new double[]{-29, 31, -41};
         public static double[] redSpikeMarks = new double[]{-30.5, 31, -44};
 
         // Order: Inner Y, Center Y, Outer Y
@@ -398,9 +398,9 @@ public abstract class AutoBase extends LinearOpMode {
                                         )
                                         .splineToSplineHeading(
                                                 new Pose2d(outerX, (32 + 4) * c, Math.toRadians(startHeading - 45 * c)),
-                                                Math.toRadians(startHeading - 45 * c),
-                                                robot.drive.getSpeedConstraint(TrajectorySpeed.NORMAL).velConstraint,
-                                                robot.drive.getSpeedConstraint(TrajectorySpeed.SLOW).accelConstraint
+                                                Math.toRadians(startHeading - 45 * c)
+//                                                robot.drive.getSpeedConstraint(TrajectorySpeed.NORMAL).velConstraint,
+//                                                robot.drive.getSpeedConstraint(TrajectorySpeed.SLOW).accelConstraint
                                         )
                                         .strafeToLinearHeading(
                                                 new Vector2d(outerX, 32 * c),
@@ -421,7 +421,9 @@ public abstract class AutoBase extends LinearOpMode {
                                 robot.drive.actionBuilder(new Pose2d(-36, 48 * c, Math.toRadians(startHeading - 45 * c)))
                                         .splineToLinearHeading(
                                                 new Pose2d(-50, stackY * c, Math.toRadians(180)),
-                                                Math.toRadians(0)
+                                                Math.toRadians(0),
+                                                robot.drive.getSpeedConstraint(TrajectorySpeed.NORMAL).velConstraint,
+                                                robot.drive.getSpeedConstraint(TrajectorySpeed.SLOW).accelConstraint
                                         )
                                         .build(),
                                 robot.drive.actionBuilder(new Pose2d(-50 + 2, stackY * c, Math.toRadians(180)), TrajectorySpeed.SLOW)
@@ -632,7 +634,7 @@ public abstract class AutoBase extends LinearOpMode {
             if (whiteTag == BoardPosition.INNER) {
                 placeOffset += (isBlue ? 2 : 1) * c;
             } else if (whiteTag == BoardPosition.OUTER) {
-                placeOffset -= 1 * c;
+                placeOffset -= 1.2 * c;
             }
 
 
