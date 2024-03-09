@@ -5,6 +5,7 @@ import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.Servo;
 import org.firstinspires.ftc.teamcode.util.auto.RobotStorage;
 import org.firstinspires.ftc.teamcode.util.lib.FieldOverlayUtils;
 import org.firstinspires.ftc.teamcode.util.lib.GamepadButton;
@@ -14,6 +15,7 @@ import org.firstinspires.ftc.teamcode.util.robot.arm.ArmRotation;
 import org.firstinspires.ftc.teamcode.util.robot.arm.ArmSpeed;
 import org.firstinspires.ftc.teamcode.util.robot.arm.WristRotation;
 import org.firstinspires.ftc.teamcode.util.robot.chassis.ChassisSpeed;
+import org.firstinspires.ftc.teamcode.util.robot.claw.ClawPosition;
 
 
 @Config
@@ -30,6 +32,9 @@ public class Drive extends LinearOpMode {
         robot = new Robot(hardwareMap);
         robot.arm.lockDrone();
         robot.claw.open();
+
+        Servo usbServo = hardwareMap.get(Servo.class, "usbServo");
+        usbServo.setPosition(ClawPosition.UsbPulledOut);
 
         RobotStorage.armUp = false;
 
@@ -181,7 +186,7 @@ public class Drive extends LinearOpMode {
 
             // Wrist Controls (Gamepad 2)
 
-            if (gamepad2Buttons.wasJustPressed(GamepadButton.B)) {
+            if (gamepad2.right_trigger > 0.1 && gamepad2Buttons.wasJustPressed(GamepadButton.B)) {
                 robot.wristLevelingEnabled = false;
                 robot.arm.setGlobalWristRotation(false);
                 robot.arm.setWristRotation(WristRotation.PickupBack);
