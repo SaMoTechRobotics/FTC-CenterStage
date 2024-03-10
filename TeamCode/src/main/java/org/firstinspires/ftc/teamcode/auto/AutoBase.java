@@ -40,6 +40,8 @@ import java.util.Timer;
  *             |    |       | |              |
  *             ------------------------------
  *                         BLUE
+ *
+ * Auto worked great, perfect every match except when alliance partner interfered.
  */
 @Config
 public abstract class AutoBase extends LinearOpMode {
