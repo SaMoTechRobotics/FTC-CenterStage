@@ -17,6 +17,8 @@ public class Arm {
 
     private int startingRotation = 0;
 
+    public boolean isHanging = false;
+
     private double boardAngle = WristRotation.DefaultBoardAngle;
 
     public Arm(HardwareMap hardwareMap) {
@@ -83,6 +85,10 @@ public class Arm {
 
     public void updateSpeed() {
         if (armMotors.getMode() != DcMotor.RunMode.RUN_TO_POSITION) return;
+        if (isHanging) {
+            armMotors.setPower(ArmSpeed.Max);
+            return;
+        }
         double conversion = (90.0 / ArmRotation.TicksAt90Degrees);
         double current = armMotors.getCurrentPosition() * conversion;
         double target = armMotors.getTargetPosition() * conversion;

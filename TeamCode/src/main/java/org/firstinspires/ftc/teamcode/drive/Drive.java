@@ -179,6 +179,7 @@ public class Drive extends LinearOpMode {
             // Hang Controls (Gamepad 1)
 
             if (gamepad1Buttons.wasJustPressed(GamepadButton.Y)) {
+                robot.arm.isHanging = true;
                 robot.arm.setHangingLock(true);
             } else if (gamepad1Buttons.wasJustPressed(GamepadButton.A)) {
                 robot.arm.setHangingLock(false);
