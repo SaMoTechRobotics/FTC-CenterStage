@@ -18,6 +18,7 @@ import org.firstinspires.ftc.teamcode.util.auto.AutoSide;
 import org.firstinspires.ftc.teamcode.util.auto.BoardPosition;
 import org.firstinspires.ftc.teamcode.util.auto.RobotStorage;
 import org.firstinspires.ftc.teamcode.util.auto.constants.BoardAlignmentConstants;
+import org.firstinspires.ftc.teamcode.util.robot.AutoChassis;
 import org.firstinspires.ftc.teamcode.util.robot.AutoRobot;
 import org.firstinspires.ftc.teamcode.util.robot.arm.ArmRotation;
 import org.firstinspires.ftc.teamcode.util.robot.arm.ArmSpeed;
@@ -29,16 +30,16 @@ import java.util.Optional;
 import java.util.Timer;
 
 @Autonomous(name = "RR Experiment", group = "Tests")
-public abstract class rrTest extends LinearOpMode {
-    private AutoRobot robot;
+public class rrTest extends LinearOpMode {
+    private AutoChassis robot;
     @Override
     public void runOpMode() {
         Pose2d startPose = new Pose2d(0, 0, Math.toRadians(90));
-        robot = new AutoRobot(hardwareMap, startPose);
+        robot = new AutoChassis(hardwareMap, startPose);
 
-        while(!isStarted() && !isStopRequested())
-        {
-            idle();
+        while(!isStarted() && !isStopRequested()) {
+            telemetry.addLine("e");
+            telemetry.update();
         }
 
         waitForStart();
@@ -48,7 +49,7 @@ public abstract class rrTest extends LinearOpMode {
         Actions.runBlocking(
                 new SequentialAction(
                         robot.drive.actionBuilder(robot.drive.pose)
-                                .strafeToLinearHeading(new Vector2d(12, 12), Math.toRadians(0))
+                                .strafeToLinearHeading(new Vector2d(12, 12), Math.toRadians(0), robot.drive.getSpeedConstraint(TrajectorySpeed.SLOW).velConstraint)
                                 .build()
                 )
         );
